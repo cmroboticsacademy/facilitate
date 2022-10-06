@@ -1,0 +1,16 @@
+         1998606978 function calls in 500.003 seconds
+
+   Ordered by: cumulative time
+   List reduced from 58 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000  500.003  500.003 {built-in method builtins.exec}
+        1    0.000    0.000  500.003  500.003 <string>:1(<module>)
+        1    0.000    0.000  500.003  500.003 2581721743.py:65(print_ast_changes_over_time)
+        1  136.477  136.477  500.002  500.002 808562402.py:16(gumtree)
+239832676  126.756    0.000  219.117    0.000 3630955796.py:37(__eq__)
+159888450   37.321    0.000  162.780    0.000 3630955796.py:52(count_subtree_occurences)
+159888452   45.118    0.000   82.405    0.000 808562402.py:1(get_max_key)
+239832675   69.418    0.000   69.418    0.000 3630955796.py:1(equal_ignore_order)
+639554116   32.059    0.000   32.059    0.000 {built-in method builtins.len}
+159888452   25.946    0.000   25.946    0.000 {built-in method builtins.max}
