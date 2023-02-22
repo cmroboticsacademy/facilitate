@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 from typing import Any
 import bisect
 pd.set_option("display.max_colwidth", 0)
+import textwrap
 # from IPython.core.display import display, HTML
 # display(HTML("<style>div.output_scroll { height: 100em; }</style>"))
 
@@ -57,6 +58,17 @@ class Episode():
         self.episode_data = ed
         self.program = program_rep
         self.challenge_name = challenge_name
+
+    def get_top_level_blocks(self) -> list[Block]:
+        heads = []
+        blocks = json.loads(self.program)['targets'][0]['blocks']
+        for bid, bi in blocks.items():
+            if bi["topLevel"]:
+                heads.append(bid)
+        return heads
+
+
+
     def __str__(self):
         return str(ed)
         
@@ -205,7 +217,6 @@ def find_session(userid:int, challengename:str) -> list:
 sesh = find_session(1927379, "spike_curric_turn_around_craters_mini_challenge")
 json.loads(sesh[1].program)['targets'][0]['blocks']['!QNn08d3nL#%E%[LEByz'].keys()
 
-
 # In[15]:
 
 
@@ -227,26 +238,72 @@ def print_program_changes_over_time(userid:int, challengename:str):
             prev_fields = fields
             print("------------")
 
+# In[16]
+
+print_program_changes_over_time(1947078, "spike_curric_turn_around_craters_mini_challenge")
+
+
+# In[17]
+
+def print_programs(userid:int, challengename:str):
+    for episode in find_session(userid, challengename):
+        print(episode.passing)
+
+        if len(episode.program) > 0:
+            heads = episode.get_top_level_blocks()
+            blocks = json.loads(episode.program)['targets'][0]['blocks']
+            for h in heads:
+                b = blocks[h]
+                print(b["opcode"], b["inputs"], b["fields"])
+                while b["next"] is not None:
+                    b = blocks[b["next"]]
+                    print(b["opcode"], b["inputs"], b["fields"])
+            print()
+            for k, v in blocks.items():
+                print(k, v)
+        print("--------")
+
+
+print_programs(1947084, "spike_curric_vacuum_mini_challenge")
+# 1947124
+# 1927379
+# 1947087
+
+
 
 # # AST
+
 
 # In[19]:
 
 
 class ASTNode:
     def __init__(self):
-        self.parent = None
-        self.blockid = None
-        self.op = None
-        self.children = []
-        self._height = 1
+        pass
         
-    def __init__(self, parent, blockid, desc, children):
+    @staticmethod
+    def from_descriptor(self, parent, blockid, op):
+        self.parentid = parent.blockid
         self.parent = parent
         self.blockid = blockid
-        self.op = desc
-        self.children = sorted(children, key=lambda n: n.blockid)
-        self._height = self.__height__()
+        self.nextid = None
+        self.op = op
+        self.children = []
+        self._height = -1
+        self.next = None
+        return self
+
+    @staticmethod
+    def from_db(self, blockid, block, parent):
+        self.parentid = block["parent"]
+        self.parent = parent
+        self.blockid = blockid
+        self.nextid = block["next"]
+        self.op = block["opcode"]
+        self.children = []
+        self._height = -1 #TODO: will need to reset once next is set
+        self.next = None
+        return self
     
     def accept(self, visit_func:Callable[['ASTNode'],None]):
         visit_func(self)
@@ -266,12 +323,12 @@ class ASTNode:
         return self.children == other.children
     
     def __height__(self):
-        if len(self.children) == 0:
+        if len(self.children) == 0 and self.next is None:
             return 1
-        return max([c.height() for c in self.children]) + 1
+        return max([c.height() for c in self.children] + [self.next.height() if self.next is not None else 0]) + 1
     
-    def height(self):
-        return self._height
+    # def height(self):
+    #     return self._height # TODO: probably not set properly
     
     def count_subtree_occurences(self, other:'ASTNode'):
         if other._height > self._height:
@@ -290,233 +347,296 @@ class ASTNode:
             
     def get_descendants(self):
         return [s for s in self.iter_descendants()]
-    
-    def __str__(self):
-        return f"ASTNode: {self.blockid} {self.op}\n\tParent: {self.parent.blockid if self.parent else None}, {len(self.children)} children"
-    
 
+    def full_str(self):
+        tab = "    "
+        return f"ASTNode: {self.blockid} {self.op}\n{tab}Parent: {self.parent.blockid if self.parent else None}, {len(self.children)} children\n" + \
+            "\n".join([f"{textwrap.indent(str(c), tab)}" for c in self.children]) + \
+                f"\n{str(self.next)}"
 
-# In[20]:
+    def __repr__(self):
+        tab = "    "
+        return f"{self.op}\n" + \
+            "\n".join([f"{textwrap.indent(str(c), tab)}" for c in self.children]) + \
+                f"\n{str(self.next)}"
 
-
-def get_max_key(pq:defaultdict)->int:
-    return max(pq.keys())
-
-def insert_pq(pq:defaultdict, n:ASTNode):
-    pq[n.height()].append(n)
     
-def dice(parent1:ASTNode, parent2:ASTNode, mappings: list):
-    desc1 = parent1.get_descendants()
-    desc2 = parent2.get_descendants()
-    
-    contained_mappings = [(t1, t2) for (t1, t2) in mappings
-                           if (t1 in desc1 and t2 in desc2)]
-    return 2*len(contained_mappings) / (len(desc1) + len(desc2))
-    
-
-def gumtree(head1:ASTNode, head2:ASTNode):
-    # top down phase
-    subtree_queue1 = defaultdict(list) # dict { height : [subtrees with that height]
-    subtree_queue2 = defaultdict(list)
-    
-    candidate_mappings = []
-    mappings = []
-    
-    
-    insert_pq(subtree_queue1, head1)
-    insert_pq(subtree_queue2, head2)
-    
-    while len(subtree_queue1)> 0 and len(subtree_queue2) > 0:
-        maxheight1 = get_max_key(subtree_queue1)
-        maxheight2 = get_max_key(subtree_queue2)
-        
-        if maxheight1 != maxheight2:
-            if maxheight1 > maxheight2:
-                maxtrees = subtree_queue1[maxheight1]
-                del subtree_queue1[maxheight1]
-                for t in maxtrees:
-                    for c in t.children:
-                        insert_pq(subtree_queue1, c)
-            else:
-                maxtrees = subtree_queue2[maxheight2]
-                del subtree_queue2[maxheight2]
-                for t in maxtrees:
-                    for c in t.children:
-                        insert_pq(subtree_queue2, c)
+def build_ast(blocks, blockid, parent):
+    n = ASTNode.from_db(ASTNode(), blockid, blocks[blockid], parent)
+    n.parent = parent
+    for k, v in blocks[blockid]["inputs"].items():
+        subid = f'{blockid}_{k}'
+        # some blocks probably have linked blocks; I'm hard coding these for now
+        if k in ["DIRECTION", "CONDITION", 'MOTOR', 'custom_block', "SPIN_DIRECTIONS", "PORT", "COLOR", "HEADING"] and \
+            isinstance(v, list) and len(v) >=2 and isinstance(v[1], str) and len(v[1]) >= 18:
+                # 'DIRECTION': [1, '_lJfZG9d@jI-O/I~%=Lx']
+                # check this is in fact a id
+                n_child = ASTNode.from_descriptor(ASTNode(), n, subid, (k, v))
+                sub_block = build_ast(blocks, v[1], n_child)
+                n_child.children.append(sub_block)
+                n.children.append(n_child)
         else:
-            maxtrees1 = subtree_queue1[maxheight1]
-            maxtrees2 = subtree_queue2[maxheight2]
-            added_trees1 = []
-            added_trees2 = []
-            for t1 in maxtrees1:
-                for t2 in maxtrees2:
-                    if t1 == t2:
-                        if head1.count_subtree_occurences(t2) > 1 or                         head2.count_subtree_occurences(t1) > 1:
-                            candidate_mappings.append((t1, t2))
-                        else:
-                            mappings.append((t1, t2))
-                        added_trees1.append(t1)
-                        added_trees2.append(t2)
-            for t in maxtrees1:
-                if t not in added_trees1:
-                    for c in t.children:
-                        insert_pq(subtree_queue1, c)
-            for t in maxtrees2:
-                if t not in added_trees2:
-                    for c in t.children:
-                        insert_pq(subtree_queue2, c)
-    sorted_candidates = sorted(candidate_mappings, 
-                               key = lambda t1, t2: dice(t1.parent, t2.parent, mappings),
-                               reverse=True)
-    while len(sorted_candidates) > 0:
-        top = sorted_candidates[0]
-        del sorted_candidates[0]
-        mappings.append(top)
-        sorted_candidates = [s for s in sorted_candidates                              if s[0]!=top[0] and s[1] != top[1]]
-    
-    # bottom up
-    matched1 = [t[0] for t in mappings]
-    matched2 = [t[1] for t in mappings]
-    def bottom_up_helper(node:ASTNode):
-        if node not in matched1:
-            mapped_child = False
-            for c in node.children:
-                if c in matched1:
-                    mapped_child = True
-                    break
-            if mapped_child:
-                candidates = []
-                head2.accept(lambda n : 
-                             n.op == node.op and n.blockid == node.blockid and n not in matched2 and candidates.append(n))
-                candidates = sorted(candidates,
-                                    key = lambda t2: dice(node, t2, mappings),
-                                    reverse=True)
-                if len(candidates) > 0 and dice(node, candidates[0], mappings) > 0.45:
-                    mappings.append(node, candidates[0])
-                    # here the original gumtree algorithm uses an edit script algorithm to find 
-                    # further mappings for trees under a certain size, but all these programs are small
-                    # so I don't anticipate needing that
-    node1.accept_postorder(bottom_up_helper)
-    return mappings
+            n_child = ASTNode.from_descriptor(ASTNode(), n, subid, (k, v))
+            n.children.append(n_child)
+    for k, v in blocks[blockid]["fields"].items():
+        subid = f'{blockid}_{k}'
+        # some blocks probably have linked blocks; I'm hard coding these for now
+        if k in ["PORT"] and \
+            isinstance(v, list) and len(v) >=2 and isinstance(v[1], str) and len(v[1]) >= 18:
+            # 'DIRECTION': [1, '_lJfZG9d@jI-O/I~%=Lx']
+            n_child = ASTNode.from_descriptor(ASTNode(), n, subid, (k, v))
+            sub_block = build_ast(blocks, v[1], n_child)
+            n_child.children.append(sub_block)
+            n.children.append(n_child)
+        else:
+            n_child = ASTNode.from_descriptor(ASTNode(), n, subid, (k, v))
+            n.children.append(n_child)
 
+    if n.nextid is None:
+        n.next = None
+    else:
+        n.next = build_ast(blocks, n.nextid, n)
 
-# In[21]:
-
-
-def build_ast_tree(program_blocks:dict):
-    root_node = None
-    nodes = {} # block id: node
-    for blockid, block in program_blocks.items():
-        parent_id = block["parent"]
-        desc = block["opcode"]
-        child_id = block["next"]
-        
-        node = ASTNode(None, blockid, desc, [])
-        
-        if parent_id in nodes:
-            node.parent = nodes[parent_id]
-            nodes[parent_id].children.append(node)
+    return n
             
-        if child_id in nodes:
-            node.children.append(nodes[child_id])
+
+
+def build_ast_from_episode(episode):
+    if len(episode.program) > 0:
+        heads = episode.get_top_level_blocks()
+        blocks = json.loads(episode.program)['targets'][0]['blocks']
+        asts = []
+        for h in heads:
+            n = build_ast(blocks, h, None)
+            asts.append(n)
+        return asts
+    return []
+
+# In[21]
+
+# 1947126
+for episode in find_session(1947081, "spike_curric_exploring_a_disaster_site_challenge"):
+    print(episode.passing)
+    print("\n------".join([str(n) for n in build_ast_from_episode(episode)]))
+    print("------------------------")
+
+# In[21]
+
+### Needs updating with new AST structure (next and children are separated)
+
+
+# def get_max_key(pq:defaultdict)->int:
+#     return max(pq.keys())
+
+# def insert_pq(pq:defaultdict, n:ASTNode):
+#     pq[n.height()].append(n)
+    
+# def dice(parent1:ASTNode, parent2:ASTNode, mappings: list):
+#     desc1 = parent1.get_descendants()
+#     desc2 = parent2.get_descendants()
+    
+#     contained_mappings = [(t1, t2) for (t1, t2) in mappings
+#                            if (t1 in desc1 and t2 in desc2)]
+#     return 2*len(contained_mappings) / (len(desc1) + len(desc2))
+    
+
+# def gumtree(head1:ASTNode, head2:ASTNode):
+#     # top down phase
+#     subtree_queue1 = defaultdict(list) # dict { height : [subtrees with that height]
+#     subtree_queue2 = defaultdict(list)
+    
+#     candidate_mappings = []
+#     mappings = []
+    
+    
+#     insert_pq(subtree_queue1, head1)
+#     insert_pq(subtree_queue2, head2)
+    
+#     while len(subtree_queue1)> 0 and len(subtree_queue2) > 0:
+#         maxheight1 = get_max_key(subtree_queue1)
+#         maxheight2 = get_max_key(subtree_queue2)
         
-        for k, v in block["fields"].items():
-            id_num = blockid+"_field_"+str(k)
-            field_node = ASTNode(None, id_num, k, [])
-            field_child_node = ASTNode(field_node, id_num+"_value", v, [])
-            field_node.children.append(field_child_node)
-            node.children.append(field_node)
-            
-        for k, v in block["inputs"].items():
-            id_num = blockid+"_input_"+str(k)
-            input_node = ASTNode(None, id_num, k, [])
-            input_child_node = ASTNode(input_node, id_num+"_value", v, [])
-            input_node.children.append(input_child_node)
-            node.children.append(input_node)
+#         if maxheight1 != maxheight2:
+#             if maxheight1 > maxheight2:
+#                 maxtrees = subtree_queue1[maxheight1]
+#                 del subtree_queue1[maxheight1]
+#                 for t in maxtrees:
+#                     for c in t.children:
+#                         insert_pq(subtree_queue1, c)
+#             else:
+#                 maxtrees = subtree_queue2[maxheight2]
+#                 del subtree_queue2[maxheight2]
+#                 for t in maxtrees:
+#                     for c in t.children:
+#                         insert_pq(subtree_queue2, c)
+#         else:
+#             maxtrees1 = subtree_queue1[maxheight1]
+#             maxtrees2 = subtree_queue2[maxheight2]
+#             added_trees1 = []
+#             added_trees2 = []
+#             for t1 in maxtrees1:
+#                 for t2 in maxtrees2:
+#                     if t1 == t2:
+#                         if head1.count_subtree_occurences(t2) > 1 or                         head2.count_subtree_occurences(t1) > 1:
+#                             candidate_mappings.append((t1, t2))
+#                         else:
+#                             mappings.append((t1, t2))
+#                         added_trees1.append(t1)
+#                         added_trees2.append(t2)
+#             for t in maxtrees1:
+#                 if t not in added_trees1:
+#                     for c in t.children:
+#                         insert_pq(subtree_queue1, c)
+#             for t in maxtrees2:
+#                 if t not in added_trees2:
+#                     for c in t.children:
+#                         insert_pq(subtree_queue2, c)
+#     sorted_candidates = sorted(candidate_mappings, 
+#                                key = lambda t1, t2: dice(t1.parent, t2.parent, mappings),
+#                                reverse=True)
+#     while len(sorted_candidates) > 0:
+#         top = sorted_candidates[0]
+#         del sorted_candidates[0]
+#         mappings.append(top)
+#         sorted_candidates = [s for s in sorted_candidates                              if s[0]!=top[0] and s[1] != top[1]]
     
-        nodes[blockid] = node
+#     # bottom up
+#     matched1 = [t[0] for t in mappings]
+#     matched2 = [t[1] for t in mappings]
+#     def bottom_up_helper(node:ASTNode):
+#         if node not in matched1:
+#             mapped_child = False
+#             for c in node.children:
+#                 if c in matched1:
+#                     mapped_child = True
+#                     break
+#             if mapped_child:
+#                 candidates = []
+#                 head2.accept(lambda n : 
+#                              n.op == node.op and n.blockid == node.blockid and n not in matched2 and candidates.append(n))
+#                 candidates = sorted(candidates,
+#                                     key = lambda t2: dice(node, t2, mappings),
+#                                     reverse=True)
+#                 if len(candidates) > 0 and dice(node, candidates[0], mappings) > 0.45:
+#                     mappings.append(node, candidates[0])
+#                     # here the original gumtree algorithm uses an edit script algorithm to find 
+#                     # further mappings for trees under a certain size, but all these programs are small
+#                     # so I don't anticipate needing that
+#     node1.accept_postorder(bottom_up_helper)
+#     return mappings
+
+
+# # In[21]:
+
+
+# def build_ast_tree(program_blocks:dict):
+#     root_node = None
+#     nodes = {} # block id: node
+#     for blockid, block in program_blocks.items():
+#         parent_id = block["parent"]
+#         desc = block["opcode"]
+#         child_id = block["next"]
         
-        if block["topLevel"] and desc == "event_whenprogramstarts":
-            root_node = node
-    return root_node
-
-def edit_script(mappings, root1, root2):
-    removed = []
-    added = []
-    mappings1 = [m[0] for m in mappings]
-    mappings2 = [m[1] for m in mappings]
-    
-    def find_unmapped_nodes(map_list:list, results:list, node:ASTNode):
-        if node not in map_list:
-            results.append(node)
-    
-    def find_removed_nodes(n):
-        find_unmapped_nodes(mappings1, removed, n)
-    
-    def find_added_nodes(n):
-        find_unmapped_nodes(mappings2, added, n)
-    
-    return removed, added
-
-def print_edit_script(removed, added):
-    print("Removed:")
-    for node in removed:
-        print(node)
-    print("Added")
-    for node in added:
-        print(node)
-    
-
-def print_ast_changes_over_time(userid:int, challengename:str):
-    prev_episode = None
-    for episode in find_session(userid, challengename):
-        if len(episode.program) > 0:
-            blocks = json.loads(episode.program)['targets'][0]['blocks']
+#         node = ASTNode(None, blockid, desc, [])
+        
+#         if parent_id in nodes:
+#             node.parent = nodes[parent_id]
+#             nodes[parent_id].children.append(node)
             
-#             print(blocks)
-            root = build_ast_tree(blocks)
-#             print(root)
-            if prev_episode is not None:
-                mappings = gumtree(prev_episode, root)
-                print(edit_script(mappings, prev_episode, root))
-            prev_episode = root
-            print("------------")
+#         if child_id in nodes:
+#             node.children.append(nodes[child_id])
+        
+#         for k, v in block["fields"].items():
+#             id_num = blockid+"_field_"+str(k)
+#             field_node = ASTNode(None, id_num, k, [])
+#             field_child_node = ASTNode(field_node, id_num+"_value", v, [])
+#             field_node.children.append(field_child_node)
+#             node.children.append(field_node)
+            
+#         for k, v in block["inputs"].items():
+#             id_num = blockid+"_input_"+str(k)
+#             input_node = ASTNode(None, id_num, k, [])
+#             input_child_node = ASTNode(input_node, id_num+"_value", v, [])
+#             input_node.children.append(input_child_node)
+#             node.children.append(input_node)
+    
+#         nodes[blockid] = node
+        
+#         if block["topLevel"] and desc == "event_whenprogramstarts":
+#             root_node = node
+#     return root_node
+
+# def edit_script(mappings, root1, root2):
+#     removed = []
+#     added = []
+#     mappings1 = [m[0] for m in mappings]
+#     mappings2 = [m[1] for m in mappings]
+    
+#     def find_unmapped_nodes(map_list:list, results:list, node:ASTNode):
+#         if node not in map_list:
+#             results.append(node)
+    
+#     def find_removed_nodes(n):
+#         find_unmapped_nodes(mappings1, removed, n)
+    
+#     def find_added_nodes(n):
+#         find_unmapped_nodes(mappings2, added, n)
+    
+#     return removed, added
+
+# def print_edit_script(removed, added):
+#     print("Removed:")
+#     for node in removed:
+#         print(node)
+#     print("Added")
+#     for node in added:
+#         print(node)
+    
+
+# def print_ast_changes_over_time(userid:int, challengename:str):
+#     prev_episode = None
+#     for episode in find_session(userid, challengename):
+#         if len(episode.program) > 0:
+#             blocks = json.loads(episode.program)['targets'][0]['blocks']
+            
+# #             print(blocks)
+#             root = build_ast_tree(blocks)
+# #             print(root)
+#             if prev_episode is not None:
+#                 mappings = gumtree(prev_episode, root)
+#                 print(edit_script(mappings, prev_episode, root))
+#             prev_episode = root
+#             print("------------")
 
 
-# In[22]:
+# # In[23]:
 
 
-# possible indicators of struggling/good performing
+# import signal
+# from contextlib import contextmanager
 
 
-# In[23]:
+# @contextmanager
+# def timeout(time):
+#     # Register a function to raise a TimeoutError on the signal.
+#     signal.signal(signal.SIGALRM, raise_timeout)
+#     # Schedule the signal to be sent after ``time``.
+#     signal.alarm(time)
+
+#     try:
+#         yield
+#     except TimeoutError:
+#         pass
+#     finally:
+#         # Unregister the signal so it won't be triggered
+#         # if the timeout is not reached.
+#         signal.signal(signal.SIGALRM, signal.SIG_IGN)
 
 
-import signal
-from contextlib import contextmanager
+# def raise_timeout(signum, frame):
+#     raise TimeoutError
 
 
-@contextmanager
-def timeout(time):
-    # Register a function to raise a TimeoutError on the signal.
-    signal.signal(signal.SIGALRM, raise_timeout)
-    # Schedule the signal to be sent after ``time``.
-    signal.alarm(time)
-
-    try:
-        yield
-    except TimeoutError:
-        pass
-    finally:
-        # Unregister the signal so it won't be triggered
-        # if the timeout is not reached.
-        signal.signal(signal.SIGALRM, signal.SIG_IGN)
-
-
-def raise_timeout(signum, frame):
-    raise TimeoutError
-
-
-def test():
-    with timeout(500):
-        print_ast_changes_over_time(1927379, "spike_curric_turn_around_craters_mini_challenge")
+# def test():
+#     with timeout(500):
+#         print_ast_changes_over_time(1927379, "spike_curric_turn_around_craters_mini_challenge")
