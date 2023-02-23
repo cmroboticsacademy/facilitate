@@ -1,0 +1,3 @@
+# packages in environment at /home/leo/anaconda3/envs/facilitate:
+#
+# Name                    Version                   Build  Channel
