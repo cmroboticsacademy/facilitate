@@ -1,6 +1,5 @@
 from parsing.ast import ASTNode
 from collections import defaultdict, Counter
-from collections.abc import Callable
 from queue import PriorityQueue
 
 

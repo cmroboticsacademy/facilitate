@@ -1,11 +1,15 @@
-from ast import ASTNode
+from parsing.ast import ASTNode, OpCodes
 
 def build_ast_tree(program_blocks:dict):
     root_node = None
     nodes = {} # block id: node
     for blockid, block in program_blocks.items():
         parent_id = block["parent"]
-        desc = block["opcode"]
+        oc = block["opcode"]
+        try:
+            desc = OpCodes[oc]
+        except:
+            desc = oc
         child_id = block["next"]
         
         node = ASTNode(None, blockid, desc, [])
@@ -33,6 +37,6 @@ def build_ast_tree(program_blocks:dict):
     
         nodes[blockid] = node
         
-        if block["topLevel"] and desc == "event_whenprogramstarts":
+        if block["topLevel"] and desc == OpCodes.event_whenprogramstarts:
             root_node = node
     return root_node

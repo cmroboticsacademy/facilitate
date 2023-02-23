@@ -1,0 +1,524 @@
+{
+  "targets": [
+    {
+      "isStage": true,
+      "name": "Stage",
+      "variables": {
+        "`jEk@4|i[#Fk?(8x)AV.-my variable": [
+          "my variable",
+          0
+        ]
+      },
+      "lists": {},
+      "broadcasts": {},
+      "blocks": {
+        "io9Jcf3?[Z3`[$L)5Zbd": {
+          "opcode": "event_whenprogramstarts",
+          "next": "0z(.tYRa{!SepmI$)#U,",
+          "parent": null,
+          "inputs": {},
+          "fields": {},
+          "shadow": false,
+          "topLevel": true,
+          "x": 69,
+          "y": 53
+        },
+        "0z(.tYRa{!SepmI$)#U,": {
+          "opcode": "spike_movemenet_direction",
+          "next": "8JDo}mJ%HU*F^eT)9li:",
+          "parent": "io9Jcf3?[Z3`[$L)5Zbd",
+          "inputs": {
+            "DIRECTION": [
+              1,
+              "x:e}MT(JcdrCU9-b]!D?"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "x:e}MT(JcdrCU9-b]!D?": {
+          "opcode": "spike_movement_direction_picker",
+          "next": null,
+          "parent": "0z(.tYRa{!SepmI$)#U,",
+          "inputs": {},
+          "fields": {
+            "SPIN_DIRECTIONS": [
+              "forward",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "8JDo}mJ%HU*F^eT)9li:": {
+          "opcode": "control_wait_until",
+          "next": "iGEvR$b[2QHK#2K`bkrB",
+          "parent": "0z(.tYRa{!SepmI$)#U,",
+          "inputs": {
+            "CONDITION": [
+              2,
+              "?kegHpYMl}a-h4_m8Ve4"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "?kegHpYMl}a-h4_m8Ve4": {
+          "opcode": "spike_sensor_is_pressed",
+          "next": null,
+          "parent": "8JDo}mJ%HU*F^eT)9li:",
+          "inputs": {
+            "PORT": [
+              1,
+              "6D.mq-}FNkcpkuTweX|b"
+            ]
+          },
+          "fields": {
+            "STATE": [
+              "pressed",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "6D.mq-}FNkcpkuTweX|b": {
+          "opcode": "spike_sensor_port_menu",
+          "next": null,
+          "parent": "?kegHpYMl}a-h4_m8Ve4",
+          "inputs": {},
+          "fields": {
+            "PORT": [
+              "E",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "iGEvR$b[2QHK#2K`bkrB": {
+          "opcode": "spike_movemenet_direction_for_duration",
+          "next": "Bs]SL)6S`k(hLjl*Cz,$",
+          "parent": "8JDo}mJ%HU*F^eT)9li:",
+          "inputs": {
+            "DIRECTION": [
+              1,
+              "T$b^Tq0.mV9wdws.DA@["
+            ],
+            "RATE": [
+              1,
+              [
+                4,
+                "8"
+              ]
+            ]
+          },
+          "fields": {
+            "UNITS": [
+              "cm",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "T$b^Tq0.mV9wdws.DA@[": {
+          "opcode": "spike_movement_direction_picker",
+          "next": null,
+          "parent": "iGEvR$b[2QHK#2K`bkrB",
+          "inputs": {},
+          "fields": {
+            "SPIN_DIRECTIONS": [
+              "right",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "Bs]SL)6S`k(hLjl*Cz,$": {
+          "opcode": "spike_movemenet_direction",
+          "next": "}Are5C@zU$,k#,A80|ww",
+          "parent": "iGEvR$b[2QHK#2K`bkrB",
+          "inputs": {
+            "DIRECTION": [
+              1,
+              ";UXN^kcB}()L,w3LFgoL"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        ";UXN^kcB}()L,w3LFgoL": {
+          "opcode": "spike_movement_direction_picker",
+          "next": null,
+          "parent": "Bs]SL)6S`k(hLjl*Cz,$",
+          "inputs": {},
+          "fields": {
+            "SPIN_DIRECTIONS": [
+              "forward",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "}Are5C@zU$,k#,A80|ww": {
+          "opcode": "control_wait_until",
+          "next": ":O(/=jeye9E{vE|o@0qe",
+          "parent": "Bs]SL)6S`k(hLjl*Cz,$",
+          "inputs": {
+            "CONDITION": [
+              2,
+              "nidJdKyZHARft!JOYU[}"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "nidJdKyZHARft!JOYU[}": {
+          "opcode": "spike_sensor_is_pressed",
+          "next": null,
+          "parent": "}Are5C@zU$,k#,A80|ww",
+          "inputs": {
+            "PORT": [
+              1,
+              "Zdo!7Kx)+^*N?qk?x(0P"
+            ]
+          },
+          "fields": {
+            "STATE": [
+              "pressed",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "Zdo!7Kx)+^*N?qk?x(0P": {
+          "opcode": "spike_sensor_port_menu",
+          "next": null,
+          "parent": "nidJdKyZHARft!JOYU[}",
+          "inputs": {},
+          "fields": {
+            "PORT": [
+              "E",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        ":O(/=jeye9E{vE|o@0qe": {
+          "opcode": "spike_movemenet_direction_for_duration",
+          "next": "U$G9M~S)yP?MMH=Y)z1:",
+          "parent": "}Are5C@zU$,k#,A80|ww",
+          "inputs": {
+            "DIRECTION": [
+              1,
+              "d5--.+c(ir]=#q`#x+tX"
+            ],
+            "RATE": [
+              1,
+              [
+                4,
+                "8"
+              ]
+            ]
+          },
+          "fields": {
+            "UNITS": [
+              "cm",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "d5--.+c(ir]=#q`#x+tX": {
+          "opcode": "spike_movement_direction_picker",
+          "next": null,
+          "parent": ":O(/=jeye9E{vE|o@0qe",
+          "inputs": {},
+          "fields": {
+            "SPIN_DIRECTIONS": [
+              "right",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "U$G9M~S)yP?MMH=Y)z1:": {
+          "opcode": "spike_movemenet_direction",
+          "next": "j]U#7^CHJOqlaahe)(2n",
+          "parent": ":O(/=jeye9E{vE|o@0qe",
+          "inputs": {
+            "DIRECTION": [
+              1,
+              "WcFLv%YwG},{pS[|H%,s"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "WcFLv%YwG},{pS[|H%,s": {
+          "opcode": "spike_movement_direction_picker",
+          "next": null,
+          "parent": "U$G9M~S)yP?MMH=Y)z1:",
+          "inputs": {},
+          "fields": {
+            "SPIN_DIRECTIONS": [
+              "forward",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "j]U#7^CHJOqlaahe)(2n": {
+          "opcode": "control_wait_until",
+          "next": "~!j{FGa?zF-y|vZ^4GD4",
+          "parent": "U$G9M~S)yP?MMH=Y)z1:",
+          "inputs": {
+            "CONDITION": [
+              2,
+              "|2BJ{b~692qUEcqDPeVu"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "|2BJ{b~692qUEcqDPeVu": {
+          "opcode": "spike_sensor_is_pressed",
+          "next": null,
+          "parent": "j]U#7^CHJOqlaahe)(2n",
+          "inputs": {
+            "PORT": [
+              1,
+              "C,?2y;lhr:1kj.^xG1vX"
+            ]
+          },
+          "fields": {
+            "STATE": [
+              "pressed",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "C,?2y;lhr:1kj.^xG1vX": {
+          "opcode": "spike_sensor_port_menu",
+          "next": null,
+          "parent": "|2BJ{b~692qUEcqDPeVu",
+          "inputs": {},
+          "fields": {
+            "PORT": [
+              "E",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "~!j{FGa?zF-y|vZ^4GD4": {
+          "opcode": "spike_movemenet_direction_for_duration",
+          "next": "@.isSP-6jVKHiY.#*TM6",
+          "parent": "j]U#7^CHJOqlaahe)(2n",
+          "inputs": {
+            "DIRECTION": [
+              1,
+              "Y)H|V?W:]b;ovMea7h55"
+            ],
+            "RATE": [
+              1,
+              [
+                4,
+                "8"
+              ]
+            ]
+          },
+          "fields": {
+            "UNITS": [
+              "cm",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "Y)H|V?W:]b;ovMea7h55": {
+          "opcode": "spike_movement_direction_picker",
+          "next": null,
+          "parent": "~!j{FGa?zF-y|vZ^4GD4",
+          "inputs": {},
+          "fields": {
+            "SPIN_DIRECTIONS": [
+              "right",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "@.isSP-6jVKHiY.#*TM6": {
+          "opcode": "spike_movemenet_direction",
+          "next": "jR#!l0]kqB%K}fB9a_{O",
+          "parent": "~!j{FGa?zF-y|vZ^4GD4",
+          "inputs": {
+            "DIRECTION": [
+              1,
+              "g^S4/M.eGOY5*O*-;?iR"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "g^S4/M.eGOY5*O*-;?iR": {
+          "opcode": "spike_movement_direction_picker",
+          "next": null,
+          "parent": "@.isSP-6jVKHiY.#*TM6",
+          "inputs": {},
+          "fields": {
+            "SPIN_DIRECTIONS": [
+              "forward",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "jR#!l0]kqB%K}fB9a_{O": {
+          "opcode": "control_wait_until",
+          "next": "Y?t;5vXlQ]dvL,LPjHBG",
+          "parent": "@.isSP-6jVKHiY.#*TM6",
+          "inputs": {
+            "CONDITION": [
+              2,
+              "+9cn]gk)O3l,q*iT,loz"
+            ]
+          },
+          "fields": {},
+          "shadow": false,
+          "topLevel": false
+        },
+        "+9cn]gk)O3l,q*iT,loz": {
+          "opcode": "spike_sensor_is_pressed",
+          "next": null,
+          "parent": "jR#!l0]kqB%K}fB9a_{O",
+          "inputs": {
+            "PORT": [
+              1,
+              "^p+Od{v##FGmPi33Bb8f"
+            ]
+          },
+          "fields": {
+            "STATE": [
+              "pressed",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "^p+Od{v##FGmPi33Bb8f": {
+          "opcode": "spike_sensor_port_menu",
+          "next": null,
+          "parent": "+9cn]gk)O3l,q*iT,loz",
+          "inputs": {},
+          "fields": {
+            "PORT": [
+              "E",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        },
+        "Y?t;5vXlQ]dvL,LPjHBG": {
+          "opcode": "spike_movemenet_direction_for_duration",
+          "next": null,
+          "parent": "jR#!l0]kqB%K}fB9a_{O",
+          "inputs": {
+            "DIRECTION": [
+              1,
+              "$uB%+:F}W6r7bim--nK@"
+            ],
+            "RATE": [
+              1,
+              [
+                4,
+                "8"
+              ]
+            ]
+          },
+          "fields": {
+            "UNITS": [
+              "cm",
+              null
+            ]
+          },
+          "shadow": false,
+          "topLevel": false
+        },
+        "$uB%+:F}W6r7bim--nK@": {
+          "opcode": "spike_movement_direction_picker",
+          "next": null,
+          "parent": "Y?t;5vXlQ]dvL,LPjHBG",
+          "inputs": {},
+          "fields": {
+            "SPIN_DIRECTIONS": [
+              "right",
+              null
+            ]
+          },
+          "shadow": true,
+          "topLevel": false
+        }
+      },
+      "comments": {},
+      "currentCostume": 0,
+      "costumes": [
+        {
+          "assetId": "cd21514d0531fdffb22204e0ec5ed84a",
+          "name": "backdrop1",
+          "md5ext": "cd21514d0531fdffb22204e0ec5ed84a.svg",
+          "dataFormat": "svg",
+          "rotationCenterX": 240,
+          "rotationCenterY": 180
+        }
+      ],
+      "sounds": [
+        {
+          "assetId": "83a9787d4cb6f3b7632b4ddfebf74367",
+          "name": "pop",
+          "dataFormat": "wav",
+          "format": "",
+          "rate": 48000,
+          "sampleCount": 1123,
+          "md5ext": "83a9787d4cb6f3b7632b4ddfebf74367.wav"
+        }
+      ],
+      "volume": 100,
+      "tempo": 60,
+      "videoTransparency": 50,
+      "videoState": "on",
+      "textToSpeechLanguage": null
+    }
+  ],
+  "monitors": [],
+  "extensions": [],
+  "meta": {
+    "semver": "3.0.0",
+    "vm": "0.11.4",
+    "agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
+  }
+}

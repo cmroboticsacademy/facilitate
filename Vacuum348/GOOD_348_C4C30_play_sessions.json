@@ -1,0 +1,18 @@
+[{
+  "_id": {
+    "$oid": "63e51626b24c3e00047c4c30"
+  },
+  "assent": true,
+  "consent": true,
+  "domain": "cmra-blocks.cs2n.org",
+  "game": "cmra-blocks",
+  "object_name": "SPIKE",
+  "server_time": {
+    "$date": {
+      "$numberLong": "1675957799142"
+    }
+  },
+  "time_stamp": "2023-02-9 10:49:58.862",
+  "user_id": "2515268",
+  "version": "1.0.5"
+}]
