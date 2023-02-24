@@ -88,8 +88,8 @@ def gumtree(head1:ASTNode, head2:ASTNode):
         else:
             maxtrees1 = subtree_queue1[maxheight1]
             maxtrees2 = subtree_queue2[maxheight2]
-            added_trees1 = []
-            added_trees2 = []
+            added_trees1 = set()
+            added_trees2 = set()
             for t1 in maxtrees1:
                 for t2 in maxtrees2:
                     if t1.node_equals(t2):
@@ -99,8 +99,8 @@ def gumtree(head1:ASTNode, head2:ASTNode):
                             candidate_mappings.append((t1, t2))
                         else:
                             mappings.append((t1, t2))
-                        added_trees1.append(t1)
-                        added_trees2.append(t2)
+                        added_trees1.add(t1)
+                        added_trees2.add(t2)
             for t in maxtrees1:
                 if t not in added_trees1:
                     for c in t.children:
@@ -116,7 +116,7 @@ def gumtree(head1:ASTNode, head2:ASTNode):
         top = sorted_candidates[0]
         del sorted_candidates[0]
         mappings.append(top)
-        sorted_candidates = [s for s in sorted_candidates                              if s[0]!=top[0] and s[1] != top[1]]
+        sorted_candidates = [s for s in sorted_candidates if s[0]!=top[0] and s[1] != top[1]]
     
     # bottom up
     matched1 = [t[0] for t in mappings]
@@ -140,5 +140,5 @@ def gumtree(head1:ASTNode, head2:ASTNode):
                     # here the original gumtree algorithm uses an edit script algorithm to find 
                     # further mappings for trees under a certain size, but all these programs are small
                     # so I don't anticipate needing that
-    node1.accept_postorder(bottom_up_helper)
+    head1.accept_postorder(bottom_up_helper)
     return mappings
