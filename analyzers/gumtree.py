@@ -1,6 +1,7 @@
 from parsing.ast import ASTNode
 from collections import defaultdict, Counter
 from queue import PriorityQueue
+from analyzers.statementlistvisitor import NodeListVisitor
 
 
 def get_max_key(pq:defaultdict)->int:
@@ -15,9 +16,47 @@ def dice(parent1:ASTNode, parent2:ASTNode, mappings: list):
     
     contained_mappings = [(t1, t2) for (t1, t2) in mappings                           if (t1 in desc1 and t2 in desc2)]
     return 2*len(contained_mappings) / (len(desc1) + len(desc2))
+
+def generate_similarity_matrix(head1:ASTNode, head2:ASTNode):
+    ids_visitor_1 = NodeListVisitor()
+    ids_visitor_2 = NodeListVisitor()
+    head1.accept(ids_visitor_1.visit)
+    head2.accept(ids_visitor_2.visit)
+
+    matrix = [ 
+            [ 
+                False 
+                for _ in range(len(ids_visitor_2.statement_list)) 
+            ] 
+            for _ in range(len(ids_visitor_1.statement_list)) 
+        ]
+    
+    for i, node1 in enumerate(ids_visitor_1.statement_list):
+        for j, node2 in enumerate(ids_visitor_2.statement_list):
+            matrix[i][j] = node1.node_equals(node2)
+    
+    return matrix, ids_visitor_1.statement_list, ids_visitor_2.statement_list
+
+def sim_matrix_count_subtree_occurrences(target_node_index, sim_matrix, count_in_tree1=True):
+    count = 0
+    if count_in_tree1: # count occurences of target node in tree 1
+        for i in range(len(sim_matrix)):
+            if sim_matrix[i][target_node_index]:
+                count += 1
+    else: # count occurences of target node in tree 2
+        for i in range(len(sim_matrix[0])):
+            if sim_matrix[target_node_index][i]:
+                count += 1
+    return count
     
 
+# @profile
 def gumtree(head1:ASTNode, head2:ASTNode):
+    # generate similarity matrix to optimize comparisons later
+    sim_matrix, nodeslist1, nodeslist2 = generate_similarity_matrix(head1, head2)
+    nodes_dict1 = {n:i for i, n in enumerate(nodeslist1)}
+    nodes_dict2 = {n:i for i, n in enumerate(nodeslist2)}
+
     # top down phase
     subtree_queue1 = defaultdict(list) # dict { height : [subtrees with that height]
     subtree_queue2 = defaultdict(list)
@@ -53,8 +92,10 @@ def gumtree(head1:ASTNode, head2:ASTNode):
             added_trees2 = []
             for t1 in maxtrees1:
                 for t2 in maxtrees2:
-                    if t1 == t2:
-                        if head1.count_subtree_occurences(t2) > 1 or                         head2.count_subtree_occurences(t1) > 1:
+                    if t1.node_equals(t2):
+                        head1_occurences = sim_matrix_count_subtree_occurrences(nodes_dict2[t2], sim_matrix, count_in_tree1=True)
+                        head2_occurences = sim_matrix_count_subtree_occurrences(nodes_dict1[t1], sim_matrix, count_in_tree1=False)
+                        if head1_occurences > 1 or head2_occurences > 1:
                             candidate_mappings.append((t1, t2))
                         else:
                             mappings.append((t1, t2))
@@ -90,7 +131,7 @@ def gumtree(head1:ASTNode, head2:ASTNode):
             if mapped_child:
                 candidates = []
                 head2.accept(lambda n : 
-                             n.op == node.op and n.blockid == node.blockid and n not in matched2 and candidates.append(n))
+                             n.op == node.op and n not in matched2 and candidates.append(n))
                 candidates = sorted(candidates,
                                     key = lambda t2: dice(node, t2, mappings),
                                     reverse=True)
