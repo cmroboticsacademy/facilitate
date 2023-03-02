@@ -54,6 +54,9 @@ class ASTNode(dict):
         self.op = None
         self.name = self.op # for visualization
         self.children = []
+        self.next = None
+        self.inputs = []
+        self.fields = []
         self._height = 1
         dict.__init__(self, 
             blockid = self.blockid,
@@ -62,12 +65,15 @@ class ASTNode(dict):
             children = self.children,
             _height = self._height)
         
-    def __init__(self, parent, blockid, desc, children):
+    def __init__(self, parent, blockid, desc, next=None, inputs=[], fields=[]):
         self.parent = parent
         self.blockid = blockid
         self.op = desc
         self.name = self.op # for visualization
-        self.children = sorted(children, key=lambda n: n.op)
+        self.next = next
+        self.inputs = sorted(inputs, key=lambda n: str(n.op))
+        self.fields = sorted(fields, key=lambda n: str(n.op))
+        self.children = self.inputs + self.fields + ([self.next] if self.next is not None else [])
         self._height = self.__height__()
         dict.__init__(self, 
             blockid = self.blockid,
@@ -75,6 +81,28 @@ class ASTNode(dict):
             name = self.name,
             children = self.children,
             _height = self._height)
+
+    def add_child(self, child:'ASTNode', childtype="next"):
+
+        if childtype == "next":
+            if self.next is not None:
+                self.children.remove(self.next)
+            self.next = child
+        elif childtype == "inputs":
+            self.inputs.append(child)
+            self.inputs = sorted(self.inputs, key=lambda n: str(n.op))
+        elif childtype == "fields":
+            self.fields.append(child)
+            self.fields = sorted(self.fields, key=lambda n: str(n.op))
+        else:
+            raise ValueError("Child type " + childtype + " is not valid")
+
+        self.children = self.inputs + self.fields + ([self.next] if self.next is not None else [])
+
+        super().update({"children": self.children})
+
+        self._height = self.__height__()
+
     
     def accept(self, visit_func:Callable[['ASTNode'],None]):
         visit_func(self)
@@ -96,9 +124,10 @@ class ASTNode(dict):
             return False
         if len(self.children) != len(other.children):
             return False
-        # self.children.sort(key=lambda n: str(n.op))
-        # other.children.sort(key=lambda n: str(n.op))
-        # gonna assume that nodes of the same kind will be added in the same order
+        if self.__height__() != other.__height__():
+            return False
+
+        # gonna assume that chidren are sorted
         for i in range(len(self.children)):
             if not self.children[i].node_equals(other.children[i]):
                 return False
@@ -107,7 +136,7 @@ class ASTNode(dict):
     def __height__(self):
         if len(self.children) == 0:
             return 1
-        return max([c.height() for c in self.children]) + 1
+        return max([c.__height__() for c in self.children]) + 1
     
     def height(self):
         return self._height
@@ -115,7 +144,7 @@ class ASTNode(dict):
     def count_subtree_occurences(self, other:'ASTNode'):
         if other._height > self._height:
             return 0
-        if self == other:
+        if self.node_equals(other):
             return 1
         counter = 0
         for c in self.children:

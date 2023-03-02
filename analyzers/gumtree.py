@@ -8,13 +8,13 @@ def get_max_key(pq:defaultdict)->int:
     return max(pq.keys())
 
 def insert_pq(pq:defaultdict, n:ASTNode):
-    pq[n.height()].append(n)
+    pq[n.height()].add(n)
     
 def dice(parent1:ASTNode, parent2:ASTNode, mappings: list):
     desc1 = parent1.get_descendants()
     desc2 = parent2.get_descendants()
     
-    contained_mappings = [(t1, t2) for (t1, t2) in mappings                           if (t1 in desc1 and t2 in desc2)]
+    contained_mappings = [(t1, t2) for (t1, t2) in mappings if (t1 in desc1 and t2 in desc2)]
     return 2*len(contained_mappings) / (len(desc1) + len(desc2))
 
 def generate_similarity_matrix(head1:ASTNode, head2:ASTNode):
@@ -58,8 +58,8 @@ def gumtree(head1:ASTNode, head2:ASTNode):
     nodes_dict2 = {n:i for i, n in enumerate(nodeslist2)}
 
     # top down phase
-    subtree_queue1 = defaultdict(list) # dict { height : [subtrees with that height]
-    subtree_queue2 = defaultdict(list)
+    subtree_queue1 = defaultdict(set) # dict { height : [subtrees with that height]
+    subtree_queue2 = defaultdict(set)
     
     candidate_mappings = []
     mappings = []
@@ -71,6 +71,7 @@ def gumtree(head1:ASTNode, head2:ASTNode):
     while len(subtree_queue1)> 0 and len(subtree_queue2) > 0:
         maxheight1 = get_max_key(subtree_queue1)
         maxheight2 = get_max_key(subtree_queue2)
+        print(maxheight1, maxheight2)
         
         if maxheight1 != maxheight2:
             if maxheight1 > maxheight2:
@@ -88,6 +89,7 @@ def gumtree(head1:ASTNode, head2:ASTNode):
         else:
             maxtrees1 = subtree_queue1[maxheight1]
             maxtrees2 = subtree_queue2[maxheight2]
+            
             added_trees1 = set()
             added_trees2 = set()
             for t1 in maxtrees1:
@@ -109,8 +111,11 @@ def gumtree(head1:ASTNode, head2:ASTNode):
                 if t not in added_trees2:
                     for c in t.children:
                         insert_pq(subtree_queue2, c)
+            del subtree_queue1[maxheight1]
+            del subtree_queue2[maxheight2]
+
     sorted_candidates = sorted(candidate_mappings, 
-                               key = lambda t1, t2: dice(t1.parent, t2.parent, mappings),
+                               key = lambda t: dice(t[0].parent, t[1].parent, mappings),
                                reverse=True)
     while len(sorted_candidates) > 0:
         top = sorted_candidates[0]

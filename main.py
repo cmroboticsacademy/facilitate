@@ -43,6 +43,13 @@ if __name__ == "__main__":
     tree_bad = build_ast_tree(program_bad[0]["frames"][-2]["state_info"]["program"]["targets"][0]["blocks"])
     with open("temp_code.json", "w") as f:
         json.dump(tree_good, f, indent=3, default=lambda x: x.name)
-    # gumtree_timeout(100, tree_good, tree_bad)
-    cProfile.run("gumtree_timeout(1000, tree_good, tree_bad)")
+    
+    def print_parents(astnode):
+        print(astnode.parent)
+    
+    # tree_good.accept(print_parents)
+    
+    mappings = gumtree(tree_good, tree_bad)
+    for m in mappings:
+        print(m)
     pass
