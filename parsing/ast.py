@@ -103,6 +103,8 @@ class ASTNode(dict):
 
         self._height = self.__height__()
 
+    def accept_no_children(self, visit_func:Callable[['ASTNode'],None]):
+        visit_func(self)
     
     def accept(self, visit_func:Callable[['ASTNode'],None]):
         visit_func(self)

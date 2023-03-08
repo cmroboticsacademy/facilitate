@@ -42,14 +42,48 @@ if __name__ == "__main__":
         program_bad = json.load(f)
     tree_bad = build_ast_tree(program_bad[0]["frames"][-2]["state_info"]["program"]["targets"][0]["blocks"])
     with open("temp_code.json", "w") as f:
-        json.dump(tree_good, f, indent=3, default=lambda x: x.name)
+        json.dump(tree_bad, f, indent=3, default=lambda x: x.name)
     
     def print_parents(astnode):
         print(astnode.parent)
+
+    count = 0
+    def count_nodes(astnode):
+        global count
+        count+=1
+    tree_good.accept(count_nodes)
+    print(count, " nodes in good example")
+    tree_bad.accept(count_nodes)
+    print(count, " nodes in both the good and bad examples")
     
-    # tree_good.accept(print_parents)
-    
-    mappings = gumtree(tree_good, tree_bad)
-    for m in mappings:
-        print(m)
+    mappings = gumtree(tree_bad, tree_good)
+    print(len(mappings), " subtree mappings found")
+    # with open("temp_code.json", "w") as f:
+    #     json.dump(mappings[0][0], f, indent=3, default=lambda x: x.name)
+    # with open("tempcode_2.json", "w") as f:
+    #     json.dump(mappings[0][1], f, indent=3, default=lambda x: x.name)
+
+    befores, afters = zip(*mappings)
+
+    deleted = []
+    def get_del_nodes(before_node):
+        if before_node not in befores:
+            deleted.append(before_node)
+            for c in before_node.children:
+                c.accept_no_children(get_del_nodes)
+    tree_bad.accept_no_children(get_del_nodes)
+
+    added = []
+    def get_add_nodes(after_node):
+        if after_node not in afters:
+            added.append(after_node)
+            for c in after_node.children:
+                c.accept_no_children(get_add_nodes)
+    tree_good.accept_no_children(get_add_nodes)
+
+    # for m in mappings:
+    #     print(m)
+
+    print(len(deleted), " nodes deleted")
+    print(len(added), " nodes added")
     pass
