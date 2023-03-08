@@ -71,7 +71,6 @@ def gumtree(head1:ASTNode, head2:ASTNode):
     while len(subtree_queue1)> 0 and len(subtree_queue2) > 0:
         maxheight1 = get_max_key(subtree_queue1)
         maxheight2 = get_max_key(subtree_queue2)
-        print(maxheight1, maxheight2)
         
         if maxheight1 != maxheight2:
             if maxheight1 > maxheight2:
