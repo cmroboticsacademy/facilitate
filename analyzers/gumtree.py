@@ -122,27 +122,93 @@ def gumtree(head1:ASTNode, head2:ASTNode):
         mappings.append(top)
         sorted_candidates = [s for s in sorted_candidates if s[0]!=top[0] and s[1] != top[1]]
     
+    # mapping all nodes of subtrees
+    def add_children_as_mappings(n1, n2):
+        if len(n1.children) != len(n2.children):
+            raise Exception("nodes are not the same")
+        for i in range(len(n1.children)):
+            c1 = n1.children[i]
+            c2 = n2.children[i]
+            if (c1, c2) not in mappings:
+                mappings.append((c1, c2))
+                add_children_as_mappings(c1, c2)
+    for m1, m2 in mappings:
+        add_children_as_mappings(m1, m2)
+
+    
     # bottom up
     matched1 = [t[0] for t in mappings]
     matched2 = [t[1] for t in mappings]
     def bottom_up_helper(node:ASTNode):
         if node not in matched1:
-            mapped_child = False
-            for c in node.children:
-                if c in matched1:
-                    mapped_child = True
-                    break
-            if mapped_child:
+            # print("not matched", node)
+            mapped_child = [False]
+            def has_mapped_child(node):
+                for c in node.children:
+                    if c in matched1:
+                        # print("found match")
+                        mapped_child[0] = True
+            node.accept(has_mapped_child)
+            # for c in node.children:
+            #     if c in matched1:
+            #         mapped_child = True
+            #         break
+            # print(mapped_child[0])
+            if mapped_child[0]:
                 candidates = []
-                head2.accept(lambda n : 
-                             n.op == node.op and n not in matched2 and candidates.append(n))
+                def unmatched(n):
+                    if n.op == node.op and n not in matched2:
+                        candidates.append(n)
+                head2.accept(unmatched)
+                             
+                # print(candidates)
                 candidates = sorted(candidates,
                                     key = lambda t2: dice(node, t2, mappings),
                                     reverse=True)
-                if len(candidates) > 0 and dice(node, candidates[0], mappings) > 0.45:
-                    mappings.append(node, candidates[0])
+                # print("\n\n".join(["\n".join([str(d) for d in c]) for c in candidates]))
+
+                if len(candidates) > 0 and dice(node, candidates[0], mappings) > 0.2:
+                    mappings.append((node, candidates[0]))
                     # here the original gumtree algorithm uses an edit script algorithm to find 
                     # further mappings for trees under a certain size, but all these programs are small
                     # so I don't anticipate needing that
     head1.accept_postorder(bottom_up_helper)
     return mappings
+
+
+def get_edit_script(tree_before, tree_after):
+    mappings = gumtree(tree_before, tree_after)
+
+    print(len(mappings), " subtree mappings found")
+
+    befores, afters = zip(*mappings)
+
+    deleted = []
+    def get_del_nodes(before_node):
+        if before_node not in befores:
+            deleted.append(before_node)
+    tree_before.accept(get_del_nodes)
+    # print("\n".join([str(d) for d in deleted]))
+
+
+    added = []
+    def get_add_nodes(after_node):
+        if after_node not in afters:
+            added.append(after_node)
+    tree_after.accept(get_add_nodes)
+
+    moved = []
+    for before, after in mappings:
+        if (before.parent is None) and (after.parent is None):
+            continue
+        elif (before.parent is None) or (after.parent is None):
+            moved.append((before, after))
+        elif before.parent.op != after.parent.op:
+            if before.parent not in deleted and after.parent not in added:
+                moved.append((before, after))
+
+    return added, deleted, moved
+
+    # print(len(deleted), " nodes deleted")
+    # print(len(added), " nodes added")
+    # print(len(moved), " nodes moved")

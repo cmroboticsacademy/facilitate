@@ -1,7 +1,7 @@
 from parsing.ast import ASTNode
 from parsing.parser import *
 import json
-from analyzers.gumtree import gumtree
+from analyzers.gumtree import get_edit_script
 import cProfile
 
 
@@ -35,52 +35,6 @@ def gumtree_timeout(time, tree_good, tree_bad):
         gumtree(tree_good, tree_bad)
 
 
-def print_node_changes(tree_before, tree_after):
-    mappings = gumtree(tree_before, tree_after)
-    print(len(mappings), " subtree mappings found")
-    # with open("temp_code.json", "w") as f:
-    #     json.dump(mappings[0][0], f, indent=3, default=lambda x: x.name)
-    # with open("tempcode_2.json", "w") as f:
-    #     json.dump(mappings[0][1], f, indent=3, default=lambda x: x.name)
-
-    befores, afters = zip(*mappings)
-
-    deleted = []
-    def get_del_nodes(before_node):
-        if before_node not in befores:
-            deleted.append(before_node)
-            for c in before_node.children:
-                c.accept_no_children(get_del_nodes)
-    tree_before.accept_no_children(get_del_nodes)
-
-    added = []
-    def get_add_nodes(after_node):
-        if after_node not in afters:
-            added.append(after_node)
-            for c in after_node.children:
-                c.accept_no_children(get_add_nodes)
-    tree_after.accept_no_children(get_add_nodes)
-
-    moved = []
-    i = 0
-    while i < len(deleted):
-        delnode = deleted[i]
-        matching_index = -1
-        for j in range(len(added)):
-            if added[j].node_equals(delnode):
-                matching_index = j
-                break
-        if matching_index >= 0:
-            moved.append((delnode, added[matching_index]))
-            del deleted[i]
-            del added[matching_index]
-        else:
-            i += 1
-
-    print(len(deleted), " nodes deleted")
-    print(len(added), " nodes added")
-    print(len(moved), " nodes moved")
-
 # main
 if __name__ == "__main__":
     with open("Vacuum348/GOOD_348_C4C30_session_data_last_program.json") as f:
@@ -92,9 +46,43 @@ if __name__ == "__main__":
     with open("Vacuum348/UGLY_348_C4C34_session_data.json") as f:
         program_ugly = json.load(f)
     tree_ugly = build_ast_tree(program_ugly[0]["frames"][-2]["state_info"]["program"]["targets"][0]["blocks"])
-    with open("temp_code.json", "w") as f:
+
+
+    with open("test1.json") as f:
+        program_1 = json.load(f)
+    tree_1 = build_ast_tree(program_1["targets"][0]["blocks"])
+    with open("test2.json") as f:
+        program_2 = json.load(f)
+    tree_2 = build_ast_tree(program_2["targets"][0]["blocks"])
+    with open("test3.json") as f:
+        program_3 = json.load(f)
+    tree_3 = build_ast_tree(program_3["targets"][0]["blocks"])
+    with open("test4.json") as f:
+        program_4 = json.load(f)
+    tree_4 = build_ast_tree(program_4["targets"][0]["blocks"])
+    with open("test5.json") as f:
+        program_5 = json.load(f)
+    tree_5 = build_ast_tree(program_5["targets"][0]["blocks"])
+
+
+    with open("bad.json", "w") as f:
         json.dump(tree_bad, f, indent=3, default=lambda x: x.name)
-    
+    with open("good.json", "w") as f:
+        json.dump(tree_good, f, indent=3, default=lambda x: x.name)
+    with open("ugly.json", "w") as f:
+        json.dump(tree_ugly, f, indent=3, default=lambda x: x.name)
+
+    with open("test1_tree.json", "w") as f:
+        json.dump(tree_1, f, indent=3, default=lambda x: x.name)
+    with open("test2_tree.json", "w") as f:
+        json.dump(tree_2, f, indent=3, default=lambda x: x.name)
+    with open("test3_tree.json", "w") as f:
+        json.dump(tree_3, f, indent=3, default=lambda x: x.name)
+    with open("test4_tree.json", "w") as f:
+        json.dump(tree_4, f, indent=3, default=lambda x: x.name)
+    with open("test5_tree.json", "w") as f:
+        json.dump(tree_5, f, indent=3, default=lambda x: x.name)
+
     def print_parents(astnode):
         print(astnode.parent)
 
@@ -107,18 +95,46 @@ if __name__ == "__main__":
     tree_bad.accept(count_nodes)
     print(count, " nodes in both the good and bad examples")
 
-    print("----")
-    print("before: bad, after: good")
-    print_node_changes(tree_bad, tree_good)
+    # print("----")
+    # print("before: bad, after: good")
+    # print_node_changes(tree_bad, tree_good)
     
-    print("----")
-    print("before: bad, after: ugly")
-    print_node_changes(tree_bad, tree_ugly)
+    # print("----")
+    # print("before: bad, after: ugly")
+    # print_node_changes(tree_bad, tree_ugly)
+
+    # print("----")
+    # print("before: ugly, after: good")
+    # print_node_changes(tree_ugly, tree_good)
+    
+    # print("----")
+    # print("before: good, after: good")
+    # print_node_changes(tree_good, tree_good)
 
     print("----")
-    print("before: ugly, after: good")
-    print_node_changes(tree_ugly, tree_good)
+    print("before: 1, after: 2")
+    added, deleted, moved = get_edit_script(tree_1, tree_2)
+    print(len(deleted), " nodes deleted")
+    print(len(added), " nodes added")
+    print(len(moved), " nodes moved")
     
     print("----")
-    print("before: good, after: good")
-    print_node_changes(tree_good, tree_good)
+    print("before: 2, after: 3")
+    added, deleted, moved = get_edit_script(tree_2, tree_3)
+    print(len(deleted), " nodes deleted")
+    print(len(added), " nodes added")
+    print(len(moved), " nodes moved")
+
+    print("----")
+    print("before: 2, after: 4")
+    added, deleted, moved = get_edit_script(tree_2, tree_4)
+    print(len(deleted), " nodes deleted")
+    print(len(added), " nodes added")
+    print(len(moved), " nodes moved")
+    
+    print("----")
+    print("before: 4, after: 5")
+    added, deleted, moved = get_edit_script(tree_4, tree_5)
+    print(len(deleted), " nodes deleted")
+    print(len(added), " nodes added")
+    print(len(moved), " nodes moved")
