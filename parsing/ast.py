@@ -80,7 +80,8 @@ class ASTNode(dict):
             op = self.op,
             name = self.name,
             children = self.children,
-            _height = self._height)
+            _height = self._height,
+            attributes = None)
 
     def add_child(self, child:'ASTNode', childtype="next"):
 

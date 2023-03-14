@@ -91,6 +91,7 @@ class TestGumtree(unittest.TestCase):
 
         added, deleted, moved = get_edit_script(tree_4, tree_5)
         self.assertEqual(len(deleted), 0, "incorrect number of nodes deleted")
+        print(added)
         self.assertEqual(len(added), 0, "incorrect number of nodes added")
         self.assertEqual(len(moved), 1, "incorrect number of nodes moved")
 unittest.main()

@@ -209,6 +209,15 @@ def get_edit_script(tree_before, tree_after):
 
     return added, deleted, moved
 
-    # print(len(deleted), " nodes deleted")
-    # print(len(added), " nodes added")
-    # print(len(moved), " nodes moved")
+def annotate_with_diff(mutable_tree_1, mutable_tree_2):
+    added, deleted, moved = get_edit_script(mutable_tree_1, mutable_tree_2)
+
+    for m in added:
+        m['attributes'] = "added"
+    
+    for m in deleted:
+        m['attributes'] = "deleted"
+    for m1, m2 in moved:
+        m1['attributes'] = "moved"
+        m2['attributes'] = "moved"
+
