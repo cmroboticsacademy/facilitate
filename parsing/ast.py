@@ -58,12 +58,14 @@ class ASTNode(dict):
         self.inputs = []
         self.fields = []
         self._height = 1
+        self.attributes = {}
         dict.__init__(self, 
             blockid = self.blockid,
             op = self.op,
             name = self.name,
             children = self.children,
-            _height = self._height)
+            _height = self._height,
+            attributes = self.attributes)
         
     def __init__(self, parent, blockid, desc, next=None, inputs=[], fields=[]):
         self.parent = parent
@@ -75,13 +77,14 @@ class ASTNode(dict):
         self.fields = sorted(fields, key=lambda n: str(n.op))
         self.children = self.inputs + self.fields + ([self.next] if self.next is not None else [])
         self._height = self.__height__()
+        self.attributes = {}
         dict.__init__(self, 
             blockid = self.blockid,
             op = self.op,
             name = self.name,
             children = self.children,
             _height = self._height,
-            attributes = None)
+            attributes = self.attributes)
 
     def add_child(self, child:'ASTNode', childtype="next"):
 
@@ -102,7 +105,7 @@ class ASTNode(dict):
 
         super().update({"children": self.children})
 
-        self._height = self.__height__()
+        self.update_height()
 
     def accept_no_children(self, visit_func:Callable[['ASTNode'],None]):
         visit_func(self)
@@ -135,11 +138,17 @@ class ASTNode(dict):
             if not self.children[i].node_equals(other.children[i]):
                 return False
         return True
+
+    def update_height(self):
+        self._height = self.__height__()
+        super().update({"_height" : self._height})
+        if isinstance(self.parent, ASTNode):
+            self.parent.update_height()
     
     def __height__(self):
         if len(self.children) == 0:
             return 1
-        return max([c.__height__() for c in self.children]) + 1
+        return max([c._height for c in self.children]) + 1
     
     def height(self):
         return self._height

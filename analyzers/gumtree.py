@@ -13,9 +13,21 @@ def insert_pq(pq:defaultdict, n:ASTNode):
 def dice(parent1:ASTNode, parent2:ASTNode, mappings: list):
     desc1 = parent1.get_descendants()
     desc2 = parent2.get_descendants()
+
+    contained_mappings = []
+    for (t1, t2) in mappings:
+        t1_contain = False
+        for n in desc1:
+            if n.node_equals(t1):
+                t1_contain = True
+        t2_contain = False
+        for n in desc2:
+            if n.node_equals(t2):
+                t2_contain = True
+        if t1_contain and t2_contain:
+            contained_mappings.append((t1, t2))
     
-    contained_mappings = [(t1, t2) for (t1, t2) in mappings if (t1 in desc1 and t2 in desc2)]
-    return 2*len(contained_mappings) / (len(desc1) + len(desc2))
+    return (2*len(contained_mappings) / (len(desc1) + len(desc2))) * (2 if parent1.blockid == parent2.blockid else 1)
 
 def generate_similarity_matrix(head1:ASTNode, head2:ASTNode):
     ids_visitor_1 = NodeListVisitor()
@@ -116,6 +128,34 @@ def gumtree(head1:ASTNode, head2:ASTNode):
     sorted_candidates = sorted(candidate_mappings, 
                                key = lambda t: dice(t[0].parent, t[1].parent, mappings),
                                reverse=True)
+
+     # debugging test5
+    # direction_nodes = []
+    # count = [0]
+    # def get_direction_block(node):
+    #     if node.op == "DIRECTION":
+    #         print('der1')
+    #         direction_nodes.append(node)
+    #         node.attributes['index'] = str(count[0])
+    #         count[0] += 1
+    # head2.accept(get_direction_block)
+    # print(len(direction_nodes))
+
+    # count = [0]
+    # def label_dice(node):
+    #     print('label')
+    #     if node.op == "DIRECTION":
+    #         print('der2')
+    #         for i in range(len(direction_nodes)):
+    #             d = dice(node.parent, direction_nodes[i].parent, mappings)
+    #             print(d)
+    #             node['attributes']["parent_dice" + str(i)] = str(d)
+    #             direction_nodes[i]['attributes']["parent_dice" + str(count)] = str(d)
+    #         node.attributes['index'] = str(count[0])
+    #         count[0] += 1
+
+    # head1.accept(label_dice)
+
     while len(sorted_candidates) > 0:
         top = sorted_candidates[0]
         del sorted_candidates[0]
@@ -205,7 +245,8 @@ def get_edit_script(tree_before, tree_after):
             moved.append((before, after))
         elif before.parent.op != after.parent.op:
             if before.parent not in deleted and after.parent not in added:
-                moved.append((before, after))
+                if not any([True if (before.parent == m1 or after.parent == m2) else False for m1, m2 in moved ]):
+                    moved.append((before, after))
 
     return added, deleted, moved
 
@@ -213,11 +254,10 @@ def annotate_with_diff(mutable_tree_1, mutable_tree_2):
     added, deleted, moved = get_edit_script(mutable_tree_1, mutable_tree_2)
 
     for m in added:
-        m['attributes'] = "added"
+        m['attributes']['diff'] = "added"
     
     for m in deleted:
-        m['attributes'] = "deleted"
+        m['attributes']['diff'] = "deleted"
     for m1, m2 in moved:
-        m1['attributes'] = "moved"
-        m2['attributes'] = "moved"
-
+        m1['attributes']['diff'] = "moved"
+        m2['attributes']['diff'] = "moved"
