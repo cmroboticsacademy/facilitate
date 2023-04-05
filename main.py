@@ -85,18 +85,10 @@ if __name__ == "__main__":
 
 
 
-    with open("test4.json") as f:
+    with open("if.json") as f:
         program_4 = json.load(f)
     tree_4 = build_ast_tree(program_4["targets"][0]["blocks"])
 
-    with open("test5.json") as f:
-        program_5 = json.load(f)
-    tree_5 = build_ast_tree(program_5["targets"][0]["blocks"])
 
-    annotate_with_diff(tree_4, tree_5)
-
-    with open("tree_4_annotated.json", "w") as f:
+    with open("if_tree.json", "w") as f:
         json.dump(tree_4, f, indent=3, default=lambda x: x.name)
-
-    with open("tree_5_annotated.json", "w") as f:
-        json.dump(tree_5, f, indent=3, default=lambda x: x.name)

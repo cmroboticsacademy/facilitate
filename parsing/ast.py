@@ -67,15 +67,15 @@ class ASTNode(dict):
             _height = self._height,
             attributes = self.attributes)
         
-    def __init__(self, parent, blockid, desc, next=None, inputs=[], fields=[]):
+    def __init__(self, parent, blockid, desc, next=[], inputs=[], fields=[]):
         self.parent = parent
         self.blockid = blockid
         self.op = desc
         self.name = self.op # for visualization
-        self.next = next
+        self.next = sorted(next, key=lambda n: str(n.op))
         self.inputs = sorted(inputs, key=lambda n: str(n.op))
         self.fields = sorted(fields, key=lambda n: str(n.op))
-        self.children = self.inputs + self.fields + ([self.next] if self.next is not None else [])
+        self.children = self.inputs + self.fields + self.next
         self._height = self.__height__()
         self.attributes = {}
         dict.__init__(self, 
@@ -89,9 +89,8 @@ class ASTNode(dict):
     def add_child(self, child:'ASTNode', childtype="next"):
 
         if childtype == "next":
-            if self.next is not None:
-                self.children.remove(self.next)
-            self.next = child
+            self.next.append(child)
+            self.next = sorted(self.next, key=lambda n: str(n.op))
         elif childtype == "inputs":
             self.inputs.append(child)
             self.inputs = sorted(self.inputs, key=lambda n: str(n.op))
@@ -101,11 +100,22 @@ class ASTNode(dict):
         else:
             raise ValueError("Child type " + childtype + " is not valid")
 
-        self.children = self.inputs + self.fields + ([self.next] if self.next is not None else [])
+        self.children = self.inputs + self.fields + self.next
 
         super().update({"children": self.children})
 
         self.update_height()
+    
+    def remove_child(self, child:'ASTNode'):
+        self.next.remove(child)
+        self.inputs.remove(child)
+        self.fields.remove(child)
+        self.children = self.inputs + self.fields + self.next
+
+        super().update({"children": self.children})
+
+        self.update_height()
+
 
     def accept_no_children(self, visit_func:Callable[['ASTNode'],None]):
         visit_func(self)
@@ -125,17 +135,32 @@ class ASTNode(dict):
     def __eq__(self, other:'ASTNode'):
         return self.blockid == other.blockid
 
-    def node_equals(self, other:'ASTNode'):
-        if self.op != other.op:
-            return False
-        if len(self.children) != len(other.children):
+    def subtree_equals(self, other:'ASTNode'):
+        if not self.node_equals(other):
             return False
         if self.__height__() != other.__height__():
             return False
+        if len(self.next) != len(other.next):
+            return False
+        for next1, next2 in zip(self.next, other.next):
+            if not next1.subtree_equals(next2):
+                return False
+        return True
+
+    def node_equals(self, other:'ASTNode'):
+        if self.op != other.op:
+            return False
+        if len(self.inputs) != len(other.inputs):
+            return False
+        if len(self.fields) != len(other.fields):
+            return False
 
         # gonna assume that chidren are sorted
-        for i in range(len(self.children)):
-            if not self.children[i].node_equals(other.children[i]):
+        for i in range(len(self.inputs)):
+            if not self.inputs[i].node_equals(other.inputs[i]):
+                return False
+        for i in range(len(self.fields)):
+            if not self.fields[i].node_equals(other.fields[i]):
                 return False
         return True
 
@@ -156,7 +181,7 @@ class ASTNode(dict):
     def count_subtree_occurences(self, other:'ASTNode'):
         if other._height > self._height:
             return 0
-        if self.node_equals(other):
+        if self.subtree_equals(other):
             return 1
         counter = 0
         for c in self.children:
@@ -176,3 +201,12 @@ class ASTNode(dict):
 
     def __hash__(self):
         return hash(self.blockid)
+
+    def copy(self):
+        copied_next = [n.copy() for n in self.next]
+        copied_inputs = [n.copy() for n in self.inputs]
+        copied_fields = [n.copy() for n in self.fields]
+        return ASTNode(self.parent, self.blockid, self.op, next=copied_next, inputs=copied_inputs, fields=copied_fields)
+
+    def copy_no_children(self):
+        return ASTNode(self.parent, self.blockid, self.op)

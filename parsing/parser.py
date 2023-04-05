@@ -1,7 +1,7 @@
 from parsing.ast import ASTNode, OpCodes
 
 def build_ast_tree(program_blocks:dict):
-    root_node = None
+    root_node = None # TODO: concurrent top blocks
     nodes = {} # block id: node
     to_parse_queue = program_blocks.copy()
     while len(to_parse_queue) > 0:

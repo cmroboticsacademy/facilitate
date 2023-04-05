@@ -18,11 +18,11 @@ def dice(parent1:ASTNode, parent2:ASTNode, mappings: list):
     for (t1, t2) in mappings:
         t1_contain = False
         for n in desc1:
-            if n.node_equals(t1):
+            if n.subtree_equals(t1):
                 t1_contain = True
         t2_contain = False
         for n in desc2:
-            if n.node_equals(t2):
+            if n.subtree_equals(t2):
                 t2_contain = True
         if t1_contain and t2_contain:
             contained_mappings.append((t1, t2))
@@ -45,7 +45,7 @@ def generate_similarity_matrix(head1:ASTNode, head2:ASTNode):
     
     for i, node1 in enumerate(ids_visitor_1.statement_list):
         for j, node2 in enumerate(ids_visitor_2.statement_list):
-            matrix[i][j] = node1.node_equals(node2)
+            matrix[i][j] = node1.subtree_equals(node2)
     
     return matrix, ids_visitor_1.statement_list, ids_visitor_2.statement_list
 
@@ -105,7 +105,7 @@ def gumtree(head1:ASTNode, head2:ASTNode):
             added_trees2 = set()
             for t1 in maxtrees1:
                 for t2 in maxtrees2:
-                    if t1.node_equals(t2):
+                    if t1.subtree_equals(t2):
                         head1_occurences = sim_matrix_count_subtree_occurrences(nodes_dict2[t2], sim_matrix, count_in_tree1=True)
                         head2_occurences = sim_matrix_count_subtree_occurrences(nodes_dict1[t1], sim_matrix, count_in_tree1=False)
                         if head1_occurences > 1 or head2_occurences > 1:
@@ -219,9 +219,11 @@ def gumtree(head1:ASTNode, head2:ASTNode):
 def get_edit_script(tree_before, tree_after):
     mappings = gumtree(tree_before, tree_after)
 
-    print(len(mappings), " subtree mappings found")
-
-    befores, afters = zip(*mappings)
+    if len(mappings) == 0:
+        befores = []
+        afters = []
+    else:
+        befores, afters = zip(*mappings)
 
     deleted = []
     def get_del_nodes(before_node):
@@ -237,7 +239,7 @@ def get_edit_script(tree_before, tree_after):
             added.append(after_node)
     tree_after.accept(get_add_nodes)
 
-    moved = []
+    moved = [] # todo, inputs and fields technically get moved too, sometimes next but not always ?????
     for before, after in mappings:
         if (before.parent is None) and (after.parent is None):
             continue
@@ -247,6 +249,68 @@ def get_edit_script(tree_before, tree_after):
             if before.parent not in deleted and after.parent not in added:
                 if not any([True if (before.parent == m1 or after.parent == m2) else False for m1, m2 in moved ]):
                     moved.append((before, after))
+
+    return added, deleted, moved
+
+
+def get_chawathe_edit_script(tree_before, tree_after):
+    tree_before_copy = tree_before.copy() # this is the one we manipulate to check if the edit script is correct
+
+    mappings = gumtree(tree_before_copy, tree_after)
+
+    befores, afters = zip(*mappings)
+
+    added = []
+    moved = []
+    deleted = []
+    updated = []
+
+    def find_mapping(node, after=True):
+        if after:
+            node_maps = [(m1, m2) for m1, m2 in mappings if m2 == node]
+        else:
+            node_maps = [(m1, m2) for m1, m2 in mappings if m1 == node]
+        if len(node_maps) > 1:
+            raise Exception('mappings should be 1 to 1')
+        if len(node_maps) == 0:
+            if after: 
+                return None, node
+            else:
+                return node, None
+        return node_maps[0]
+
+    def check_insert_update_move_align(node):
+        parent_before, parent_after = find_mapping(node.parent, after=True)
+        before, _ = find_mapping(node, after=True)
+        # insertion
+        if before is None:
+            copied_node = node.copy_no_children()
+            if node in parent_after.next:
+                # if parent_before.next:
+                #     copied_node.add_child(parent_before.next)
+                parent_before.add_child(copied_node)
+            elif node in parent_after.inputs:
+                parent_before.add_child(copied_node, "inputs")
+            else: # node in fields
+                parent_before.add_child(copied_node, "fields")    
+            added.append(node)
+        elif node.parent:
+            # TODO: check update here, probably involves seeing if fields/inputs are changed?
+            # move
+            if parent_before != before.parent:
+                moved.append((before, node))
+                before.parent.remove_child(before)
+                before.parent = parent_before
+                if node in parent_after.next:
+                    parent_before.add_child(before)
+                elif node in parent_after.inputs:
+                    parent_before.add_child(before, "inputs")
+                else: # node in fields
+                    parent_before.add_child(before, "fields")   
+            #check alignment
+            # else: 
+
+        
 
     return added, deleted, moved
 
