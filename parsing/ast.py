@@ -1,5 +1,7 @@
 from collections.abc import Callable
 from enum import Enum
+import json
+from contextlib import suppress
 
 OpCodes = Enum('OpCodes', ["spike_movemenet_direction_for_duration",
     "spike_movemenet_direction",
@@ -58,7 +60,7 @@ class ASTNode(dict):
         self.inputs = []
         self.fields = []
         self._height = 1
-        self.attributes = {}
+        self.attributes = {"id": self.blockid}
         dict.__init__(self, 
             blockid = self.blockid,
             op = self.op,
@@ -77,7 +79,7 @@ class ASTNode(dict):
         self.fields = sorted(fields, key=lambda n: str(n.op))
         self.children = self.inputs + self.fields + self.next
         self._height = self.__height__()
-        self.attributes = {}
+        self.attributes = {"id": self.blockid}
         dict.__init__(self, 
             blockid = self.blockid,
             op = self.op,
@@ -99,6 +101,7 @@ class ASTNode(dict):
             self.fields = sorted(self.fields, key=lambda n: str(n.op))
         else:
             raise ValueError("Child type " + childtype + " is not valid")
+        child.parent = self
 
         self.children = self.inputs + self.fields + self.next
 
@@ -107,10 +110,12 @@ class ASTNode(dict):
         self.update_height()
     
     def remove_child(self, child:'ASTNode'):
-        self.next.remove(child)
-        self.inputs.remove(child)
-        self.fields.remove(child)
+        # suppressing so we don't get a ValueError for trying to remove a node that might not exist
+        with suppress(ValueError): self.next.remove(child)
+        with suppress(ValueError): self.inputs.remove(child)
+        with suppress(ValueError): self.fields.remove(child)
         self.children = self.inputs + self.fields + self.next
+        child.parent = None
 
         super().update({"children": self.children})
 
@@ -127,15 +132,28 @@ class ASTNode(dict):
             
     def accept_postorder(self, visit_func:Callable[['ASTNode'],None]):
         for c in self.children:
-            c.accept(visit_func)
+            c.accept_postorder(visit_func)
         visit_func(self)
 
     
             
     def __eq__(self, other:'ASTNode'):
+        """
+        Based on Scratch block ID, does not consider children at all.
+        For checking isomomorphic trees, see `subtree_equals`
+        For equals based on whether two nodes represent the same block, see `node_equals`.
+        """
+        if other is None:
+            return False
         return self.blockid == other.blockid
 
+    
     def subtree_equals(self, other:'ASTNode'):
+        """
+        Based on whether the two nodes are roots of isomorphic trees -- based on opcodes and children.
+        For equals based on whether two nodes represent the same block, see `node_equals`.
+        For equals based on ID, see `__eq__`.
+        """
         if not self.node_equals(other):
             return False
         if self.__height__() != other.__height__():
@@ -148,6 +166,11 @@ class ASTNode(dict):
         return True
 
     def node_equals(self, other:'ASTNode'):
+        """
+        Based on whether the two nodes have the same opcodes, inputs, and fields.
+        For equals based on ID, see `__eq__`.
+        For subtree isomorphism (which also checks the `next` node), see `subtree_equals`
+        """
         if self.op != other.op:
             return False
         if len(self.inputs) != len(other.inputs):
@@ -157,14 +180,21 @@ class ASTNode(dict):
 
         # gonna assume that chidren are sorted
         for i in range(len(self.inputs)):
-            if not self.inputs[i].node_equals(other.inputs[i]):
+            if not self.inputs[i].subtree_equals(other.inputs[i]): 
+                # TODO: subtree_equals is probably not the right thing to do here, 
+                # it's probably better to make a node that takes some sort of value
+                # but that would require overhauling the parser
+                # so this is a hack for now
                 return False
         for i in range(len(self.fields)):
-            if not self.fields[i].node_equals(other.fields[i]):
+            if not self.fields[i].subtree_equals(other.fields[i]):
                 return False
         return True
 
     def update_height(self):
+        """
+        Internal method, should be called every time children are updated (and will be recursively called on the parent)
+        """
         self._height = self.__height__()
         super().update({"_height" : self._height})
         if isinstance(self.parent, ASTNode):
@@ -195,9 +225,24 @@ class ASTNode(dict):
             
     def get_descendants(self):
         return [s for s in self.iter_descendants()]
+
+    def has_descendant(self, potential_desc:'ASTNode'):
+        """
+        Compares based on blockid (i.e. not node_equals, because that has to take into account whether the children are equal.
+        If you want that method, use the `node_equals` method instead of `==`
+        """
+        for d in self.iter_descendants():
+            if d == potential_desc:
+                return True
+        return False
+
     
     def __str__(self):
         return f"ASTNode: {self.blockid} {self.op}\n\tParent: {self.parent.blockid if self.parent else None}, {len(self.children)} children"
+
+    def dump_json(self, fname):
+        with open(fname, "w") as f:
+            json.dump(self, f, indent=3, default=lambda x: x.name)
 
     def __hash__(self):
         return hash(self.blockid)

@@ -89,6 +89,22 @@ def cluster_passing(challenge_name):
         compute_full_tree='True', linkage="average", distance_threshold=40).fit(distance_matrix)
     print(ac_cluster.n_clusters_)
     print(ac_cluster.labels_)
+    # find "center" of each agglomerative cluster
+    all_clusters = [[] for _ in range(ac_cluster.n_clusters_)]
+    for i, l in enumerate(ac_cluster.labels_):
+        all_clusters[l].append(i)
+    cluster_centers = []
+    for c in all_clusters:
+        distances = [sum([distance_matrix[i][j] for j in c]) for i in c]
+        min_pos = distances.index(min(distances))
+        cluster_centers.append(c[min_pos])
+    print(cluster_centers)
+    if challenge_name == "spike_curric_exploring_a_disaster_site_challenge":
+        for c_idx, c in enumerate(cluster_centers):
+            with open(f"cluster{c_idx}.json", "w") as f:
+                center_tree = build_ast_tree(json.loads(passing_progs[c].program)['targets'][0]['blocks'])
+                json.dump(center_tree, f, indent=3, default=lambda x: x.name)
+
 
 for a in all_activities:
     if a == "spike_curric_getting_started_curriculum": # don't know what's up with this one

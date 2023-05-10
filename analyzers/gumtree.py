@@ -1,5 +1,5 @@
 from parsing.ast import ASTNode
-from collections import defaultdict, Counter
+from collections import defaultdict
 from queue import PriorityQueue
 from analyzers.statementlistvisitor import NodeListVisitor
 
@@ -256,21 +256,32 @@ def get_edit_script(tree_before, tree_after):
 def get_chawathe_edit_script(tree_before, tree_after):
     tree_before_copy = tree_before.copy() # this is the one we manipulate to check if the edit script is correct
 
+    tree_before_copy.dump_json("debugging1.json")
+    tree_after.dump_json("debugging2.json")
+
     mappings = gumtree(tree_before_copy, tree_after)
 
-    befores, afters = zip(*mappings)
-
+    # for m in mappings:
+    #     print(m[0].blockid, m[1].blockid)
+  
     added = []
     moved = []
     deleted = []
     updated = []
 
+
+    # TODO: make edits to the tree as we go
     def find_mapping(node, after=True):
         if after:
             node_maps = [(m1, m2) for m1, m2 in mappings if m2 == node]
         else:
             node_maps = [(m1, m2) for m1, m2 in mappings if m1 == node]
         if len(node_maps) > 1:
+            for n1, n2 in mappings:
+                print(f"{n1.blockid:50} {n2.blockid:50}")
+            print(node)
+            for n1, n2 in node_maps:
+                print(f"{n1.blockid:50} {n2.blockid:50}")
             raise Exception('mappings should be 1 to 1')
         if len(node_maps) == 0:
             if after: 
@@ -279,12 +290,13 @@ def get_chawathe_edit_script(tree_before, tree_after):
                 return node, None
         return node_maps[0]
 
-    def check_insert_update_move_align(node):
+    def insert_update_move_align(node):
         parent_before, parent_after = find_mapping(node.parent, after=True)
         before, _ = find_mapping(node, after=True)
         # insertion
         if before is None:
             copied_node = node.copy_no_children()
+            copied_node.blockid = copied_node.blockid+"_copy"
             if node in parent_after.next:
                 # if parent_before.next:
                 #     copied_node.add_child(parent_before.next)
@@ -292,25 +304,62 @@ def get_chawathe_edit_script(tree_before, tree_after):
             elif node in parent_after.inputs:
                 parent_before.add_child(copied_node, "inputs")
             else: # node in fields
-                parent_before.add_child(copied_node, "fields")    
+                parent_before.add_child(copied_node, "fields")   
+            # print("added", copied_node.blockid)
+            # print("added to parent", copied_node.parent.blockid)
+            # print()
             added.append(node)
+            mappings.append((copied_node, node))
         elif node.parent:
             # TODO: check update here, probably involves seeing if fields/inputs are changed?
             # move
             if parent_before != before.parent:
                 moved.append((before, node))
+
+                print()
+                print("before", before.blockid)
+                print("after", node.blockid)
+                print("parent_from", before.parent.blockid)
+                print("parent_to", parent_before.blockid)
+                print("if condition, should always be true:", parent_before != before.parent)
+                print("ids:", parent_before.blockid != before.parent.blockid)
+
                 before.parent.remove_child(before)
-                before.parent = parent_before
+
                 if node in parent_after.next:
                     parent_before.add_child(before)
                 elif node in parent_after.inputs:
                     parent_before.add_child(before, "inputs")
                 else: # node in fields
                     parent_before.add_child(before, "fields")   
-            #check alignment
-            # else: 
 
-        
+                if before.has_descendant(parent_before):
+                    # might indicate nodes to be deleted or moved; in any case, separate the parent so that we don't get circles in our tree
+                    parent_before.parent.remove_child(parent_before) 
+            #check alignment in the original program -- we don't do that (unlikely to be a thing)
+            # else: 
+    
+    def breadth_first_traverse(root, apply_fn):
+        node_q = []
+        node_q.append(root)
+        while len(node_q) > 0:
+            curr = node_q.pop(0)
+            apply_fn(curr)
+            node_q.extend(curr.children)
+    
+    breadth_first_traverse(tree_after, insert_update_move_align)
+
+    def delete(node):
+        _, after = find_mapping(node, after=False)
+        if after is None:
+            node.parent.remove_child(node)
+            deleted.append(node)
+
+    tree_before_copy.accept_postorder(delete)
+
+    print(tree_before_copy.node_equals(tree_after)) 
+    if (not tree_before_copy.node_equals(tree_after)):
+        return None
 
     return added, deleted, moved
 
