@@ -13,7 +13,7 @@ class TestASTOps(unittest.TestCase):
         self.test_remove_child()
 
     def test_add_child(self):
-        with open("test1.json") as f:
+        with open("test/tests_resources/test1.json") as f:
             program_1 = json.load(f)
         tree_1 = build_ast_tree(program_1["targets"][0]["blocks"])
         counter = CountVisitor()
@@ -52,7 +52,7 @@ class TestASTOps(unittest.TestCase):
         self.assertEqual(len(tree_1.fields), 1, "incorrect adding input")
         self.assertEqual(nextnode.parent, tree_1, "child node parent not properly added")
 
-        # with open("test2.json") as f:
+        # with open("test/tests_resources/test2.json") as f:
         #     program_2 = json.load(f)
         # tree_2 = build_ast_tree(program_2["targets"][0]["blocks"])
         # counter = CountVisitor()
@@ -60,7 +60,7 @@ class TestASTOps(unittest.TestCase):
         # self.assertEqual(counter.counter, 11, "incorrect parsing")
 
     def test_remove_child(self):
-        with open("test1.json") as f:
+        with open("test/tests_resources/test1.json") as f:
             program_1 = json.load(f)
         tree_1 = build_ast_tree(program_1["targets"][0]["blocks"])
         counter = CountVisitor()
@@ -90,7 +90,7 @@ class TestASTOps(unittest.TestCase):
         self.assertIsNone(to_delete.parent, "incorrect removal of children")
 
     def test_move_child(self):
-        with open("test1.json") as f:
+        with open("test/tests_resources/test1.json") as f:
             program_1 = json.load(f)
         tree_1 = build_ast_tree(program_1["targets"][0]["blocks"])
         counter = CountVisitor()
@@ -133,7 +133,7 @@ class TestASTOps(unittest.TestCase):
         self.assertEqual(len(node.children), n, "incorrect number of children")
 
     def test_move_children(self):
-        with open("test4.json") as f:
+        with open("test/tests_resources/test4.json") as f:
             program_4 = json.load(f)
         tree_4 = build_ast_tree(program_4["targets"][0]["blocks"])
         counter = CountVisitor()
@@ -196,9 +196,11 @@ class TestASTOps(unittest.TestCase):
         node1 = ASTNode(None, "123", "Yes")
         node2 = ASTNode(None, "123", "No")
         self.assertFalse(node1.node_equals(node2))
+
+        # this is here because for some reason I was having a bug where == and != were not opposite values
         self.assertEqual(node1, node2)
         self.assertTrue(node1 == node2)
-        self.assertFalse(node1 != node2) # does not pass?????????
+        self.assertFalse(node1 != node2)
         self.assertFalse(not (node1 == node2))
 
     def test_equals3(self):
@@ -254,7 +256,7 @@ class TestASTOps(unittest.TestCase):
         node2.add_child(node2_input, "inputs")
         self.assertFalse(node1.subtree_equals(node2))
         self.assertFalse(node1.node_equals(node2))
-        self.assertNotEqual(node1, node2)
+        self.assertEqual(node1, node2)
 
     def test_equals9(self):
         node1 = ASTNode(None, "123", "Yes")
@@ -305,4 +307,5 @@ class TestASTOps(unittest.TestCase):
         self.assertTrue(node1.node_equals(node2))
         self.assertEqual(node1, node2)
 
-unittest.main()
+if __name__ == "__main__":
+    unittest.main()

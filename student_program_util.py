@@ -24,7 +24,6 @@ class Episode():
     def __str__(self):
         return str(self.episode_data)
 
-# TODO: change method based on version
 def pickle_db_csv(play_sessions, session_data):
     play_sessions = pd.read_csv(play_sessions)
     play_sessions = play_sessions[play_sessions.user_id.notnull()]
@@ -131,4 +130,5 @@ def pickle_db_csv(play_sessions, session_data):
 
     print("pickled")
 
-pickle_db_csv("initial-analysis/play_sessions.csv", "session_data.csv")
+if __name__ == "__main__":
+    pickle_db_csv("initial-analysis/play_sessions.csv", "session_data.csv")

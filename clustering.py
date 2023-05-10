@@ -12,24 +12,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 import sys
-
-
-class Episode():
-    def __init__(self):
-        self.passing = False
-        self.programming_interface = pd.DataFrame()
-        self.episode_data = pd.DataFrame()
-        self.program = ""
-        self.challenge_name = ""
-
-    def __init__(self, pi:pd.DataFrame, ed:pd.DataFrame, passing:bool, program_rep:str, challenge_name:str):
-        self.passing = passing
-        self.programming_interface = pi
-        self.episode_data = ed
-        self.program = program_rep
-        self.challenge_name = challenge_name
-    def __str__(self):
-        return str(self.episode_data)
+from student_program_util import Episode
 
 with open("organized_sessions.pkl", 'rb') as f:
     organized_sessions = pickle.load(f)

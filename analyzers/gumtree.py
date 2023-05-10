@@ -129,33 +129,6 @@ def gumtree(head1:ASTNode, head2:ASTNode):
                                key = lambda t: dice(t[0].parent, t[1].parent, mappings),
                                reverse=True)
 
-     # debugging test5
-    # direction_nodes = []
-    # count = [0]
-    # def get_direction_block(node):
-    #     if node.op == "DIRECTION":
-    #         print('der1')
-    #         direction_nodes.append(node)
-    #         node.attributes['index'] = str(count[0])
-    #         count[0] += 1
-    # head2.accept(get_direction_block)
-    # print(len(direction_nodes))
-
-    # count = [0]
-    # def label_dice(node):
-    #     print('label')
-    #     if node.op == "DIRECTION":
-    #         print('der2')
-    #         for i in range(len(direction_nodes)):
-    #             d = dice(node.parent, direction_nodes[i].parent, mappings)
-    #             print(d)
-    #             node['attributes']["parent_dice" + str(i)] = str(d)
-    #             direction_nodes[i]['attributes']["parent_dice" + str(count)] = str(d)
-    #         node.attributes['index'] = str(count[0])
-    #         count[0] += 1
-
-    # head1.accept(label_dice)
-
     while len(sorted_candidates) > 0:
         top = sorted_candidates[0]
         del sorted_candidates[0]
@@ -189,11 +162,6 @@ def gumtree(head1:ASTNode, head2:ASTNode):
                         # print("found match")
                         mapped_child[0] = True
             node.accept(has_mapped_child)
-            # for c in node.children:
-            #     if c in matched1:
-            #         mapped_child = True
-            #         break
-            # print(mapped_child[0])
             if mapped_child[0]:
                 candidates = []
                 def unmatched(n):
@@ -205,7 +173,6 @@ def gumtree(head1:ASTNode, head2:ASTNode):
                 candidates = sorted(candidates,
                                     key = lambda t2: dice(node, t2, mappings),
                                     reverse=True)
-                # print("\n\n".join(["\n".join([str(d) for d in c]) for c in candidates]))
 
                 if len(candidates) > 0 and dice(node, candidates[0], mappings) > 0.2:
                     mappings.append((node, candidates[0]))
@@ -321,8 +288,6 @@ def get_chawathe_edit_script(tree_before, tree_after):
                 print("after", node.blockid)
                 print("parent_from", before.parent.blockid)
                 print("parent_to", parent_before.blockid)
-                print("if condition, should always be true:", parent_before != before.parent)
-                print("ids:", parent_before.blockid != before.parent.blockid)
 
                 before.parent.remove_child(before)
 

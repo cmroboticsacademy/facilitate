@@ -147,6 +147,12 @@ class ASTNode(dict):
             return False
         return self.blockid == other.blockid
 
+    def __ne__(self, other:'ASTNode'):
+        """
+        For some reason it doesn't just invert itself 
+        """
+        return not (self == other)
+
     
     def subtree_equals(self, other:'ASTNode'):
         """

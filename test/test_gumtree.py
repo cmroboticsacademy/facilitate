@@ -8,21 +8,16 @@ from analyzers.count import CountVisitor
 
 
 class TestGumtree(unittest.TestCase):
-    def runTest(self):
-        self.tree1_tree2()
-        self.tree2_tree3()
-        self.tree2_tree4()
-        self.tree4_tree5()
 
-    def tree1_tree2(self):
-        with open("test1.json") as f:
+    def test_tree1_tree2(self):
+        with open("test/tests_resources/test1.json") as f:
             program_1 = json.load(f)
         tree_1 = build_ast_tree(program_1["targets"][0]["blocks"])
         counter = CountVisitor()
         tree_1.accept(counter.visit)
         self.assertEqual(counter.counter, 6, "incorrect parsing")
 
-        with open("test2.json") as f:
+        with open("test/tests_resources/test2.json") as f:
             program_2 = json.load(f)
         tree_2 = build_ast_tree(program_2["targets"][0]["blocks"])
         counter = CountVisitor()
@@ -36,15 +31,15 @@ class TestGumtree(unittest.TestCase):
 
 
 
-    def tree2_tree3(self):
-        with open("test2.json") as f:
+    def test_tree2_tree3(self):
+        with open("test/tests_resources/test2.json") as f:
             program_2 = json.load(f)
         tree_2 = build_ast_tree(program_2["targets"][0]["blocks"])
         counter = CountVisitor()
         tree_2.accept(counter.visit)
         self.assertEqual(counter.counter, 11, "incorrect parsing")
 
-        with open("test3.json") as f:
+        with open("test/tests_resources/test3.json") as f:
             program_3 = json.load(f)
         tree_3 = build_ast_tree(program_3["targets"][0]["blocks"])
         counter = CountVisitor()
@@ -56,15 +51,15 @@ class TestGumtree(unittest.TestCase):
         self.assertEqual(len(added), 3, "incorrect number of nodes added")
         self.assertEqual(len(moved), 0, "incorrect number of nodes moved")
 
-    def tree2_tree4(self):
-        with open("test2.json") as f:
+    def test_tree2_tree4(self):
+        with open("test/tests_resources/test2.json") as f:
             program_2 = json.load(f)
         tree_2 = build_ast_tree(program_2["targets"][0]["blocks"])
         counter = CountVisitor()
         tree_2.accept(counter.visit)
         self.assertEqual(counter.counter, 11, "incorrect parsing")
 
-        with open("test4.json") as f:
+        with open("test/tests_resources/test4.json") as f:
             program_4 = json.load(f)
         tree_4 = build_ast_tree(program_4["targets"][0]["blocks"])
         counter = CountVisitor()
@@ -76,15 +71,15 @@ class TestGumtree(unittest.TestCase):
         self.assertEqual(len(added), 9, "incorrect number of nodes added")
         self.assertEqual(len(moved), 0, "incorrect number of nodes moved")
 
-    def tree4_tree5(self):
-        with open("test4.json") as f:
+    def test_tree4_tree5(self):
+        with open("test/tests_resources/test4.json") as f:
             program_4 = json.load(f)
         tree_4 = build_ast_tree(program_4["targets"][0]["blocks"])
         counter = CountVisitor()
         tree_4.accept(counter.visit)
         self.assertEqual(counter.counter, 20, "incorrect parsing")
 
-        with open("test5.json") as f:
+        with open("test/tests_resources/test5.json") as f:
             program_5 = json.load(f)
         tree_5 = build_ast_tree(program_5["targets"][0]["blocks"])
         counter = CountVisitor()
@@ -97,18 +92,13 @@ class TestGumtree(unittest.TestCase):
         self.assertEqual(len(moved), 2, "incorrect number of nodes moved")
 
 class TestEditScript(unittest.TestCase):
-    def runTest(self):
-        self.tree1_tree2()
-        self.tree2_tree3()
-        self.tree2_tree4()
-        self.tree4_tree5()
 
-    def tree1_tree2(self):
-        with open("test1.json") as f:
+    def test_tree1_tree2(self):
+        with open("test/tests_resources/test1.json") as f:
             program_1 = json.load(f)
         tree_1 = build_ast_tree(program_1["targets"][0]["blocks"])
 
-        with open("test2.json") as f:
+        with open("test/tests_resources/test2.json") as f:
             program_2 = json.load(f)
         tree_2 = build_ast_tree(program_2["targets"][0]["blocks"])
 
@@ -119,12 +109,12 @@ class TestEditScript(unittest.TestCase):
 
 
 
-    def tree2_tree3(self):
-        with open("test2.json") as f:
+    def test_tree2_tree3(self):
+        with open("test/tests_resources/test2.json") as f:
             program_2 = json.load(f)
         tree_2 = build_ast_tree(program_2["targets"][0]["blocks"])
 
-        with open("test3.json") as f:
+        with open("test/tests_resources/test3.json") as f:
             program_3 = json.load(f)
         tree_3 = build_ast_tree(program_3["targets"][0]["blocks"])
 
@@ -133,12 +123,12 @@ class TestEditScript(unittest.TestCase):
         self.assertEqual(len(added), 3, "incorrect number of nodes added")
         self.assertEqual(len(moved), 1, "incorrect number of nodes moved")
 
-    def tree2_tree4(self):
-        with open("test2.json") as f:
+    def test_tree2_tree4(self):
+        with open("test/tests_resources/test2.json") as f:
             program_2 = json.load(f)
         tree_2 = build_ast_tree(program_2["targets"][0]["blocks"])
 
-        with open("test4.json") as f:
+        with open("test/tests_resources/test4.json") as f:
             program_4 = json.load(f)
         tree_4 = build_ast_tree(program_4["targets"][0]["blocks"])
 
@@ -147,13 +137,13 @@ class TestEditScript(unittest.TestCase):
         self.assertEqual(len(added), 9, "incorrect number of nodes added")
         self.assertEqual(len(moved), 1, "incorrect number of nodes moved")
 
-    def tree4_tree5(self):
+    def test_tree4_tree5(self):
         print("trees 4-5")
-        with open("test4.json") as f:
+        with open("test/tests_resources/test4.json") as f:
             program_4 = json.load(f)
         tree_4 = build_ast_tree(program_4["targets"][0]["blocks"])
 
-        with open("test5.json") as f:
+        with open("test/tests_resources/test5.json") as f:
             program_5 = json.load(f)
         tree_5 = build_ast_tree(program_5["targets"][0]["blocks"])
 
@@ -167,4 +157,6 @@ class TestEditScript(unittest.TestCase):
         self.assertEqual(len(deleted), 0, "incorrect number of nodes deleted")
         self.assertEqual(len(added), 0, "incorrect number of nodes added")
         self.assertEqual(len(moved), 2, "incorrect number of nodes moved")
-unittest.main()
+
+if __name__ == "__main__":
+    unittest.main()
