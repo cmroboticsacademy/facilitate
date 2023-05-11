@@ -262,8 +262,10 @@ def get_chawathe_edit_script(tree_before, tree_after):
         before, _ = find_mapping(node, after=True)
         # insertion
         if before is None:
+            print("insertion")
             copied_node = node.copy_no_children()
             copied_node.blockid = copied_node.blockid+"_copy"
+            print(copied_node.blockid)
             if node in parent_after.next:
                 # if parent_before.next:
                 #     copied_node.add_child(parent_before.next)
@@ -322,8 +324,17 @@ def get_chawathe_edit_script(tree_before, tree_after):
 
     tree_before_copy.accept_postorder(delete)
 
-    print(tree_before_copy.node_equals(tree_after)) 
-    if (not tree_before_copy.node_equals(tree_after)):
+    from analyzers.count import CountVisitor
+    c = CountVisitor()
+    try:
+        tree_before_copy.accept(c.visit)
+    except:
+        print(c.counter)
+
+    print(tree_before_copy.subtree_equals(tree_after)) 
+    if (not (tree_before_copy.subtree_equals(tree_after))):
+        tree_before_copy.dump_json("debugging1.json")
+        tree_after.dump_json("debugging2.json")
         return None
 
     return added, deleted, moved

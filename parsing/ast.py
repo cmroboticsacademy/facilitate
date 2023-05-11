@@ -131,6 +131,7 @@ class ASTNode(dict):
             c.accept(visit_func)
             
     def accept_postorder(self, visit_func:Callable[['ASTNode'],None]):
+        # print(self.blockid)
         for c in self.children:
             c.accept_postorder(visit_func)
         visit_func(self)
