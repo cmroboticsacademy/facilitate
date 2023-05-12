@@ -11,7 +11,7 @@ import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.cluster import KMeans, DBSCAN
-from student_program_util import Episode
+from student_program_util import Episode, find_session
 
 
 
@@ -19,21 +19,15 @@ from student_program_util import Episode
 with open("organized_sessions.pkl", 'rb') as f:
     organized_sessions = pickle.load(f)
 
-def find_session(userid:int, challengename:str) -> list:
-    for session in reversed(organized_sessions[userid]):
-        if len(session) > 0 and session[0].challenge_name == challengename:
-            return session
-    return []
-
 all_uids = list(organized_sessions.keys())
 
 
 # Pick out some interesting cases
 
-sesh = find_session(1927379, "spike_curric_cleaning_the_home_myblocks_challenge")
+sesh = find_session(1927379, "spike_curric_cleaning_the_home_myblocks_challenge", organized_sessions)
 
 
-sesh_correct = find_session(1947084, "spike_curric_cleaning_the_home_myblocks_challenge")
+sesh_correct = find_session(1947084, "spike_curric_cleaning_the_home_myblocks_challenge", organized_sessions)
 for ep in sesh_correct:
     if ep.passing:
         print(ep.program)
@@ -73,7 +67,7 @@ print("----- similarity ------")
 "spike_curric_90_degree_turn_try_it"
 passing_progs = []
 for uid in organized_sessions.keys():
-    session = find_session(uid, "spike_curric_sequential_movements_mini_challenge_curriculum")
+    session = find_session(uid, "spike_curric_sequential_movements_mini_challenge_curriculum", organized_sessions)
     for episode in session:
         if episode.passing:
             passing_progs.append(episode)
@@ -161,7 +155,7 @@ print(db_cluster.core_sample_indices_)
 
 
 # print trajectory
-# sesh = find_session(1947120, "spike_curric_turn_around_craters_mini_challenge")
+# sesh = find_session(1947120, "spike_curric_turn_around_craters_mini_challenge", organized_sessions)
 
 
 # for ep in sesh:

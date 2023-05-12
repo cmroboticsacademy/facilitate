@@ -50,25 +50,6 @@ OpCodes = Enum('OpCodes', ["spike_movemenet_direction_for_duration",
     "spike_sensor_color_menu"])
 
 class ASTNode(dict):
-    def __init__(self):
-        self.parent = None
-        self.blockid = None
-        self.op = None
-        self.name = self.op # for visualization
-        self.children = []
-        self.next = None
-        self.inputs = []
-        self.fields = []
-        self._height = 1
-        self.attributes = {"id": self.blockid}
-        dict.__init__(self, 
-            blockid = self.blockid,
-            op = self.op,
-            name = self.name,
-            children = self.children,
-            _height = self._height,
-            attributes = self.attributes)
-        
     def __init__(self, parent, blockid, desc, next=[], inputs=[], fields=[]):
         self.parent = parent
         self.blockid = blockid
@@ -131,7 +112,6 @@ class ASTNode(dict):
             c.accept(visit_func)
             
     def accept_postorder(self, visit_func:Callable[['ASTNode'],None]):
-        # print(self.blockid)
         for c in self.children:
             c.accept_postorder(visit_func)
         visit_func(self)
@@ -254,11 +234,16 @@ class ASTNode(dict):
     def __hash__(self):
         return hash(self.blockid)
 
-    def copy(self):
-        copied_next = [n.copy() for n in self.next]
-        copied_inputs = [n.copy() for n in self.inputs]
-        copied_fields = [n.copy() for n in self.fields]
-        return ASTNode(self.parent, self.blockid, self.op, next=copied_next, inputs=copied_inputs, fields=copied_fields)
+    def copy(self, parent=None):
+        temp_copy = ASTNode(parent, self.blockid, self.op)
+        for n in self.next:
+            temp_copy.add_child(n.copy(parent=temp_copy), "next")
+        for n in self.inputs:
+            temp_copy.add_child(n.copy(parent=temp_copy), "inputs")
+        for n in self.fields:
+            temp_copy.add_child(n.copy(parent=temp_copy), "fields")
+
+        return temp_copy
 
     def copy_no_children(self):
         return ASTNode(self.parent, self.blockid, self.op)

@@ -34,11 +34,53 @@ I'm not going to push the csv and pickle file I used, but if you need the data I
 
 Some data analysis on CS2N programs is in `student_sample_statistics.py`. Clustering code is mostly in `clustering.py`
 
+# Getting the diff
+
+There are two methods for getting the diff: `get_edit_script` and `get_chawathe_edit_script`, both in  `analyzers/gumtree.py`.
+Both these methods will call gumtree and return a lists of nodes that were added, deleted, and moved.
+
+Weighting the nodes should be a matter of going through the lists and counting how many nodes of each type are present.
+
+`get_chawathe_edit_script` is probably more recommended since it's based on the algorithm other research papers used. But that depends if I can get the bugs out in time.
+
 # Visualizing
 
 The `ASTNode` class has a `dump_json` function that takes a filename and dumps a JSON that is readable by the tree visualization program.
 
 FYI -- because of this, the `.gitignore` automatically ignores JSON files, so if you add more testing JSONs, you will have to manually add them.
+
+If you want to visualize a tree that's been annotated with nodes that are added, removed or moved, the `gumtree.py` file contains a method called `annotate_with_diff` that takes two trees, calls `get_chawathe_edit_script`, and modifies the trees in the parameter to show whether the node has been added, removed, or moved when the tree is dumped to a json.
+
+# Importing CS2N data
+
+To parse and organzie CS2N data, download the data files for the two databases (`play_sessions` and `sessions_data`) as CSVs, make sure the main block at the bottom of `student_program_util.py` points to those CSVs, and call `python3 student_program_util.py`.
+
+That will generate a data structure (indicated in `diagram.png`) of all the sessions, organized by user ID, then challenge name, then sessions and episodes. This data structure is saved in `organized_sessions.pkl` for quick loading. To load the data structure in your program, call:
+
+```
+with open("organized_sessions.pkl", 'rb') as f:
+    organized_sessions = pickle.load(f)
+```
+
+**Note on versions:** I parse the rows of the database based on their data gathering version (since pre-1.0.4 and post 1.0.5 have different parsing methods). You may need to include or exclude certain versions of data or put other filtering mechanisms in the `pickle_db_csv` function.
+
+# Using the CS2N data
+
+Once you've generated the pickle file, you can load the data structure in and query it using the `find_session` function in `student_program_util.py`. This function takes the user id, challenge name, and data structure of sessions, and returns the latest (most recent) session for that user/challenge name. 
+
+For example, for user "1000" and challenge "cleaning_the_home" call `find_session(1000, "cleaning_the_home", organized session)` for the list of episodes. Each episode includes all the episode frames, programming interface frames leading up to the episode, the program being executed, and whether that episode passed or failed.
+
+You can directly access the data structure as well, by iterating through the user ids or the sessions for a given user.
+For example, if you want all the challenge names that a user has worked on, this would be a bit more complicated, since the challenge names are stored at the episode level. I would write:
+
+```
+challenges = set()
+for session in organized_sessions[user_id]:
+    if len(session) > 0:
+        challenges.add(session[0].challenge_name)
+```
+
+Feel free to extend `student_program_util.py` with other functions for interfacing with the sessions data structure.
 
 # Known problems, details, and potential improvements
 

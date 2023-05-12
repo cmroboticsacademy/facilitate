@@ -130,5 +130,11 @@ def pickle_db_csv(play_sessions, session_data):
 
     print("pickled")
 
+def find_session(userid:int, challengename:str, organized_sessions:dict) -> list:
+    for session in reversed(organized_sessions[userid]):
+        if len(session) > 0 and session[0].challenge_name == challengename:
+            return session
+    return []
+
 if __name__ == "__main__":
     pickle_db_csv("initial-analysis/play_sessions.csv", "session_data.csv")

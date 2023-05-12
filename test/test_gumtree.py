@@ -124,7 +124,6 @@ class TestEditScript(unittest.TestCase):
         self.assertEqual(len(moved), 1, "incorrect number of nodes moved")
 
     def test_tree2_tree4(self):
-        print("tree 2-4")
         with open("test/tests_resources/test2.json") as f:
             program_2 = json.load(f)
         tree_2 = build_ast_tree(program_2["targets"][0]["blocks"])
@@ -138,8 +137,7 @@ class TestEditScript(unittest.TestCase):
         self.assertEqual(len(added), 9, "incorrect number of nodes added")
         self.assertEqual(len(moved), 1, "incorrect number of nodes moved")
 
-    def _test_tree4_tree5(self):
-        print("trees 4-5")
+    def test_tree4_tree5(self):
         with open("test/tests_resources/test4.json") as f:
             program_4 = json.load(f)
         tree_4 = build_ast_tree(program_4["targets"][0]["blocks"])
