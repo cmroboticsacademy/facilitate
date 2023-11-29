@@ -18,8 +18,42 @@ pytest = "^7.4.3"
 pep8-naming = "^0.13.3"
 flake8-import-order = "^0.18.2"
 flake8-comprehensions = "^3.14.0"
-flake8-docstrings = "^1.7.0"
 flake8-bugbear = "^23.9.16"
+flake8-future-annotations = "^1.1.0"
+flake8-quotes = "^3.3.2"
+pytest-cov = "^4.1.0"
+ruff = "^0.1.6"
+nox = "^2023.4.22"
+
+[tool.mypy]
+ignore_missing_imports = false
+strict = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src"]
+select = [
+    "ALL",  # includes all rules (including new ones)
+]
+extend-ignore = [
+    "ANN101",   # missing type annotation for 'self' in method
+    "ANN102",   # missing type annotation for 'cls' in classmethod
+    "D100",     # missing docstring in public module
+    "D101",     # missing docstring in public class
+    "D102",     # missing docstring in public method
+    "D103",     # missing docstring in public function
+    "D104",     # missing docstring in public package
+    "D203",     # one-blank-line-before-class
+    "D213",     # multi-line-summary-second-line
+    "FIX001",   # unresolved FIXME
+    "TD001",    # invalid TODO tag: `FIXME`
+    "TD002",    # missing author in TODO
+    "TD003",    # missing issue link on line following TODO
+    "TD004",    # missing colon in TODO
+    "TRY003",   # avoid specifying long messages outside the exception class
+    "S101",     # use of assertions
+]
 
 [build-system]
 requires = ["poetry-core"]
