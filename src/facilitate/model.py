@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import enum
+import typing as t
 from dataclasses import dataclass
 
 
@@ -32,29 +33,35 @@ class BlockCategory(enum.Enum):
         return cls(prefix)
 
 
-class Value(abc.ABC):
-    """Tagged interface to indicate an AST element that can be evaluated to a value."""
+class Node(abc.ABC):
+    """Represents a node in the abstract syntax tree."""
+    @abc.abstractmethod
+    def children(self) -> t.Iterator[Node]:
+        ...
 
 
-class Expression(Value):
-    """Indicates that given block represents an expression."""
+class TerminalNode(Node, abc.ABC):
+    """Represents a node in the abstract syntax tree that has no children."""
+    def children(self) -> t.Iterator[Node]:
+        return
 
 
 @dataclass
-class Field:
+class Field(TerminalNode):
     """Fields store specific values, options, or settings that customize the behavior or appearance of a block."""
     name: str
     value: str
 
 
 @dataclass
-class Literal(Value):
+class Literal(TerminalNode):
+    """Represents a literal value within the AST."""
     value: str
 
 
 @dataclass
-class VarRef(Value):
-    """A reference to a named, in-scope variable."""
+class VarRef(TerminalNode):
+    """Represents a reference to a named variable."""
     variable: str
 
 
@@ -63,9 +70,12 @@ class Sequence(Node):
     """Represents a sequence of blocks."""
     blocks: list[Block]
 
+    def children(self) -> t.Iterator[Node]:
+        yield from self.blocks
+
 
 @dataclass
-class SimpleBlock:
+class Block(Node):
     id_: str
     opcode: str
     parent: Block | None
@@ -73,13 +83,20 @@ class SimpleBlock:
     inputs: list[Node]
     is_shadow: bool
 
+    # FIXME ensure that fields and inputs are ordered (postinit)
+
     @property
     def category(self) -> BlockCategory:
         return BlockCategory.from_opcode(self.opcode)
 
-    # TODO ensure that fields and inputs are ordered
+    def children(self) -> t.Iterator[Node]:
+        yield from self.fields
+        yield from self.inputs
 
 
 @dataclass
-class Program:
+class Program(Node):
     top_level_blocks: list[Block]
+
+    def children(self) -> t.Iterator[Node]:
+        yield from self.top_level_blocks
