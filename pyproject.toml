@@ -54,6 +54,7 @@ extend-ignore = [
     "TD004",    # missing colon in TODO
     "TRY003",   # avoid specifying long messages outside the exception class
     "S101",     # use of assertions
+    "T201",     # use of print
 ]
 
 [build-system]
