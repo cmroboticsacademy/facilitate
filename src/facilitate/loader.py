@@ -22,8 +22,33 @@ class _BlockDescription(t.TypedDict):
 
 
 @dataclass
-class _BlockDescriptionSequence:
+class _SequenceDescription:
+    parent_id: str
     descriptions: list[_BlockDescription]
+
+    @property
+    def id_(self) -> str:
+        """The ID of the sequence."""
+        return f"{self.parent_id}_sequence_{self.start_id}_to_{self.end_id}"
+
+    @property
+    def start_id(self) -> str:
+        """The ID of the first block in the sequence."""
+        return self.descriptions[0]["id_"]
+
+    @property
+    def end_id(self) -> str:
+        """The ID of the last block in the sequence."""
+        return self.descriptions[-1]["id_"]
+
+    def add(self, description: _BlockDescription) -> None:
+        """Add a block to the end of the sequence."""
+        assert description["parent"] == self.parent_id
+        assert description["id_"] not in self.block_ids
+        self.descriptions.append(description)
+
+
+_NodeDescription = _BlockDescription | _SequenceDescription
 
 
 _ProgramDescription = t.MutableMapping[
@@ -33,15 +58,18 @@ _ProgramDescription = t.MutableMapping[
 
 
 def _toposort(
-    id_to_description: _ProgramDescription,
-) -> list[_BlockDescription]:
+    id_to_node_description: dict[str, _NodeDescription],
+) -> list[_NodeDescription]:
     depends_on: dict[str, set[str]] = {
-        id_: set() for id_ in id_to_description
+        id_: set() for id_ in id_to_node_description
     }
-    for id_, description in id_to_description.items():
-        description["id_"] = id_
-        if "parent" in description:
+    for id_, description in id_to_node_description.items():
+        parent_id: str | None = None
+        if isinstance(description, _BlockDescription):
             parent_id = description["parent"]
+        elif isinstance(description, _SequenceDescription):
+            parent_id = description.parent_id
+        if parent_id:
             depends_on[parent_id].add(id_)
 
     queue: list[str] = list(depends_on.keys())
@@ -57,13 +85,59 @@ def _toposort(
 
     assert visited == set(depends_on.keys())
 
-    return [id_to_description[id_] for id_ in sorted_ids]
+    return [id_to_node_description[id_] for id_ in sorted_ids]
+
+
+def _extract_sequences(
+    id_to_description: _ProgramDescription,
+) -> list[_SequenceDescription]:
+    sequences: list[_SequenceDescription] = []
+
+    for from_id, from_description in id_to_description.items():
+        if not from_description["next"]:
+            continue
+
+        parent_id = from_description["parent"]
+        to_id = from_description["next"]
+        to_description = id_to_description[to_id]
+
+        # is there a sequence that ends with from_id?
+        # if so, add block to the end of that sequence
+        # if not, create a new sequence
+        existing_sequence: _SequenceDescription | None = next(
+            (sequence for sequence in sequences if sequence.end_id == from_id),
+            None,
+        )
+        if existing_sequence:
+            existing_sequence.add(to_description)
+        else:
+            new_sequence = _SequenceDescription(
+                parent_id,
+                [from_description, to_description],
+            )
+            sequences.append(new_sequence)
+
+    return sequences
 
 
 def load_program_from_block_descriptions(
     id_to_description: _ProgramDescription,
 ) -> Program:
-    descriptions: list[_BlockDescription] = _toposort(id_to_description)
-    print(descriptions)
+    id_to_block_description = {
+        id_: {"id_": id_} | description
+        for id_, description in id_to_description.items()
+    }
 
-    # TODO identify sequences
+    sequences = _extract_sequences(id_to_block_description)
+    for sequence in sequences:
+        for description in sequence.descriptions:
+            description["parent"] = sequence.id_
+
+    id_to_node_description = {
+        **id_to_block_description,
+        **{sequence.id_: sequence for sequence in sequences},
+    }
+
+    descriptions = _toposort(id_to_node_description)
+
+    print(descriptions)
