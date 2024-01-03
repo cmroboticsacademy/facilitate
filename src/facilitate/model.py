@@ -4,6 +4,7 @@ import abc
 import enum
 import typing as t
 from dataclasses import dataclass
+from functools import cached_property
 
 import networkx as nx
 from overrides import final, overrides
@@ -40,6 +41,14 @@ class BlockCategory(enum.Enum):
 
 class Node(abc.ABC):
     """Represents a node in the abstract syntax tree."""
+    @cached_property
+    def height(self) -> int:
+        """The height of the subtree rooted at this node."""
+        max_child_height = 0
+        for child in self.children():
+            max_child_height = max(max_child_height, child.height)
+        return max_child_height + 1
+
     @abc.abstractmethod
     def equivalent_to(self, other: Node) -> bool:
         """Determines whether this node is equivalent to another."""
@@ -90,7 +99,7 @@ class TerminalNode(Node, abc.ABC):
     """Represents a node in the abstract syntax tree that has no children."""
     @overrides
     def children(self) -> t.Iterator[Node]:
-        return
+        yield from []
 
 
 @dataclass
