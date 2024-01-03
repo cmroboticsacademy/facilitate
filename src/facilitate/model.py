@@ -6,6 +6,7 @@ import typing as t
 from dataclasses import dataclass
 from typing import Iterator
 
+import networkx as nx
 from overrides import final, overrides
 
 
@@ -55,6 +56,18 @@ class Node(abc.ABC):
         yield self
         yield from self.descendants()
 
+    @abc.abstractmethod
+    def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        """Adds the subtree rooted as this node to a digraph."""
+        raise NotImplementedError
+
+    @final
+    def to_nx_digraph(self) -> nx.DiGraph:
+        """Converts the graph rooted as this node to an NetworkX DiGraph."""
+        graph = nx.DiGraph()
+        self._add_to_nx_digraph(graph)
+        return graph
+
 
 class TerminalNode(Node, abc.ABC):
     """Represents a node in the abstract syntax tree that has no children."""
@@ -66,24 +79,54 @@ class TerminalNode(Node, abc.ABC):
 @dataclass
 class Field(TerminalNode):
     """Fields store specific values, options, or settings that customize the behavior or appearance of a block."""
+    id_: str
     name: str
     value: str
+
+    @overrides
+    def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        graph.add_node(
+            self.id_,
+            label="field",
+            name=self.name,
+            value=self.value,
+        )
 
 
 @dataclass
 class Literal(TerminalNode):
     """Represents a literal value within the AST."""
+    id_: str
     value: str
+
+    @overrides
+    def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        graph.add_node(
+            self.id_,
+            label="literal",
+            value=self.value,
+        )
 
 
 @dataclass
 class Input(Node):
+    id_: str
     name: str
     expression: Node
 
     @overrides
     def children(self) -> t.Iterator[Node]:
         yield self.expression
+
+    @overrides
+    def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        graph.add_node(
+            self.id_,
+            label="input",
+            name=self.name,
+        )
+        self.expression._add_to_nx_digraph(graph)
+        graph.add_edge(self.id_, self.expression.id_)
 
 
 @dataclass
@@ -102,6 +145,16 @@ class Sequence(Node):
     @overrides
     def children(self) -> t.Iterator[Node]:
         yield from self.blocks
+
+    @overrides
+    def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        graph.add_node(
+            self.id_,
+            label="sequence",
+        )
+        for block in self.blocks:
+            block._add_to_nx_digraph(graph)
+            graph.add_edge(self.id_, block.id_)
 
 
 @dataclass
@@ -126,11 +179,36 @@ class Block(Node):
         yield from self.fields
         yield from self.inputs
 
+    @overrides
+    def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        graph.add_node(
+            self.id_,
+            label="block",
+            opcode=self.opcode,
+        )
+        for child in self.children():
+            child._add_to_nx_digraph(graph)
+            graph.add_edge(self.id_, child.id_)
+
 
 @dataclass
 class Program(Node):
     top_level_blocks: list[Block]
 
+    @property
+    def id_(self) -> str:
+        return "PROGRAM"
+
     @overrides
     def children(self) -> t.Iterator[Node]:
         yield from self.top_level_blocks
+
+    @overrides
+    def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        graph.add_node(
+            self.id_,
+            label="program",
+        )
+        for child in self.children():
+            child._add_to_nx_digraph(graph)
+            graph.add_edge(self.id_, child.id_)

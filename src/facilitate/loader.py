@@ -12,6 +12,7 @@ from facilitate.model import (
     Block,
     Field,
     Input,
+    Literal,
     Node,
     Program,
     Sequence,
@@ -174,22 +175,48 @@ def load_program_from_block_descriptions(
     node_descriptions = _toposort(id_to_node_description)
     logger.trace("toposorted blocks for parsing")
 
-    # build the nodes in reverse order
     id_to_node: dict[str, Node] = {}
     for description in reversed(node_descriptions):
         id_ = description["id_"]
         node_type = description["type"]
 
         if node_type == "block":
-            # fetch inputs (should already have been built!)
-            inputs: list[Input] = [
-                Input(name=name, expression=id_to_node[block_id])
-                for name, block_id in _extract_input_names_to_id(description).items()
-            ]
+            inputs: list[Input] = []
+            for input_name, input_value_arr in description["inputs"].items():
+                assert len(input_value_arr) == 2
+                assert isinstance(input_value_arr[0], int)
 
-            # build fields
+                expression: Node
+                if isinstance(input_value_arr[1], str):
+                    expression = id_to_node[input_value_arr[1]]
+                elif isinstance(input_value_arr[1], list):
+                    assert len(input_value_arr[1]) == 2
+                    literal_value = input_value_arr[1][1]
+                    assert isinstance(literal_value, str)
+                    literal_id = f":literal@input[{input_name}]@{id_}"
+                    expression = Literal(
+                        id_=literal_id,
+                        value=literal_value,
+                    )
+                else:
+                    raise ValueError(
+                        f"invalid input value: {input_value_arr[1]}"
+                    )
+
+                input_id = f":input[{input_name}]@{id_}"
+                input = Input(
+                    id_=input_id,
+                    name=input_name,
+                    expression=expression,
+                )
+                inputs.append(input)
+
             fields: list[Field] = [
-                Field(name=name, value=value_arr[0])
+                Field(
+                    id_=f":field[{name}]@{id_}",
+                    name=name,
+                    value=value_arr[0],
+                )
                 for name, value_arr in description["fields"].items()
             ]
 
