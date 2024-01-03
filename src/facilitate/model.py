@@ -42,8 +42,14 @@ class BlockCategory(enum.Enum):
 class Node(abc.ABC):
     """Represents a node in the abstract syntax tree."""
     @abc.abstractmethod
+    def equivalent_to(self, other: Node) -> bool:
+        """Determines whether this node is equivalent to another."""
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def children(self) -> t.Iterator[Node]:
-        ...
+        """Iterates over all children of this node."""
+        raise NotImplementedError
 
     @final
     def descendants(self) -> t.Iterator[Node]:
@@ -96,6 +102,14 @@ class Field(TerminalNode):
     value: str
 
     @overrides
+    def equivalent_to(self, other: Node) -> bool:
+        if not isinstance(other, Field):
+            return False
+        if self.name != other.name:
+            return False
+        return self.value == other.value
+
+    @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         label = f'"field:{self.name}={self.value}"'
         graph.add_node(
@@ -111,6 +125,10 @@ class Literal(TerminalNode):
     value: str
 
     @overrides
+    def equivalent_to(self, other: Node) -> bool:
+        return isinstance(other, Literal) and self.value == other.value
+
+    @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         label = f'"literal:{self.value}"'
         graph.add_node(
@@ -124,6 +142,14 @@ class Input(Node):
     id_: str
     name: str
     expression: Node
+
+    @overrides
+    def equivalent_to(self, other: Node) -> bool:
+        if not isinstance(other, Input):
+            return False
+        if self.name != other.name:
+            return False
+        return self.expression.equivalent_to(other.expression)
 
     @overrides
     def children(self) -> t.Iterator[Node]:
@@ -154,6 +180,17 @@ class Sequence(Node):
     blocks: list[Block]
 
     @overrides
+    def equivalent_to(self, other: Node) -> bool:
+        if not isinstance(other, Sequence):
+            return False
+        if len(self.blocks) != len(other.blocks):
+            return False
+        for block, other_block in zip(self.blocks, other.blocks):
+            if not block.equivalent_to(other_block):
+                return False
+        return True
+
+    @overrides
     def children(self) -> t.Iterator[Node]:
         yield from self.blocks
 
@@ -176,6 +213,31 @@ class Block(Node):
     fields: list[Field]
     inputs: list[Input]
     is_shadow: bool
+
+    @overrides
+    def equivalent_to(self, other: Node) -> bool:
+        """Determines whether this block is equivalent to another."""
+        if not isinstance(other, Block):
+            return False
+
+        if self.opcode != other.opcode:
+            return False
+
+        # compare fields
+        if len(self.fields) != len(other.fields):
+            return False
+        for field, other_field in zip(self.fields, other.fields):
+            if not field.equivalent_to(other_field):
+                return False
+
+        # compare inputs
+        if len(self.inputs) != len(other.inputs):
+            return False
+        for input_, other_input in zip(self.inputs, other.inputs):
+            if not input_.equivalent_to(other_input):
+                return False
+
+        return True
 
     def __post_init__(self) -> None:
         self.fields.sort(key=lambda field: field.name)
@@ -210,6 +272,17 @@ class Program(Node):
     @property
     def id_(self) -> str:
         return "PROGRAM"
+
+    @overrides
+    def equivalent_to(self, other: Node) -> bool:
+        if not isinstance(other, Program):
+            return False
+        if len(self.top_level_blocks) != len(other.top_level_blocks):
+            return False
+        for block, other_block in zip(self.top_level_blocks, other.top_level_blocks):
+            if not block.equivalent_to(other_block):
+                return False
+        return True
 
     @overrides
     def children(self) -> t.Iterator[Node]:
