@@ -9,7 +9,7 @@ def get_max_key(pq:defaultdict)->int:
 
 def insert_pq(pq:defaultdict, n:ASTNode):
     pq[n.height()].add(n)
-    
+
 def dice(parent1:ASTNode, parent2:ASTNode, mappings: list):
     desc1 = parent1.get_descendants()
     desc2 = parent2.get_descendants()
@@ -26,7 +26,7 @@ def dice(parent1:ASTNode, parent2:ASTNode, mappings: list):
                 t2_contain = True
         if t1_contain and t2_contain:
             contained_mappings.append((t1, t2))
-    
+
     return (2*len(contained_mappings) / (len(desc1) + len(desc2))) * (2 if parent1.blockid == parent2.blockid else 1)
 
 def generate_similarity_matrix(head1:ASTNode, head2:ASTNode):
@@ -35,18 +35,18 @@ def generate_similarity_matrix(head1:ASTNode, head2:ASTNode):
     head1.accept(ids_visitor_1.visit)
     head2.accept(ids_visitor_2.visit)
 
-    matrix = [ 
-            [ 
-                False 
-                for _ in range(len(ids_visitor_2.statement_list)) 
-            ] 
-            for _ in range(len(ids_visitor_1.statement_list)) 
+    matrix = [
+            [
+                False
+                for _ in range(len(ids_visitor_2.statement_list))
+            ]
+            for _ in range(len(ids_visitor_1.statement_list))
         ]
-    
+
     for i, node1 in enumerate(ids_visitor_1.statement_list):
         for j, node2 in enumerate(ids_visitor_2.statement_list):
             matrix[i][j] = node1.subtree_equals(node2)
-    
+
     return matrix, ids_visitor_1.statement_list, ids_visitor_2.statement_list
 
 def sim_matrix_count_subtree_occurrences(target_node_index, sim_matrix, count_in_tree1=True):
@@ -60,7 +60,7 @@ def sim_matrix_count_subtree_occurrences(target_node_index, sim_matrix, count_in
             if sim_matrix[target_node_index][i]:
                 count += 1
     return count
-    
+
 
 # @profile
 def gumtree(head1:ASTNode, head2:ASTNode):
@@ -72,18 +72,18 @@ def gumtree(head1:ASTNode, head2:ASTNode):
     # top down phase
     subtree_queue1 = defaultdict(set) # dict { height : [subtrees with that height]
     subtree_queue2 = defaultdict(set)
-    
+
     candidate_mappings = []
     mappings = []
-    
-    
+
+
     insert_pq(subtree_queue1, head1)
     insert_pq(subtree_queue2, head2)
-    
+
     while len(subtree_queue1)> 0 and len(subtree_queue2) > 0:
         maxheight1 = get_max_key(subtree_queue1)
         maxheight2 = get_max_key(subtree_queue2)
-        
+
         if maxheight1 != maxheight2:
             if maxheight1 > maxheight2:
                 maxtrees = subtree_queue1[maxheight1]
@@ -100,9 +100,10 @@ def gumtree(head1:ASTNode, head2:ASTNode):
         else:
             maxtrees1 = subtree_queue1[maxheight1]
             maxtrees2 = subtree_queue2[maxheight2]
-            
+
             added_trees1 = set()
             added_trees2 = set()
+
             for t1 in maxtrees1:
                 for t2 in maxtrees2:
                     if t1.subtree_equals(t2):
@@ -114,18 +115,21 @@ def gumtree(head1:ASTNode, head2:ASTNode):
                             mappings.append((t1, t2))
                         added_trees1.add(t1)
                         added_trees2.add(t2)
+
             for t in maxtrees1:
                 if t not in added_trees1:
                     for c in t.children:
                         insert_pq(subtree_queue1, c)
+
             for t in maxtrees2:
                 if t not in added_trees2:
                     for c in t.children:
                         insert_pq(subtree_queue2, c)
+
             del subtree_queue1[maxheight1]
             del subtree_queue2[maxheight2]
 
-    sorted_candidates = sorted(candidate_mappings, 
+    sorted_candidates = sorted(candidate_mappings,
                                key = lambda t: dice(t[0].parent, t[1].parent, mappings),
                                reverse=True)
 
@@ -134,7 +138,7 @@ def gumtree(head1:ASTNode, head2:ASTNode):
         del sorted_candidates[0]
         mappings.append(top)
         sorted_candidates = [s for s in sorted_candidates if s[0]!=top[0] and s[1] != top[1]]
-    
+
     # mapping all nodes of subtrees
     def add_children_as_mappings(n1, n2):
         if len(n1.children) != len(n2.children):
@@ -148,7 +152,7 @@ def gumtree(head1:ASTNode, head2:ASTNode):
     for m1, m2 in mappings:
         add_children_as_mappings(m1, m2)
 
-    
+
     # bottom up
     matched1 = [t[0] for t in mappings]
     matched2 = [t[1] for t in mappings]
@@ -168,7 +172,7 @@ def gumtree(head1:ASTNode, head2:ASTNode):
                     if n.op == node.op and n not in matched2:
                         candidates.append(n)
                 head2.accept(unmatched)
-                             
+
                 # print(candidates)
                 candidates = sorted(candidates,
                                     key = lambda t2: dice(node, t2, mappings),
@@ -176,7 +180,7 @@ def gumtree(head1:ASTNode, head2:ASTNode):
 
                 if len(candidates) > 0 and dice(node, candidates[0], mappings) > 0.2:
                     mappings.append((node, candidates[0]))
-                    # here the original gumtree algorithm uses an edit script algorithm to find 
+                    # here the original gumtree algorithm uses an edit script algorithm to find
                     # further mappings for trees under a certain size, but all these programs are small
                     # so I don't anticipate needing that
     head1.accept_postorder(bottom_up_helper)
@@ -230,7 +234,7 @@ def get_chawathe_edit_script(tree_before, tree_after):
 
     # for m in mappings:
     #     print(m[0].blockid, m[1].blockid)
-  
+
     added = []
     moved = []
     deleted = []
@@ -250,7 +254,7 @@ def get_chawathe_edit_script(tree_before, tree_after):
                 print(f"{n1.blockid:50} {n2.blockid:50}")
             raise Exception('mappings should be 1 to 1')
         if len(node_maps) == 0:
-            if after: 
+            if after:
                 return None, node
             else:
                 return node, None
@@ -264,7 +268,7 @@ def get_chawathe_edit_script(tree_before, tree_after):
             copied_node = node.copy_no_children()
 
             copied_node.blockid = copied_node.blockid+"_copy"
-            
+
             if node in parent_after.next:
                 # if parent_before.next:
                 #     copied_node.add_child(parent_before.next)
@@ -272,7 +276,7 @@ def get_chawathe_edit_script(tree_before, tree_after):
             elif node in parent_after.inputs:
                 parent_before.add_child(copied_node, "inputs")
             else: # node in fields
-                parent_before.add_child(copied_node, "fields")   
+                parent_before.add_child(copied_node, "fields")
             # print("added", copied_node.blockid)
             # print("added to parent", copied_node.parent.blockid)
             # print()
@@ -291,14 +295,14 @@ def get_chawathe_edit_script(tree_before, tree_after):
                 elif node in parent_after.inputs:
                     parent_before.add_child(before, "inputs")
                 else: # node in fields
-                    parent_before.add_child(before, "fields")   
+                    parent_before.add_child(before, "fields")
 
                 if before.has_descendant(parent_before):
                     # might indicate nodes to be deleted or moved; in any case, separate the parent so that we don't get circles in our tree
-                    parent_before.parent.remove_child(parent_before) 
+                    parent_before.parent.remove_child(parent_before)
             #check alignment in the original program -- we don't do that (unlikely to be a thing)
-            # else: 
-    
+            # else:
+
     def breadth_first_traverse(root, apply_fn):
         node_q = []
         node_q.append(root)
@@ -306,7 +310,7 @@ def get_chawathe_edit_script(tree_before, tree_after):
             curr = node_q.pop(0)
             apply_fn(curr)
             node_q.extend(curr.children)
-    
+
     breadth_first_traverse(tree_after, insert_update_move_align)
 
     def delete(node):
@@ -336,7 +340,7 @@ def annotate_with_diff(mutable_tree_1, mutable_tree_2):
 
     for m in added:
         m['attributes']['diff'] = "added"
-    
+
     for m in deleted:
         m['attributes']['diff'] = "deleted"
     for m1, m2 in moved:
