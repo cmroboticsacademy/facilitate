@@ -68,6 +68,7 @@ class VarRef(TerminalNode):
 @dataclass
 class Sequence(Node):
     """Represents a sequence of blocks."""
+    id_: str
     blocks: list[Block]
 
     def children(self) -> t.Iterator[Node]:

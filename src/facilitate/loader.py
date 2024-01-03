@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import typing as t
 from dataclasses import dataclass
+from pprint import pprint
+
+from loguru import logger
 
 if t.TYPE_CHECKING:
     from facilitate.program import Program
@@ -23,12 +26,14 @@ class _BlockDescription(t.TypedDict):
 
 @dataclass
 class _SequenceDescription:
-    parent_id: str
+    parent_id: str | None
     descriptions: list[_BlockDescription]
 
     @property
     def id_(self) -> str:
         """The ID of the sequence."""
+        if self.parent_id is None:
+            return f"toplevel_sequence_{self.start_id}_to_{self.end_id}"
         return f"{self.parent_id}_sequence_{self.start_id}_to_{self.end_id}"
 
     @property
@@ -98,8 +103,11 @@ def _extract_sequences(
             continue
 
         parent_id = from_description["parent"]
+        logger.trace("parent of {} is {}", from_id, parent_id)
         to_id = from_description["next"]
         to_description = id_to_description[to_id]
+
+        logger.trace("identified sequence link: {} -> {}", from_id, to_id)
 
         # is there a sequence that ends with from_id?
         # if so, add block to the end of that sequence
@@ -109,12 +117,14 @@ def _extract_sequences(
             None,
         )
         if existing_sequence:
+            logger.trace("extending existing sequence: {}", existing_sequence.id_)
             existing_sequence.add(to_description)
         else:
             new_sequence = _SequenceDescription(
                 parent_id,
                 [from_description, to_description],
             )
+            logger.trace("creating new sequence: {}", new_sequence.id_)
             sequences.append(new_sequence)
 
     return sequences
@@ -127,8 +137,12 @@ def load_program_from_block_descriptions(
         id_: {"id_": id_} | description
         for id_, description in id_to_description.items()
     }
+    logger.trace("injected ID into block descriptions")
+    logger.trace("program description contains {} blocks", len(id_to_block_description))
+    pprint(list(id_to_block_description.values()))
 
     sequences = _extract_sequences(id_to_block_description)
+    logger.trace("extracted {} sequences", len(sequences))
     for sequence in sequences:
         for description in sequence.descriptions:
             description["parent"] = sequence.id_
@@ -139,5 +153,7 @@ def load_program_from_block_descriptions(
     }
 
     descriptions = _toposort(id_to_node_description)
-
     print(descriptions)
+
+
+# FIXME fix handling of top-level blocks
