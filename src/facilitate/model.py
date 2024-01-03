@@ -6,6 +6,8 @@ import typing as t
 from dataclasses import dataclass
 from typing import Iterator
 
+from overrides import overrides
+
 
 class BlockCategory(enum.Enum):
     CONTROL = "control"
@@ -43,6 +45,7 @@ class Node(abc.ABC):
 
 class TerminalNode(Node, abc.ABC):
     """Represents a node in the abstract syntax tree that has no children."""
+    @overrides
     def children(self) -> t.Iterator[Node]:
         return
 
@@ -65,6 +68,7 @@ class Input(Node):
     name: str
     expression: Node
 
+    @overrides
     def children(self) -> t.Iterator[Node]:
         yield self.expression
 
@@ -82,6 +86,7 @@ class Sequence(Node):
     parent: Node | None
     blocks: list[Block]
 
+    @overrides
     def children(self) -> t.Iterator[Node]:
         yield from self.blocks
 
@@ -103,6 +108,7 @@ class Block(Node):
     def category(self) -> BlockCategory:
         return BlockCategory.from_opcode(self.opcode)
 
+    @overrides
     def children(self) -> t.Iterator[Node]:
         yield from self.fields
         yield from self.inputs
@@ -112,5 +118,6 @@ class Block(Node):
 class Program(Node):
     top_level_blocks: list[Block]
 
+    @overrides
     def children(self) -> t.Iterator[Node]:
         yield from self.top_level_blocks
