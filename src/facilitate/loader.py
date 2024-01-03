@@ -199,7 +199,12 @@ def load_program_from_block_descriptions(
         else:
             raise ValueError(f"invalid node type: {description['type']}")
 
-    # FIXME update each description with correct parent pointers
+    # update each description with correct parent pointers
+    for id_, description in id_to_node_description.items():
+        parent_id: str | None = description["parent"]
+        if parent_id:
+            id_to_node[id_].parent = id_to_node[parent_id]
+
     pprint(id_to_node)
 
     raise NotImplementedError
