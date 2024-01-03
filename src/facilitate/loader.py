@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 import typing as t
 from dataclasses import dataclass
 from pprint import pprint
@@ -8,58 +9,6 @@ from loguru import logger
 
 if t.TYPE_CHECKING:
     from facilitate.program import Program
-
-
-class _BlockDescription(t.TypedDict):
-    id_: str
-    opcode: str
-    next: str | None
-    parent: str | None
-    next: str | None
-    inputs: dict[str, list[t.Any]]
-    fields: dict[str, list[t.Any]]
-    shadow: bool
-    topLevel: bool
-    x: int
-    y: int
-
-
-@dataclass
-class _SequenceDescription:
-    parent_id: str | None
-    descriptions: list[_BlockDescription]
-
-    @property
-    def id_(self) -> str:
-        """The ID of the sequence."""
-        if self.parent_id is None:
-            return f"toplevel_sequence_{self.start_id}_to_{self.end_id}"
-        return f"{self.parent_id}_sequence_{self.start_id}_to_{self.end_id}"
-
-    @property
-    def start_id(self) -> str:
-        """The ID of the first block in the sequence."""
-        return self.descriptions[0]["id_"]
-
-    @property
-    def end_id(self) -> str:
-        """The ID of the last block in the sequence."""
-        return self.descriptions[-1]["id_"]
-
-    def add(self, description: _BlockDescription) -> None:
-        """Add a block to the end of the sequence."""
-        assert description["parent"] == self.parent_id
-        assert description["id_"] not in self.block_ids
-        self.descriptions.append(description)
-
-
-_NodeDescription = _BlockDescription | _SequenceDescription
-
-
-_ProgramDescription = t.MutableMapping[
-    str,
-    _BlockDescription,
-]
 
 
 def _toposort(
@@ -93,67 +42,115 @@ def _toposort(
     return [id_to_node_description[id_] for id_ in sorted_ids]
 
 
-def _extract_sequences(
-    id_to_description: _ProgramDescription,
-) -> list[_SequenceDescription]:
-    sequences: list[_SequenceDescription] = []
+def _inject_parent_into_block_descriptions(
+    id_to_node_description: dict[str, t.Any],
+) -> dict[str, t.Any]:
+    id_to_parent: t.Dict[str, str] = {}
+    for id_, description in id_to_node_description.items():
+        # remove ambiguous "parent" field:
+        # can mean immediate parent or predecessor (i.e., previous block in sequence)
+        if "parent" in description:
+            description["parent"] = None
 
-    for from_id, from_description in id_to_description.items():
-        if not from_description["next"]:
+        # identify parenthood via "inputs" field
+        for input_values in description["inputs"].values():
+            if len(input_values) != 2:
+                continue
+            if not isinstance(input_values[1], str):
+                continue
+            if input_values[1] in id_to_node_description:
+                id_to_parent[input_values[1]] = id_
+
+    # inject actual parent ID into each block description
+    for id_, parent_id in id_to_parent.items():
+        id_to_node_description[id_]["parent"] = parent_id
+
+
+def _extract_sequence_descriptions(
+    id_to_node_description: dict[str, t.Any],
+) -> list[dict[str, t.Any]]:
+    sequences: list[list[str]] = []
+    for id_, description in id_to_node_description.items():
+        next_id = description["next"]
+        if not next_id:
             continue
-
-        parent_id = from_description["parent"]
-        logger.trace("parent of {} is {}", from_id, parent_id)
-        to_id = from_description["next"]
-        to_description = id_to_description[to_id]
-
-        logger.trace("identified sequence link: {} -> {}", from_id, to_id)
-
-        # is there a sequence that ends with from_id?
-        # if so, add block to the end of that sequence
-        # if not, create a new sequence
-        existing_sequence: _SequenceDescription | None = next(
-            (sequence for sequence in sequences if sequence.end_id == from_id),
-            None,
-        )
-        if existing_sequence:
-            logger.trace("extending existing sequence: {}", existing_sequence.id_)
-            existing_sequence.add(to_description)
+        for sequence in sequences:
+            if sequence[-1] == id_:
+                sequence.append(next_id)
+                break
         else:
-            new_sequence = _SequenceDescription(
-                parent_id,
-                [from_description, to_description],
-            )
-            logger.trace("creating new sequence: {}", new_sequence.id_)
-            sequences.append(new_sequence)
+            sequences.append([id_, next_id])
 
-    return sequences
+    descriptions: list[dict[str, t.Any]] = []
+    for sequence in sequences:
+        starts_at = sequence[0]
+        parent_id = id_to_node_description[starts_at]["parent"]
+        for id_ in sequence[1:]:
+            assert id_to_node_description[id_]["parent"] == parent_id
+        description = {
+            "type": "sequence",
+            "id_": f":seq@{starts_at}",
+            "blocks": sequence,
+            "parent": parent_id,
+        }
+        descriptions.append(description)
+
+    return descriptions
+
+
+def _fix_input_block_references(
+    sequence_descriptions: list[dict[str, t.Any]],
+    id_to_node_description: dict[str, t.Any],
+) -> None:
+    input_block_id_to_sequence_id: dict[str, str] = {
+        description["blocks"][0]: description["id_"]
+        for description in sequence_descriptions
+    }
+    for description in id_to_node_description.values():
+        if description["type"] != "block":
+            continue
+        for input_values in description["inputs"].values():
+            if len(input_values) != 2:
+                continue
+            if not isinstance(input_values[1], str):
+                continue
+            if input_values[1] in input_block_id_to_sequence_id:
+                input_values[1] = input_block_id_to_sequence_id[input_values[1]]
 
 
 def load_program_from_block_descriptions(
-    id_to_description: _ProgramDescription,
+    id_to_raw_description: t.Dict[str, t.Any],
 ) -> Program:
-    id_to_block_description = {
-        id_: {"id_": id_} | description
-        for id_, description in id_to_description.items()
+    # inject an ID into each block description and denote as a block
+    id_to_node_description = {
+        id_: {
+            "id_": id_,
+            "type": "block",
+            "previous": None,
+        } | description
+        for id_, description in id_to_raw_description.items()
     }
     logger.trace("injected ID into block descriptions")
-    logger.trace("program description contains {} blocks", len(id_to_block_description))
-    pprint(list(id_to_block_description.values()))
+    logger.trace("program description contains {} blocks", len(id_to_node_description))
 
-    sequences = _extract_sequences(id_to_block_description)
-    logger.trace("extracted {} sequences", len(sequences))
-    for sequence in sequences:
-        for description in sequence.descriptions:
-            description["parent"] = sequence.id_
+    _inject_parent_into_block_descriptions(id_to_node_description)
+    logger.trace("injected corrected parent field into block descriptions")
 
-    id_to_node_description = {
-        **id_to_block_description,
-        **{sequence.id_: sequence for sequence in sequences},
-    }
+    sequence_descriptions = _extract_sequence_descriptions(id_to_node_description)
+    for description in sequence_descriptions:
+        sequence_id = description["id_"]
+        id_to_node_description[sequence_id] = description
 
-    descriptions = _toposort(id_to_node_description)
-    print(descriptions)
+        # update parent field for each block in sequence
+        for block_id in description["blocks"]:
+            id_to_node_description[block_id]["parent"] = sequence_id
 
+    logger.trace("extracted {} sequences", len(sequence_descriptions))
 
-# FIXME fix handling of top-level blocks
+    # update block reference in "inputs" fields for the start of each sequence
+    _fix_input_block_references(sequence_descriptions, id_to_node_description)
+    logger.trace("fixed input block references to account for sequences")
+
+    pprint(id_to_node_description)
+
+    raise NotImplementedError
