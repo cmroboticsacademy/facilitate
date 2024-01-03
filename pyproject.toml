@@ -48,6 +48,7 @@ extend-ignore = [
     "D102",     # missing docstring in public method
     "D103",     # missing docstring in public function
     "D104",     # missing docstring in public package
+    "D105",     # missing docstring in magic method
     "D203",     # one-blank-line-before-class
     "D213",     # multi-line-summary-second-line
     "FIX001",   # unresolved FIXME
