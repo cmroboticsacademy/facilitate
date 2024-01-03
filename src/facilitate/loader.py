@@ -8,7 +8,14 @@ from pprint import pprint
 from loguru import logger
 import networkx as nx
 
-from facilitate.model import Block, Field, Node, Sequence
+from facilitate.model import (
+    Block,
+    Field,
+    Input,
+    Node,
+    Program,
+    Sequence,
+)
 
 if t.TYPE_CHECKING:
     from facilitate.program import Program
@@ -17,18 +24,26 @@ if t.TYPE_CHECKING:
 _NodeDescription = dict[str, t.Any]
 
 
+def _extract_input_names_to_id(description: _NodeDescription) -> dict[str, str]:
+    """Retrives a mapping from input names to block IDs."""
+    name_to_id: dict[str, str] = {}
+
+    if description["type"] != "block":
+        return {}
+
+    for name, input_values in description["inputs"].items():
+       if len(input_values) != 2:
+           continue
+       if not isinstance(input_values[1], str):
+           continue
+       name_to_id[name] = input_values[1]
+
+    return name_to_id
+
+
 def _extract_input_ids(description: _NodeDescription) -> list[str]:
     """Retrieves a list of the IDs of all inputs to a block."""
-    if description["type"] != "block":
-        return []
-    input_ids: list[str] = []
-    for input_values in description["inputs"].values():
-        if len(input_values) != 2:
-            continue
-        if not isinstance(input_values[1], str):
-            continue
-        input_ids.append(input_values[1])
-    return input_ids
+    return list(_extract_input_names_to_id(description).values())
 
 
 def _toposort(
@@ -167,9 +182,9 @@ def load_program_from_block_descriptions(
 
         if node_type == "block":
             # fetch inputs (should already have been built!)
-            inputs: list[Node] = [
-                id_to_node[input_id]
-                for input_id in _extract_input_ids(description)
+            inputs: list[Input] = [
+                Input(name=name, expression=id_to_node[block_id])
+                for name, block_id in _extract_input_names_to_id(description).items()
             ]
 
             # build fields
@@ -208,6 +223,7 @@ def load_program_from_block_descriptions(
         if parent_id:
             id_to_node[id_].parent = id_to_node[parent_id]
 
-    pprint(id_to_node)
-
-    raise NotImplementedError
+    top_level_nodes: list[Node] = [
+        node for node in id_to_node.values() if node.parent is None
+    ]
+    return Program(top_level_nodes)

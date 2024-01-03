@@ -4,6 +4,7 @@ import abc
 import enum
 import typing as t
 from dataclasses import dataclass
+from typing import Iterator
 
 
 class BlockCategory(enum.Enum):
@@ -60,6 +61,15 @@ class Literal(TerminalNode):
 
 
 @dataclass
+class Input(Node):
+    name: str
+    expression: Node
+
+    def children(self) -> t.Iterator[Node]:
+        yield self.expression
+
+
+@dataclass
 class VarRef(TerminalNode):
     """Represents a reference to a named variable."""
     variable: str
@@ -82,7 +92,7 @@ class Block(Node):
     opcode: str
     parent: Block | None
     fields: list[Field]
-    inputs: list[Node]
+    inputs: list[Input]
     is_shadow: bool
 
     # FIXME ensure that fields and inputs are ordered (postinit)
