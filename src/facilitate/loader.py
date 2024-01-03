@@ -172,8 +172,11 @@ def load_program_from_block_descriptions(
                 for input_id in _extract_input_ids(description)
             ]
 
-            # FIXME build fields
-            fields: list[Field] = []
+            # build fields
+            fields: list[Field] = [
+                Field(name=name, value=value_arr[0])
+                for name, value_arr in description["fields"].items()
+            ]
 
             block = Block(
                 id_=id_,
