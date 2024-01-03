@@ -6,7 +6,7 @@ import typing as t
 from dataclasses import dataclass
 from typing import Iterator
 
-from overrides import overrides
+from overrides import final, overrides
 
 
 class BlockCategory(enum.Enum):
@@ -41,6 +41,19 @@ class Node(abc.ABC):
     @abc.abstractmethod
     def children(self) -> t.Iterator[Node]:
         ...
+
+    @final
+    def descendants(self) -> t.Iterator[Node]:
+        """Iterates over all descendants of this node."""
+        for child in self.children():
+            yield child
+            yield from child.descendants()
+
+    @final
+    def nodes(self) -> t.Iterator[Node]:
+        """Iterates over all nodes within the subtree rooted at this node."""
+        yield self
+        yield from self.descendants()
 
 
 class TerminalNode(Node, abc.ABC):
