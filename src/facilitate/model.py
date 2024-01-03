@@ -95,7 +95,9 @@ class Block(Node):
     inputs: list[Input]
     is_shadow: bool
 
-    # FIXME ensure that fields and inputs are ordered (postinit)
+    def __post_init__(self) -> None:
+        self.fields.sort(key=lambda field: field.name)
+        self.inputs.sort(key=lambda input_: input_.name)
 
     @property
     def category(self) -> BlockCategory:
