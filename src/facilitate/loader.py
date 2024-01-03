@@ -11,6 +11,9 @@ if t.TYPE_CHECKING:
     from facilitate.program import Program
 
 
+_NodeDescription = dict[str, t.Any]
+
+
 def _toposort(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> list[_NodeDescription]:
@@ -18,11 +21,7 @@ def _toposort(
         id_: set() for id_ in id_to_node_description
     }
     for id_, description in id_to_node_description.items():
-        parent_id: str | None = None
-        if isinstance(description, _BlockDescription):
-            parent_id = description["parent"]
-        elif isinstance(description, _SequenceDescription):
-            parent_id = description.parent_id
+        parent_id: str | None = description["parent"]
         if parent_id:
             depends_on[parent_id].add(id_)
 
@@ -33,17 +32,16 @@ def _toposort(
         next_id = queue.pop(0)
         if next_id in visited:
             continue
-        queue.insert(0, *depends_on[next_id])
+        queue = list(depends_on[next_id]) + queue
         sorted_ids.insert(0, next_id)
-        visited[next_id] = True
+        visited.add(next_id)
 
     assert visited == set(depends_on.keys())
-
     return [id_to_node_description[id_] for id_ in sorted_ids]
 
 
 def _inject_parent_into_block_descriptions(
-    id_to_node_description: dict[str, t.Any],
+    id_to_node_description: dict[str, _NodeDescription],
 ) -> dict[str, t.Any]:
     id_to_parent: t.Dict[str, str] = {}
     for id_, description in id_to_node_description.items():
@@ -67,8 +65,8 @@ def _inject_parent_into_block_descriptions(
 
 
 def _extract_sequence_descriptions(
-    id_to_node_description: dict[str, t.Any],
-) -> list[dict[str, t.Any]]:
+    id_to_node_description: dict[str, _NodeDescription],
+) -> list[_NodeDescription]:
     sequences: list[list[str]] = []
     for id_, description in id_to_node_description.items():
         next_id = description["next"]
@@ -81,7 +79,7 @@ def _extract_sequence_descriptions(
         else:
             sequences.append([id_, next_id])
 
-    descriptions: list[dict[str, t.Any]] = []
+    descriptions: list[_NodeDescription] = []
     for sequence in sequences:
         starts_at = sequence[0]
         parent_id = id_to_node_description[starts_at]["parent"]
@@ -99,8 +97,8 @@ def _extract_sequence_descriptions(
 
 
 def _fix_input_block_references(
-    sequence_descriptions: list[dict[str, t.Any]],
-    id_to_node_description: dict[str, t.Any],
+    sequence_descriptions: list[_NodeDescription],
+    id_to_node_description: dict[str, _NodeDescription],
 ) -> None:
     input_block_id_to_sequence_id: dict[str, str] = {
         description["blocks"][0]: description["id_"]
@@ -119,7 +117,7 @@ def _fix_input_block_references(
 
 
 def load_program_from_block_descriptions(
-    id_to_raw_description: t.Dict[str, t.Any],
+    id_to_raw_description: t.Dict[str, _NodeDescription],
 ) -> Program:
     # inject an ID into each block description and denote as a block
     id_to_node_description = {
@@ -151,6 +149,10 @@ def load_program_from_block_descriptions(
     _fix_input_block_references(sequence_descriptions, id_to_node_description)
     logger.trace("fixed input block references to account for sequences")
 
-    pprint(id_to_node_description)
+    # toposort the descriptions
+    node_descriptions = _toposort(id_to_node_description)
+    logger.trace("toposorted blocks for parsing")
+
+    pprint(node_descriptions)
 
     raise NotImplementedError
