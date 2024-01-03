@@ -9,6 +9,8 @@ from typing import Iterator
 import networkx as nx
 from overrides import final, overrides
 
+from facilitate.util import quote
+
 
 class BlockCategory(enum.Enum):
     CONTROL = "control"
@@ -68,6 +70,12 @@ class Node(abc.ABC):
         self._add_to_nx_digraph(graph)
         return graph
 
+    def to_dot(self, filename: str) -> None:
+        """Writes the graph rooted as this node to a DOT file."""
+        graph = self.to_nx_digraph()
+
+        nx.drawing.nx_pydot.write_dot(graph, filename)
+
 
 class TerminalNode(Node, abc.ABC):
     """Represents a node in the abstract syntax tree that has no children."""
@@ -86,9 +94,9 @@ class Field(TerminalNode):
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         graph.add_node(
-            self.id_,
+            quote(self.id_),
             label="field",
-            name=self.name,
+            field_name=self.name,
             value=self.value,
         )
 
@@ -102,7 +110,7 @@ class Literal(TerminalNode):
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         graph.add_node(
-            self.id_,
+            quote(self.id_),
             label="literal",
             value=self.value,
         )
@@ -121,12 +129,12 @@ class Input(Node):
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         graph.add_node(
-            self.id_,
+            quote(self.id_),
             label="input",
-            name=self.name,
+            input_name=self.name,
         )
         self.expression._add_to_nx_digraph(graph)
-        graph.add_edge(self.id_, self.expression.id_)
+        graph.add_edge(quote(self.id_), quote(self.expression.id_))
 
 
 @dataclass
@@ -149,12 +157,12 @@ class Sequence(Node):
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         graph.add_node(
-            self.id_,
+            quote(self.id_),
             label="sequence",
         )
         for block in self.blocks:
             block._add_to_nx_digraph(graph)
-            graph.add_edge(self.id_, block.id_)
+            graph.add_edge(quote(self.id_), quote(block.id_))
 
 
 @dataclass
@@ -182,13 +190,13 @@ class Block(Node):
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         graph.add_node(
-            self.id_,
+            quote(self.id_),
             label="block",
             opcode=self.opcode,
         )
         for child in self.children():
             child._add_to_nx_digraph(graph)
-            graph.add_edge(self.id_, child.id_)
+            graph.add_edge(quote(self.id_), quote(child.id_))
 
 
 @dataclass
@@ -206,9 +214,9 @@ class Program(Node):
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         graph.add_node(
-            self.id_,
+            quote(self.id_),
             label="program",
         )
         for child in self.children():
             child._add_to_nx_digraph(graph)
-            graph.add_edge(self.id_, child.id_)
+            graph.add_edge(quote(self.id_), quote(child.id_))
