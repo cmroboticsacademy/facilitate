@@ -52,6 +52,7 @@ extend-ignore = [
     "D105",     # missing docstring in magic method
     "D203",     # one-blank-line-before-class
     "D213",     # multi-line-summary-second-line
+    "D401",     # first line of docstring should be in imperative mood
     "FIX001",   # unresolved FIXME
     "FIX002",   # TODO found
     "TD001",    # invalid TODO tag: `FIXME`
@@ -60,6 +61,7 @@ extend-ignore = [
     "TD004",    # missing colon in TODO
     "TRY003",   # avoid specifying long messages outside the exception class
     "S101",     # use of assertions
+    "SLF001",   # private member accessed
     "T201",     # use of print
     "D204",     # 1 blank line required after class docstring
 ]

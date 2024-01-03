@@ -4,7 +4,6 @@ import abc
 import enum
 import typing as t
 from dataclasses import dataclass
-from typing import Iterator
 
 import networkx as nx
 from overrides import final, overrides
@@ -185,7 +184,11 @@ class Sequence(Node):
             return False
         if len(self.blocks) != len(other.blocks):
             return False
-        for block, other_block in zip(self.blocks, other.blocks):
+        for block, other_block in zip(
+            self.blocks,
+            other.blocks,
+            strict=True,
+        ):
             if not block.equivalent_to(other_block):
                 return False
         return True
@@ -214,6 +217,32 @@ class Block(Node):
     inputs: list[Input]
     is_shadow: bool
 
+    def _fields_are_equivalent(self, other: Block) -> bool:
+        """Determines whether the fields of this block are equivalent to those of another."""
+        if len(self.fields) != len(other.fields):
+            return False
+        for field, other_field in zip(
+            self.fields,
+            other.fields,
+            strict=True,
+        ):
+            if not field.equivalent_to(other_field):
+                return False
+        return True
+
+    def _inputs_are_equivalent(self, other: Block) -> bool:
+        """Determines whether the inputs of this block are equivalent to those of another."""
+        if len(self.inputs) != len(other.inputs):
+            return False
+        for input_, other_input in zip(
+            self.inputs,
+            other.inputs,
+            strict=True,
+        ):
+            if not input_.equivalent_to(other_input):
+                return False
+        return True
+
     @overrides
     def equivalent_to(self, other: Node) -> bool:
         """Determines whether this block is equivalent to another."""
@@ -223,21 +252,10 @@ class Block(Node):
         if self.opcode != other.opcode:
             return False
 
-        # compare fields
-        if len(self.fields) != len(other.fields):
+        if not self._fields_are_equivalent(other):
             return False
-        for field, other_field in zip(self.fields, other.fields):
-            if not field.equivalent_to(other_field):
-                return False
 
-        # compare inputs
-        if len(self.inputs) != len(other.inputs):
-            return False
-        for input_, other_input in zip(self.inputs, other.inputs):
-            if not input_.equivalent_to(other_input):
-                return False
-
-        return True
+        return self._inputs_are_equivalent(other)
 
     def __post_init__(self) -> None:
         self.fields.sort(key=lambda field: field.name)
@@ -279,7 +297,11 @@ class Program(Node):
             return False
         if len(self.top_level_blocks) != len(other.top_level_blocks):
             return False
-        for block, other_block in zip(self.top_level_blocks, other.top_level_blocks):
+        for block, other_block in zip(
+            self.top_level_blocks,
+            other.top_level_blocks,
+            strict=True,
+        ):
             if not block.equivalent_to(other_block):
                 return False
         return True
