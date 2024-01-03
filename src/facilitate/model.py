@@ -73,8 +73,12 @@ class Node(abc.ABC):
     def to_dot(self, filename: str) -> None:
         """Writes the graph rooted as this node to a DOT file."""
         graph = self.to_nx_digraph()
-
         nx.drawing.nx_pydot.write_dot(graph, filename)
+
+    def to_dot_png(self, filename: str) -> None:
+        """Writes the graph rooted as this node to a PNG file."""
+        graph = self.to_nx_digraph()
+        nx.drawing.nx_pydot.to_pydot(graph).write_png(filename)
 
 
 class TerminalNode(Node, abc.ABC):
@@ -93,11 +97,10 @@ class Field(TerminalNode):
 
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        label = f'"field:{self.name}={self.value}"'
         graph.add_node(
             quote(self.id_),
-            label="field",
-            field_name=self.name,
-            value=self.value,
+            label=label,
         )
 
 
@@ -109,10 +112,10 @@ class Literal(TerminalNode):
 
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        label = f'"literal:{self.value}"'
         graph.add_node(
             quote(self.id_),
-            label="literal",
-            value=self.value,
+            label=label,
         )
 
 
@@ -128,10 +131,10 @@ class Input(Node):
 
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        label = f'"input:{self.name}"'
         graph.add_node(
             quote(self.id_),
-            label="input",
-            input_name=self.name,
+            label=label,
         )
         self.expression._add_to_nx_digraph(graph)
         graph.add_edge(quote(self.id_), quote(self.expression.id_))
@@ -189,9 +192,10 @@ class Block(Node):
 
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        label = f'"block:{self.opcode}"'
         graph.add_node(
             quote(self.id_),
-            label="block",
+            label=label,
             opcode=self.opcode,
         )
         for child in self.children():
