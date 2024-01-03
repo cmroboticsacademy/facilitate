@@ -6,6 +6,9 @@ from dataclasses import dataclass
 from pprint import pprint
 
 from loguru import logger
+import networkx as nx
+
+from facilitate.model import Block, Field, Node, Sequence
 
 if t.TYPE_CHECKING:
     from facilitate.program import Program
@@ -14,29 +17,32 @@ if t.TYPE_CHECKING:
 _NodeDescription = dict[str, t.Any]
 
 
+def _extract_input_ids(description: _NodeDescription) -> list[str]:
+    """Retrieves a list of the IDs of all inputs to a block."""
+    if description["type"] != "block":
+        return []
+    input_ids: list[str] = []
+    for input_values in description["inputs"].values():
+        if len(input_values) != 2:
+            continue
+        if not isinstance(input_values[1], str):
+            continue
+        input_ids.append(input_values[1])
+    return input_ids
+
+
 def _toposort(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> list[_NodeDescription]:
+    graph = nx.DiGraph()
     depends_on: dict[str, set[str]] = {
         id_: set() for id_ in id_to_node_description
     }
     for id_, description in id_to_node_description.items():
         parent_id: str | None = description["parent"]
         if parent_id:
-            depends_on[parent_id].add(id_)
-
-    queue: list[str] = list(depends_on.keys())
-    visited: set[str] = set()
-    sorted_ids: list[str] = []
-    while queue:
-        next_id = queue.pop(0)
-        if next_id in visited:
-            continue
-        queue = list(depends_on[next_id]) + queue
-        sorted_ids.insert(0, next_id)
-        visited.add(next_id)
-
-    assert visited == set(depends_on.keys())
+            graph.add_edge(parent_id, id_)
+    sorted_ids = list(nx.topological_sort(graph))
     return [id_to_node_description[id_] for id_ in sorted_ids]
 
 
@@ -153,6 +159,47 @@ def load_program_from_block_descriptions(
     node_descriptions = _toposort(id_to_node_description)
     logger.trace("toposorted blocks for parsing")
 
-    pprint(node_descriptions)
+    # build the nodes in reverse order
+    id_to_node: dict[str, Node] = {}
+    for description in reversed(node_descriptions):
+        id_ = description["id_"]
+        node_type = description["type"]
+
+        if node_type == "block":
+            # fetch inputs (should already have been built!)
+            inputs: list[Node] = [
+                id_to_node[input_id]
+                for input_id in _extract_input_ids(description)
+            ]
+
+            # FIXME build fields
+            fields: list[Field] = []
+
+            block = Block(
+                id_=id_,
+                opcode=description["opcode"],
+                parent=None,
+                fields=fields,
+                inputs=inputs,
+                is_shadow=description["shadow"],
+            )
+            logger.trace("constructed block {}", block.id_)
+            id_to_node[id_] = block
+
+        elif node_type == "sequence":
+            sequence = Sequence(
+                id_=id_,
+                parent=None,
+                blocks=[
+                    id_to_node[block_id] for block_id in description["blocks"]
+                ],
+            )
+            id_to_node[id_] = sequence
+
+        else:
+            raise ValueError(f"invalid node type: {description['type']}")
+
+    # FIXME update each description with correct parent pointers
+    pprint(id_to_node)
 
     raise NotImplementedError
