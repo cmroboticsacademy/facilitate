@@ -72,6 +72,13 @@ class Node(abc.ABC):
         yield self
         yield from self.descendants()
 
+    @final
+    def postorder(self) -> t.Iterator[Node]:
+        """Iterates over all nodes within the subtree rooted at this node in postorder."""
+        for child in self.children():
+            yield from child.postorder()
+        yield self
+
     @abc.abstractmethod
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         """Adds the subtree rooted as this node to a digraph."""
