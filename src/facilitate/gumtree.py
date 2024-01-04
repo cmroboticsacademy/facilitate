@@ -4,7 +4,12 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from itertools import product
 
-from facilitate.model import Node
+from facilitate.model import (
+    Block,
+    Field,
+    Input,
+    Node,
+)
 
 # NOTE change to a set?
 NodeMappings = list[tuple[Node, Node]]
@@ -23,7 +28,7 @@ class HeightIndexedPriorityList:
         """Returns the maximum height of a node in the list."""
         if not self._height_to_nodes:
             return 0
-        return max(height for height in self._height_to_nodes.keys())
+        return max(height for height in self._height_to_nodes)
 
     def push(self, node: Node) -> None:
         """Adds a node to the list."""
@@ -36,7 +41,7 @@ class HeightIndexedPriorityList:
         del self._height_to_nodes[max_height]
         return nodes
 
-    def open(self, node: Node) -> None:
+    def add_children(self, node: Node) -> None:
         """Inserts all children of given node into the list."""
         for child in node.children():
             self.push(child)
@@ -107,10 +112,10 @@ def compute_topdown_mappings(
     while min(hlist_x.max_height, hlist_y.max_height) > min_height:
         if hlist_x.max_height > hlist_y.max_height:
             for node in hlist_x.pop():
-                hlist_x.open(node)
+                hlist_x.add_children(node)
         elif hlist_x.max_height < hlist_y.max_height:
             for node in hlist_y.pop():
-                hlist_y.open(node)
+                hlist_y.add_children(node)
         else:
             max_height_nodes_x = hlist_x.pop()
             max_height_nodes_y = hlist_y.pop()
@@ -134,11 +139,11 @@ def compute_topdown_mappings(
 
             for node in max_height_nodes_x:
                 if node not in added_trees_x:
-                    hlist_x.open(node)
+                    hlist_x.add_children(node)
 
             for node in max_height_nodes_y:
                 if node not in added_trees_y:
-                    hlist_y.open(node)
+                    hlist_y.add_children(node)
 
     candidates.sort(key=lambda node_x, node_y: dice(node_x.parent, node_y.parent, mappings))
 
@@ -152,7 +157,7 @@ def compute_topdown_mappings(
         ]
 
     # FIXME we shouldn't be able to mutate mappings while we're iterating over it!
-    for node_x, node_y in list(mappings):
+    for node_x, node_y in mappings:
         _add_children_to_mappings(node_x, node_y, mappings)
 
     return mappings
@@ -164,7 +169,6 @@ def compute_bottom_up_mappings(
     mappings: NodeMappings,
     *,
     min_dice: float = 0.5,
-#    max_size: int = 100,
 ) -> NodeMappings:
     mappings = mappings.copy()
     matched_x = [node_x for node_x, _ in mappings]
@@ -179,9 +183,23 @@ def compute_bottom_up_mappings(
 
         candidates: list[Node] = []
         for node_y in root_y.nodes():
-            # FIXME check opcodes here?
-            if node_y not in matched_y:
-                candidates.append(node_y)
+            if type(node) != type(node_y):
+                continue
+            if node_y in matched_y:
+                continue
+
+            if isinstance(node, Block) and node.opcode != node_y.opcode:
+                continue
+            if isinstance(node, Field):
+                if node.name != node_y.name:
+                    continue
+                if node.value != node_y.value:
+                    continue
+            if isinstance(node, Input) and node.name != node_y.name:
+                    continue
+            # note that sequences always match
+
+            candidates.append(node_y)
 
         if not candidates:
             return
@@ -213,5 +231,4 @@ def compute_gumtree_mappings(
 ) -> NodeMappings:
     """Uses the GumTree algorithm to map nodes between two trees."""
     mappings = compute_topdown_mappings(root_x, root_y, min_height=min_height)
-    mappings = compute_bottom_up_mappings(root_x, root_y, mappings, min_dice=min_dice)
-    return mappings
+    return compute_bottom_up_mappings(root_x, root_y, mappings, min_dice=min_dice)

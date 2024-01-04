@@ -64,6 +64,8 @@ extend-ignore = [
     "SLF001",   # private member accessed
     "T201",     # use of print
     "D204",     # 1 blank line required after class docstring
+    "C901",     # function is too complex (cyclomatic complexity)
+    "PLR0912",  # too many branches
 ]
 
 [build-system]
