@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import abc
 import typing as t
-from dataclasses import dataclass
-from pprint import pprint
 
-from loguru import logger
 import networkx as nx
+from loguru import logger
 
 from facilitate.model import (
     Block,
@@ -18,11 +15,9 @@ from facilitate.model import (
     Sequence,
 )
 
-if t.TYPE_CHECKING:
-    from facilitate.program import Program
-
-
 _NodeDescription = dict[str, t.Any]
+
+_INPUT_VALUE_ARRAY_LENGTH = 2
 
 
 def _extract_input_names_to_id(description: _NodeDescription) -> dict[str, str]:
@@ -33,7 +28,7 @@ def _extract_input_names_to_id(description: _NodeDescription) -> dict[str, str]:
         return {}
 
     for name, input_values in description["inputs"].items():
-       if len(input_values) != 2:
+       if len(input_values) != _INPUT_VALUE_ARRAY_LENGTH:
            continue
        if not isinstance(input_values[1], str):
            continue
@@ -51,9 +46,6 @@ def _toposort(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> list[_NodeDescription]:
     graph = nx.DiGraph()
-    depends_on: dict[str, set[str]] = {
-        id_: set() for id_ in id_to_node_description
-    }
     for id_, description in id_to_node_description.items():
         parent_id: str | None = description["parent"]
         if parent_id:
@@ -65,7 +57,7 @@ def _toposort(
 def _inject_parent_into_block_descriptions(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> dict[str, t.Any]:
-    id_to_parent: t.Dict[str, str] = {}
+    id_to_parent: dict[str, str] = {}
     for id_, description in id_to_node_description.items():
         # remove ambiguous "parent" field:
         # can mean immediate parent or predecessor (i.e., previous block in sequence)
@@ -74,7 +66,7 @@ def _inject_parent_into_block_descriptions(
 
         # identify parenthood via "inputs" field
         for input_values in description["inputs"].values():
-            if len(input_values) != 2:
+            if len(input_values) != _INPUT_VALUE_ARRAY_LENGTH:
                 continue
             if not isinstance(input_values[1], str):
                 continue
@@ -130,7 +122,7 @@ def _fix_input_block_references(
         if description["type"] != "block":
             continue
         for input_values in description["inputs"].values():
-            if len(input_values) != 2:
+            if len(input_values) != _INPUT_VALUE_ARRAY_LENGTH:
                 continue
             if not isinstance(input_values[1], str):
                 continue
@@ -138,40 +130,9 @@ def _fix_input_block_references(
                 input_values[1] = input_block_id_to_sequence_id[input_values[1]]
 
 
-def load_program_from_block_descriptions(
-    id_to_raw_description: t.Dict[str, _NodeDescription],
+def _build_program_from_node_descriptions(
+    id_to_node_description: dict[str, _NodeDescription],
 ) -> Program:
-    # inject an ID into each block description and denote as a block
-    id_to_node_description = {
-        id_: {
-            "id_": id_,
-            "type": "block",
-            "previous": None,
-        } | description
-        for id_, description in id_to_raw_description.items()
-    }
-    logger.trace("injected ID into block descriptions")
-    logger.trace("program description contains {} blocks", len(id_to_node_description))
-
-    _inject_parent_into_block_descriptions(id_to_node_description)
-    logger.trace("injected corrected parent field into block descriptions")
-
-    sequence_descriptions = _extract_sequence_descriptions(id_to_node_description)
-    for description in sequence_descriptions:
-        sequence_id = description["id_"]
-        id_to_node_description[sequence_id] = description
-
-        # update parent field for each block in sequence
-        for block_id in description["blocks"]:
-            id_to_node_description[block_id]["parent"] = sequence_id
-
-    logger.trace("extracted {} sequences", len(sequence_descriptions))
-
-    # update block reference in "inputs" fields for the start of each sequence
-    _fix_input_block_references(sequence_descriptions, id_to_node_description)
-    logger.trace("fixed input block references to account for sequences")
-
-    # toposort the descriptions
     node_descriptions = _toposort(id_to_node_description)
     logger.trace("toposorted blocks for parsing")
 
@@ -183,14 +144,14 @@ def load_program_from_block_descriptions(
         if node_type == "block":
             inputs: list[Input] = []
             for input_name, input_value_arr in description["inputs"].items():
-                assert len(input_value_arr) == 2
+                assert len(input_value_arr) == _INPUT_VALUE_ARRAY_LENGTH
                 assert isinstance(input_value_arr[0], int)
 
                 expression: Node
                 if isinstance(input_value_arr[1], str):
                     expression = id_to_node[input_value_arr[1]]
                 elif isinstance(input_value_arr[1], list):
-                    assert len(input_value_arr[1]) == 2
+                    assert len(input_value_arr[1]) == _INPUT_VALUE_ARRAY_LENGTH
                     literal_value = input_value_arr[1][1]
                     assert isinstance(literal_value, str)
                     literal_id = f":literal@input[{input_name}]@{id_}"
@@ -199,17 +160,16 @@ def load_program_from_block_descriptions(
                         value=literal_value,
                     )
                 else:
-                    raise ValueError(
-                        f"invalid input value: {input_value_arr[1]}"
-                    )
+                    error = f"invalid input value: {input_value_arr[1]}"
+                    raise TypeError(error)
 
                 input_id = f":input[{input_name}]@{id_}"
-                input = Input(
+                input_ = Input(
                     id_=input_id,
                     name=input_name,
                     expression=expression,
                 )
-                inputs.append(input)
+                inputs.append(input_)
 
             fields: list[Field] = [
                 Field(
@@ -242,7 +202,8 @@ def load_program_from_block_descriptions(
             id_to_node[id_] = sequence
 
         else:
-            raise ValueError(f"invalid node type: {description['type']}")
+            error = f"invalid node type: {description['type']}"
+            raise ValueError(error)
 
     # update each description with correct parent pointers
     for id_, description in id_to_node_description.items():
@@ -254,3 +215,39 @@ def load_program_from_block_descriptions(
         node for node in id_to_node.values() if node.parent is None
     ]
     return Program(top_level_nodes)
+
+
+def load_program_from_block_descriptions(
+    id_to_raw_description: dict[str, _NodeDescription],
+) -> Program:
+    # inject an ID into each block description and denote as a block
+    id_to_node_description = {
+        id_: {
+            "id_": id_,
+            "type": "block",
+            "previous": None,
+        } | description
+        for id_, description in id_to_raw_description.items()
+    }
+    logger.trace("injected ID into block descriptions")
+    logger.trace("program description contains {} blocks", len(id_to_node_description))
+
+    _inject_parent_into_block_descriptions(id_to_node_description)
+    logger.trace("injected corrected parent field into block descriptions")
+
+    sequence_descriptions = _extract_sequence_descriptions(id_to_node_description)
+    for description in sequence_descriptions:
+        sequence_id = description["id_"]
+        id_to_node_description[sequence_id] = description
+
+        # update parent field for each block in sequence
+        for block_id in description["blocks"]:
+            id_to_node_description[block_id]["parent"] = sequence_id
+
+    logger.trace("extracted {} sequences", len(sequence_descriptions))
+
+    # update block reference in "inputs" fields for the start of each sequence
+    _fix_input_block_references(sequence_descriptions, id_to_node_description)
+    logger.trace("fixed input block references to account for sequences")
+
+    return _build_program_from_node_descriptions(id_to_node_description)
