@@ -149,6 +149,7 @@ class Literal(TerminalNode):
         graph.add_node(
             quote(self.id_),
             label=label,
+            shape="hexagon",
         )
 
 
@@ -218,6 +219,7 @@ class Sequence(Node):
         graph.add_node(
             quote(self.id_),
             label="sequence",
+            shape="plaintext",
         )
         for block in self.blocks:
             block._add_to_nx_digraph(graph)
@@ -293,6 +295,7 @@ class Block(Node):
             quote(self.id_),
             label=label,
             opcode=self.opcode,
+            shape="box",
         )
         for child in self.children():
             child._add_to_nx_digraph(graph)
@@ -331,6 +334,7 @@ class Program(Node):
         graph.add_node(
             quote(self.id_),
             label="program",
+            shape="plaintext",
         )
         for child in self.children():
             child._add_to_nx_digraph(graph)
