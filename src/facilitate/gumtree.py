@@ -42,13 +42,29 @@ class HeightIndexedPriorityList:
             self.push(child)
 
 
+# FIXME this doesn't look quite right; original paper contains an error in formula
+# TODO write some tests for this method
 def dice(
-    node_x: Node,
-    node_y: Node,
+    root_x: Node,
+    root_y: Node,
     mappings: NodeMappings,
 ) -> float:
     """Computes ratio of common descendants between two nodes based on given mappings."""
-    raise NotImplementedError
+    descendants_x = set(root_x.descendants())
+    descendants_y = set(root_y.descendants())
+
+    contained_mappings: NodeMappings = []
+
+    for (node_x, node_y) in mappings:
+        contains_x = any(node.subtree_equals(node_x) for node in descendants_x)
+        contains_y = any(node.subtree_equals(node_y) for node in descendants_y)
+        if contains_x and contains_y:
+            contained_mappings.append((node_x, node_y))
+
+    # NOTE Leo's code had an extra multiplication by 2 (if root_x and root_y have the same block ID) here
+    numerator = 2 * len(contained_mappings)
+    denominator = len(descendants_x) + len(descendants_y)
+    return numerator / denominator
 
 
 def _add_children_to_mappings(
@@ -70,7 +86,7 @@ def _add_children_to_mappings(
             _add_children_to_mappings(child_x, child_y, mappings)
 
 
-def _compute_topdown_mappings(
+def compute_topdown_mappings(
     root_x: Node,
     root_y: Node,
     *,
@@ -135,6 +151,67 @@ def _compute_topdown_mappings(
             if from_x != node_x and to_y != node_y
         ]
 
-    # FIXME add all kids of node_x and node_y to mappings
+    # FIXME we shouldn't be able to mutate mappings while we're iterating over it!
+    for node_x, node_y in list(mappings):
+        _add_children_to_mappings(node_x, node_y, mappings)
 
+    return mappings
+
+
+def compute_bottom_up_mappings(
+    root_x: Node,
+    root_y: Node,
+    mappings: NodeMappings,
+    *,
+    min_dice: float = 0.5,
+#    max_size: int = 100,
+) -> NodeMappings:
+    mappings = mappings.copy()
+    matched_x = [node_x for node_x, _ in mappings]
+    matched_y = [node_y for _, node_y in mappings]
+
+    def visit(node: Node) -> None:
+        if node in matched_x:
+            return
+
+        if not any(child in matched_x for child in node.descendants()):
+            return
+
+        candidates: list[Node] = []
+        for node_y in root_y.nodes():
+            # FIXME check opcodes here?
+            if node_y not in matched_y:
+                candidates.append(node_y)
+
+        if not candidates:
+            return
+
+        candidates.sort(
+            key=lambda node_y: dice(node, node_y, mappings),
+            reverse=True,
+        )
+        top_candidate = candidates[0]
+
+        if dice(node, top_candidate, mappings) > min_dice:
+            mappings.append((node, top_candidate))
+
+    for node in root_x.postorder():
+        visit(node)
+
+    # NOTE original GumTree algo uses RTED algorithm to find edit script
+    # without move actions; possibly unnecessary given small size of trees
+
+    return mappings
+
+
+def compute_gumtree_mappings(
+    root_x: Node,
+    root_y: Node,
+    *,
+    min_height: int = 2,
+    min_dice: float = 0.5,
+) -> NodeMappings:
+    """Uses the GumTree algorithm to map nodes between two trees."""
+    mappings = compute_topdown_mappings(root_x, root_y, min_height=min_height)
+    mappings = compute_bottom_up_mappings(root_x, root_y, mappings, min_dice=min_dice)
     return mappings
