@@ -245,10 +245,6 @@ def load_program_from_block_descriptions(
         sequence_id = description["id_"]
         id_to_node_description[sequence_id] = description
 
-        # update parent field for each block in sequence
-        for block_id in description["blocks"]:
-            id_to_node_description[block_id]["parent"] = sequence_id
-
     logger.trace("extracted {} sequences", len(sequence_descriptions))
 
     # update block reference in "inputs" fields for the start of each sequence

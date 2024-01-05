@@ -43,6 +43,11 @@ class BlockCategory(enum.Enum):
 class Node(abc.ABC):
     """Represents a node in the abstract syntax tree."""
     id_: str
+    parent: Node | None = None
+
+    def __post_init__(self) -> None:
+        for child in self.children():
+            child.parent = self
 
     @cached_property
     def height(self) -> int:
@@ -199,7 +204,6 @@ class Input(Node):
 @dataclass(kw_only=True)
 class Sequence(Node):
     """Represents a sequence of blocks."""
-    parent: Node | None
     blocks: list[Block]
 
     @overrides
@@ -240,7 +244,6 @@ class Sequence(Node):
 @dataclass(kw_only=True)
 class Block(Node):
     opcode: str
-    parent: Block | None
     fields: list[Field]
     inputs: list[Input]
     is_shadow: bool
@@ -289,6 +292,7 @@ class Block(Node):
         return self._inputs_are_equivalent(other)
 
     def __post_init__(self) -> None:
+        super().__post_init__()
         self.fields.sort(key=lambda field: field.name)
         self.inputs.sort(key=lambda input_: input_.name)
 
