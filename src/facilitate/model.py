@@ -87,6 +87,19 @@ class Node(abc.ABC):
             yield child
             yield from child.descendants()
 
+    def find(self, id_: str) -> Node | None:
+        """Finds the node with the given ID within the subtree rooted at this node.
+
+        Returns
+        -------
+        Node
+            the node with the given ID if it exists, otherwise None
+        """
+        for node in self.nodes():
+            if node.id_ == id_:
+                return node
+        return None
+
     @final
     def nodes(self) -> t.Iterator[Node]:
         """Iterates over all nodes within the subtree rooted at this node."""
