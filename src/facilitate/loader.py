@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import typing as t
+from pathlib import Path
 
 import networkx as nx
 from loguru import logger
@@ -255,8 +256,9 @@ def load_program_from_block_descriptions(
     return _build_program_from_node_descriptions(id_to_node_description)
 
 
-def load_from_file(filename: str) -> Program:
+def load_from_file(filename_or_path: str | Path) -> Program:
     """Loads a Facilitate program from a file."""
-    with open(filename, "r") as file:
+    path = Path(filename_or_path)
+    with path.open() as file:
         block_descriptions = json.load(file)
     return load_program_from_block_descriptions(block_descriptions)
