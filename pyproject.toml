@@ -67,6 +67,7 @@ extend-ignore = [
     "D204",     # 1 blank line required after class docstring
     "C901",     # function is too complex (cyclomatic complexity)
     "PLR0912",  # too many branches
+    "PGH003",   # use specific rule codes when ignoring type issues
 ]
 
 [build-system]

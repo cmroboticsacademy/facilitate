@@ -50,13 +50,14 @@ def _toposort(
         parent_id: str | None = description["parent"]
         if parent_id:
             graph.add_edge(parent_id, id_)
-    sorted_ids = list(nx.topological_sort(graph))
+    # NOTE networkx stubs are incorrect here; topological_sort returns a generator
+    sorted_ids = list(nx.topological_sort(graph))  # type: ignore
     return [id_to_node_description[id_] for id_ in sorted_ids]
 
 
 def _inject_parent_into_block_descriptions(
     id_to_node_description: dict[str, _NodeDescription],
-) -> dict[str, t.Any]:
+) -> None:
     id_to_parent: dict[str, str] = {}
     for id_, description in id_to_node_description.items():
         # remove ambiguous "parent" field:
@@ -192,12 +193,16 @@ def _build_program_from_node_descriptions(
             id_to_node[id_] = block
 
         elif node_type == "sequence":
+            blocks: list[Block] = []
+            for block_id in description["blocks"]:
+                node = id_to_node[block_id]
+                assert isinstance(node, Block)
+                blocks.append(node)
+
             sequence = Sequence(
                 id_=id_,
                 parent=None,
-                blocks=[
-                    id_to_node[block_id] for block_id in description["blocks"]
-                ],
+                blocks=blocks,
             )
             id_to_node[id_] = sequence
 
@@ -214,7 +219,7 @@ def _build_program_from_node_descriptions(
     top_level_nodes: list[Node] = [
         node for node in id_to_node.values() if node.parent is None
     ]
-    return Program(top_level_nodes)
+    return Program.build(top_level_nodes)
 
 
 def load_program_from_block_descriptions(

@@ -39,8 +39,11 @@ class BlockCategory(enum.Enum):
         return cls(prefix)
 
 
+@dataclass
 class Node(abc.ABC):
     """Represents a node in the abstract syntax tree."""
+    id_: str
+
     @cached_property
     def height(self) -> int:
         """The height of the subtree rooted at this node."""
@@ -112,7 +115,6 @@ class TerminalNode(Node, abc.ABC):
 @dataclass
 class Field(TerminalNode):
     """Fields store specific values, options, or settings that customize the behavior or appearance of a block."""
-    id_: str
     name: str
     value: str
 
@@ -136,7 +138,6 @@ class Field(TerminalNode):
 @dataclass
 class Literal(TerminalNode):
     """Represents a literal value within the AST."""
-    id_: str
     value: str
 
     @overrides
@@ -155,7 +156,6 @@ class Literal(TerminalNode):
 
 @dataclass
 class Input(Node):
-    id_: str
     name: str
     expression: Node
 
@@ -185,7 +185,6 @@ class Input(Node):
 @dataclass
 class Sequence(Node):
     """Represents a sequence of blocks."""
-    id_: str
     parent: Node | None
     blocks: list[Block]
 
@@ -222,7 +221,6 @@ class Sequence(Node):
 
 @dataclass
 class Block(Node):
-    id_: str
     opcode: str
     parent: Block | None
     fields: list[Field]
@@ -298,30 +296,33 @@ class Block(Node):
 
 @dataclass
 class Program(Node):
-    top_level_blocks: list[Block]
+    top_level_nodes: list[Node]
 
-    @property
-    def id_(self) -> str:
-        return "PROGRAM"
+    @classmethod
+    def build(cls, top_level_nodes: list[Node]) -> Program:
+        return cls(
+            id_="PROGRAM",
+            top_level_nodes=top_level_nodes,
+        )
 
     @overrides
     def equivalent_to(self, other: Node) -> bool:
         if not isinstance(other, Program):
             return False
-        if len(self.top_level_blocks) != len(other.top_level_blocks):
+        if len(self.top_level_nodes) != len(other.top_level_nodes):
             return False
-        for block, other_block in zip(
-            self.top_level_blocks,
-            other.top_level_blocks,
+        for node, other_node in zip(
+            self.top_level_nodes,
+            other.top_level_nodes,
             strict=True,
         ):
-            if not block.equivalent_to(other_block):
+            if not node.equivalent_to(other_node):
                 return False
         return True
 
     @overrides
     def children(self) -> t.Iterator[Node]:
-        yield from self.top_level_blocks
+        yield from self.top_level_nodes
 
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
