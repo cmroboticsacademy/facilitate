@@ -15,6 +15,7 @@ networkx = "^3.2.1"
 overrides = "^7.4.0"
 pydot = "^2.0.0"
 networkx-stubs = "^0.0.1"
+click = "^8.1.7"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"
