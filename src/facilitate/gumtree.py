@@ -5,6 +5,8 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from itertools import product
 
+from loguru import logger
+
 from facilitate.model import Node
 
 # NOTE change to a set?
@@ -240,8 +242,17 @@ def compute_gumtree_mappings(
 ) -> NodeMappings:
     """Uses the GumTree algorithm to map nodes between two trees."""
     mappings = compute_topdown_mappings(root_x, root_y, min_height=min_height)
-    mappings = compute_bottom_up_mappings(root_x, root_y, mappings, min_dice=min_dice)
+    logger.trace(
+        "sanity checking top-down mappings:\n{}",
+        "\n".join(f"* {node_from.id_} -> {node_to.id_}" for (node_from, node_to) in mappings),
+    )
+    sanity_check_mappings(mappings)
 
+    mappings = compute_bottom_up_mappings(root_x, root_y, mappings, min_dice=min_dice)
+    logger.trace(
+        "sanity checking complete mappings:\n{}",
+        "\n".join(f"* {node_from.id_} -> {node_to.id_}" for (node_from, node_to) in mappings),
+    )
     sanity_check_mappings(mappings)
 
     return mappings
