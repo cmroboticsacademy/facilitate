@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 from collections import defaultdict
 from dataclasses import dataclass, field
 from itertools import product
@@ -56,8 +57,8 @@ def dice(
     contained_mappings: NodeMappings = []
 
     for (node_x, node_y) in mappings:
-        contains_x = any(node.subtree_equals(node_x) for node in descendants_x)
-        contains_y = any(node.subtree_equals(node_y) for node in descendants_y)
+        contains_x = any(node.equivalent_to(node_x) for node in descendants_x)
+        contains_y = any(node.equivalent_to(node_y) for node in descendants_y)
         if contains_x and contains_y:
             contained_mappings.append((node_x, node_y))
 
@@ -140,7 +141,7 @@ def compute_topdown_mappings(
                 if node not in added_trees_y:
                     hlist_y.add_children(node)
 
-    candidates.sort(key=lambda node_x, node_y: dice(node_x.parent, node_y.parent, mappings))
+    candidates.sort(key=functools.partial(dice, mappings=mappings))
 
     while candidates:
         node_x, node_y = candidates.pop(0)

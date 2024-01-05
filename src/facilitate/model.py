@@ -39,7 +39,7 @@ class BlockCategory(enum.Enum):
         return cls(prefix)
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Node(abc.ABC):
     """Represents a node in the abstract syntax tree."""
     id_: str
@@ -123,7 +123,7 @@ class TerminalNode(Node, abc.ABC):
     def equivalent_to(self, other: Node) -> bool:
         return self.surface_equivalent_to(other)
 
-@dataclass
+@dataclass(kw_only=True)
 class Field(TerminalNode):
     """Fields store specific values, options, or settings that customize the behavior or appearance of a block."""
     name: str
@@ -146,7 +146,7 @@ class Field(TerminalNode):
         )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Literal(TerminalNode):
     """Represents a literal value within the AST."""
     value: str
@@ -165,7 +165,7 @@ class Literal(TerminalNode):
         )
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Input(Node):
     name: str
     expression: Node
@@ -178,6 +178,7 @@ class Input(Node):
     def equivalent_to(self, other: Node) -> bool:
         if not self.surface_equivalent_to(other):
             return False
+        assert isinstance(other, Input)
         return self.expression.equivalent_to(other.expression)
 
     @overrides
@@ -195,7 +196,7 @@ class Input(Node):
         graph.add_edge(quote(self.id_), quote(self.expression.id_))
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Sequence(Node):
     """Represents a sequence of blocks."""
     parent: Node | None
@@ -236,7 +237,7 @@ class Sequence(Node):
             graph.add_edge(quote(self.id_), quote(block.id_))
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Block(Node):
     opcode: str
     parent: Block | None
@@ -314,7 +315,7 @@ class Block(Node):
             graph.add_edge(quote(self.id_), quote(child.id_))
 
 
-@dataclass
+@dataclass(kw_only=True)
 class Program(Node):
     top_level_nodes: list[Node]
 
