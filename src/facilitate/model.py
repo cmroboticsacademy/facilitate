@@ -146,6 +146,7 @@ class TerminalNode(Node, abc.ABC):
     def equivalent_to(self, other: Node) -> bool:
         return self.surface_equivalent_to(other)
 
+
 @dataclass(kw_only=True)
 class Field(TerminalNode):
     """Fields store specific values, options, or settings that customize the behavior or appearance of a block."""
@@ -220,7 +221,7 @@ class Input(Node):
         return Input(
             id_=self.id_,
             name=self.name,
-            expression=self.expression,
+            expression=self.expression.copy(),
         )
 
     @overrides
@@ -261,7 +262,7 @@ class Sequence(Node):
     def copy(self) -> Node:
         return Sequence(
             id_=self.id_,
-            blocks=list(self.blocks),
+            blocks=[block.copy() for block in self.blocks],
         )
 
     @overrides
@@ -314,8 +315,8 @@ class Block(Node):
         return Block(
             id_=self.id_,
             opcode=self.opcode,
-            fields=list(self.fields),
-            inputs=list(self.inputs),
+            fields=[field.copy() for field in self.fields],
+            inputs=[input_.copy() for input_ in self.inputs],
             is_shadow=self.is_shadow,
         )
 
@@ -396,6 +397,13 @@ class Program(Node):
 
     def __hash__(self) -> int:
         return hash(self.id_)
+
+    @overrides
+    def copy(self) -> Node:
+        return Program(
+            id_=self.id_,
+            top_level_nodes=[node.copy() for node in self.top_level_nodes],
+        )
 
     @classmethod
     def build(cls, top_level_nodes: list[Node]) -> Program:
