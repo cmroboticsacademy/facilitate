@@ -5,4 +5,8 @@ lint:
 	poetry run ruff src
 	poetry run mypy src
 
-.PHONY: install lint
+test:
+
+check: lint test
+
+.PHONY: check install lint
