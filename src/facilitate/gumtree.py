@@ -13,7 +13,9 @@ NodeMappings = list[tuple[Node, Node]]
 
 @dataclass
 class HeightIndexedPriorityList:
-    _height_to_nodes: dict[int, set[Node]] = field(default_factory=defaultdict)
+    _height_to_nodes: dict[int, set[Node]] = field(
+        default_factory=functools.partial(defaultdict, set),
+    )
 
     @property
     def max_height(self) -> int:
