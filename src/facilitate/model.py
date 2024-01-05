@@ -134,6 +134,9 @@ class Field(TerminalNode):
     name: str
     value: str
 
+    def __hash__(self) -> int:
+        return hash(self.id_)
+
     @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
         if not isinstance(other, Field):
@@ -156,6 +159,9 @@ class Literal(TerminalNode):
     """Represents a literal value within the AST."""
     value: str
 
+    def __hash__(self) -> int:
+        return hash(self.id_)
+
     @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
         return isinstance(other, Literal) and self.value == other.value
@@ -174,6 +180,9 @@ class Literal(TerminalNode):
 class Input(Node):
     name: str
     expression: Node
+
+    def __hash__(self) -> int:
+        return hash(self.id_)
 
     @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
@@ -205,6 +214,9 @@ class Input(Node):
 class Sequence(Node):
     """Represents a sequence of blocks."""
     blocks: list[Block]
+
+    def __hash__(self) -> int:
+        return hash(self.id_)
 
     @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
@@ -247,6 +259,9 @@ class Block(Node):
     fields: list[Field]
     inputs: list[Input]
     is_shadow: bool
+
+    def __hash__(self) -> int:
+        return hash(self.id_)
 
     def _fields_are_equivalent(self, other: Block) -> bool:
         """Determines whether the fields of this block are equivalent to those of another."""
@@ -322,6 +337,9 @@ class Block(Node):
 @dataclass(kw_only=True)
 class Program(Node):
     top_level_nodes: list[Node]
+
+    def __hash__(self) -> int:
+        return hash(self.id_)
 
     @classmethod
     def build(cls, top_level_nodes: list[Node]) -> Program:
