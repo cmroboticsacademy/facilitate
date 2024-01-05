@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import typing as t
 
 import networkx as nx
@@ -252,3 +253,10 @@ def load_program_from_block_descriptions(
     logger.trace("fixed input block references to account for sequences")
 
     return _build_program_from_node_descriptions(id_to_node_description)
+
+
+def load_from_file(filename: str) -> Program:
+    """Loads a Facilitate program from a file."""
+    with open(filename, "r") as file:
+        block_descriptions = json.load(file)
+    return load_program_from_block_descriptions(block_descriptions)

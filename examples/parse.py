@@ -6,7 +6,8 @@ from loguru import logger
 from pprint import pprint
 import networkx as nx
 
-from facilitate.loader import load_program_from_block_descriptions
+from facilitate.gumtree import compute_gumtree_mappings
+from facilitate.loader import load_from_file
 from facilitate.model import Program
 
 EXAMPLE_DIR = os.path.dirname(__file__)
@@ -48,14 +49,17 @@ def load_ugly() -> Program:
 def main() -> None:
     setup_logging()
 
-    program_ugly = load_ugly()
+    program_ugly = load_from_file(f"{EXAMPLE_DIR}/ugly.json")
     program_ugly.to_dot_png("visualizations/ugly.dot.png")
 
-    program_bad = load_bad()
+    program_bad = load_from_file(f"{EXAMPLE_DIR}/bad.json")
     program_bad.to_dot_png("visualizations/bad.dot.png")
 
-    program_good = load_good()
+    program_good = load_from_file(f"{EXAMPLE_DIR}/good.json")
     program_good.to_dot_png("visualizations/good.dot.png")
+
+    # edit distance: bad -> good
+
 
 
 if __name__ == "__main__":
