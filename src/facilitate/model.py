@@ -50,7 +50,7 @@ class Node(abc.ABC):
             child.parent = self
 
     @abc.abstractmethod
-    def copy(self) -> Node:
+    def copy(self: t.Self) -> t.Self:
         """Creates a deep copy of this node."""
         raise NotImplementedError
 
@@ -158,8 +158,8 @@ class Field(TerminalNode):
 
 
     @overrides
-    def copy(self) -> Node:
-        return Field(
+    def copy(self: t.Self) -> t.Self:
+        return self.__class__(
             id_=self.id_,
             name=self.name,
             value=self.value,
@@ -191,8 +191,8 @@ class Literal(TerminalNode):
         return hash(self.id_)
 
     @overrides
-    def copy(self) -> Node:
-        return Literal(id_=self.id_, value=self.value)
+    def copy(self: t.Self) -> t.Self:
+        return self.__class__(id_=self.id_, value=self.value)
 
     @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
@@ -217,8 +217,8 @@ class Input(Node):
         return hash(self.id_)
 
     @overrides
-    def copy(self) -> Node:
-        return Input(
+    def copy(self: t.Self) -> t.Self:
+        return self.__class__(
             id_=self.id_,
             name=self.name,
             expression=self.expression.copy(),
@@ -259,8 +259,8 @@ class Sequence(Node):
         return hash(self.id_)
 
     @overrides
-    def copy(self) -> Node:
-        return Sequence(
+    def copy(self: t.Self) -> t.Self:
+        return self.__class__(
             id_=self.id_,
             blocks=[block.copy() for block in self.blocks],
         )
@@ -311,8 +311,8 @@ class Block(Node):
         return hash(self.id_)
 
     @overrides
-    def copy(self) -> Node:
-        return Block(
+    def copy(self: t.Self) -> t.Self:
+        return self.__class__(
             id_=self.id_,
             opcode=self.opcode,
             fields=[field.copy() for field in self.fields],
@@ -399,8 +399,8 @@ class Program(Node):
         return hash(self.id_)
 
     @overrides
-    def copy(self) -> Node:
-        return Program(
+    def copy(self: t.Self) -> t.Self:
+        return self.__class__(
             id_=self.id_,
             top_level_nodes=[node.copy() for node in self.top_level_nodes],
         )

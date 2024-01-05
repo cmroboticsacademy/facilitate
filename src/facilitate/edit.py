@@ -40,10 +40,6 @@ class InsertInput(Edit):
     def apply(self, root: Node) -> None:
         parent = root.find(self.block_id)
         assert isinstance(parent, Block)
-        parent.create_input(
-            id_=self.created_id,
-            name=self.name,
-        )
 
 
 @dataclass(frozen=True, kw_only=True)
