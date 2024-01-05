@@ -379,7 +379,7 @@ class Block(Node):
 
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
-        label = f'"block:{self.opcode}"'
+        label = f'"block:{self.opcode}\n{self.id_}"'
         graph.add_node(
             quote(self.id_),
             label=label,
