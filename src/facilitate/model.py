@@ -115,7 +115,7 @@ class Node(abc.ABC):
     def to_dot_png(self, filename: str) -> None:
         """Writes the graph rooted as this node to a PNG file."""
         graph = self.to_nx_digraph()
-        nx.drawing.nx_pydot.to_pydot(graph).write_png(filename)
+        nx.drawing.nx_pydot.to_pydot(graph).write_png(filename)  # type: ignore
 
 
 class TerminalNode(Node, abc.ABC):
