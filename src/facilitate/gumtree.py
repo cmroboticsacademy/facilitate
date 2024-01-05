@@ -143,7 +143,11 @@ def compute_topdown_mappings(
                 if node not in added_trees_y:
                     hlist_y.add_children(node)
 
-    candidates.sort(key=functools.partial(dice, mappings=mappings))
+    def sort_key(map_entry: tuple[Node, Node]) -> float:
+        node_x, node_y = map_entry
+        return dice(node_x, node_y, mappings)
+
+    candidates.sort(key=sort_key)
 
     while candidates:
         node_x, node_y = candidates.pop(0)
