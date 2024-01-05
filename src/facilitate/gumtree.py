@@ -210,6 +210,27 @@ def compute_bottom_up_mappings(
     return mappings
 
 
+def sanity_check_mappings(
+    mappings: NodeMappings,
+) -> None:
+    mapped_from: set[Node] = set()
+    mapped_to: set[Node] = set()
+
+    for (node_from, node_to) in mappings:
+        # both nodes must have identical labels
+        assert type(node_from) == type(node_to)
+
+        if node_from in mapped_from:
+            error = f"source node {node_from.__class__.__name__}({node_from.id_}) already mapped"
+            raise ValueError(error)
+        mapped_from.add(node_from)
+
+        if node_to in mapped_to:
+            error = f"destination node {node_to.__class__.__name__}({node_to.id_}) already mapped"
+            raise ValueError(error)
+        mapped_to.add(node_to)
+
+
 def compute_gumtree_mappings(
     root_x: Node,
     root_y: Node,
@@ -219,4 +240,8 @@ def compute_gumtree_mappings(
 ) -> NodeMappings:
     """Uses the GumTree algorithm to map nodes between two trees."""
     mappings = compute_topdown_mappings(root_x, root_y, min_height=min_height)
-    return compute_bottom_up_mappings(root_x, root_y, mappings, min_dice=min_dice)
+    mappings = compute_bottom_up_mappings(root_x, root_y, mappings, min_dice=min_dice)
+
+    sanity_check_mappings(mappings)
+
+    return mappings
