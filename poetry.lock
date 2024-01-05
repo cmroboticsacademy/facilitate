@@ -673,6 +673,23 @@ extra = ["lxml (>=4.6)", "pydot (>=1.4.2)", "pygraphviz (>=1.11)", "sympy (>=1.1
 test = ["pytest (>=7.2)", "pytest-cov (>=4.0)"]
 
 [[package]]
+name = "networkx-stubs"
+version = "0.0.1"
+description = "Typing stubs for NetworkX"
+optional = false
+python-versions = "*"
+files = [
+    {file = "networkx-stubs-0.0.1.tar.gz", hash = "sha256:1751cbc87898328f89d79476ec6363174c05f9e48592f0953cc1077188717a21"},
+    {file = "networkx_stubs-0.0.1-py3-none-any.whl", hash = "sha256:ce58dff9b9dcbfdf895d0fce20fa8a73f2e82e581004596b7552086b5bb91366"},
+]
+
+[package.dependencies]
+networkx = "*"
+
+[package.extras]
+dev = ["black", "flake8", "flake8-black", "flake8-pyi", "mypy", "setuptools", "wheel"]
+
+[[package]]
 name = "nox"
 version = "2023.4.22"
 description = "Flexible test automation."
@@ -1285,4 +1302,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "e53ceb701fba1a8b0440c0080c98fe449618bab39541d169050a16cf237f2b54"
+content-hash = "835634694123f91bdf5f3791bba42f51a878746f17aa68dd7573ddd2ea792245"
