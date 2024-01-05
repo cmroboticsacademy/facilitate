@@ -49,6 +49,11 @@ class Node(abc.ABC):
         for child in self.children():
             child.parent = self
 
+    @abc.abstractmethod
+    def copy(self) -> Node:
+        """Creates a deep copy of this node."""
+        raise NotImplementedError
+
     @cached_property
     def height(self) -> int:
         """The height of the subtree rooted at this node."""
@@ -137,6 +142,15 @@ class Field(TerminalNode):
     def __hash__(self) -> int:
         return hash(self.id_)
 
+
+    @overrides
+    def copy(self) -> Node:
+        return Field(
+            id_=self.id_,
+            name=self.name,
+            value=self.value,
+        )
+
     @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
         if not isinstance(other, Field):
@@ -163,6 +177,10 @@ class Literal(TerminalNode):
         return hash(self.id_)
 
     @overrides
+    def copy(self) -> Node:
+        return Literal(id_=self.id_, value=self.value)
+
+    @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
         return isinstance(other, Literal) and self.value == other.value
 
@@ -183,6 +201,14 @@ class Input(Node):
 
     def __hash__(self) -> int:
         return hash(self.id_)
+
+    @overrides
+    def copy(self) -> Node:
+        return Input(
+            id_=self.id_,
+            name=self.name,
+            expression=self.expression,
+        )
 
     @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
@@ -217,6 +243,13 @@ class Sequence(Node):
 
     def __hash__(self) -> int:
         return hash(self.id_)
+
+    @overrides
+    def copy(self) -> Node:
+        return Sequence(
+            id_=self.id_,
+            blocks=list(self.blocks),
+        )
 
     @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
@@ -262,6 +295,16 @@ class Block(Node):
 
     def __hash__(self) -> int:
         return hash(self.id_)
+
+    @overrides
+    def copy(self) -> Node:
+        return Block(
+            id_=self.id_,
+            opcode=self.opcode,
+            fields=list(self.fields),
+            inputs=list(self.inputs),
+            is_shadow=self.is_shadow,
+        )
 
     def _fields_are_equivalent(self, other: Block) -> bool:
         """Determines whether the fields of this block are equivalent to those of another."""
