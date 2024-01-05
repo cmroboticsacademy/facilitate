@@ -4,12 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from itertools import product
 
-from facilitate.model import (
-    Block,
-    Field,
-    Input,
-    Node,
-)
+from facilitate.model import Node
 
 # NOTE change to a set?
 NodeMappings = list[tuple[Node, Node]]
@@ -181,25 +176,11 @@ def compute_bottom_up_mappings(
         if not any(child in matched_x for child in node.descendants()):
             return
 
-        candidates: list[Node] = []
-        for node_y in root_y.nodes():
-            if type(node) != type(node_y):
-                continue
-            if node_y in matched_y:
-                continue
-
-            if isinstance(node, Block) and node.opcode != node_y.opcode:
-                continue
-            if isinstance(node, Field):
-                if node.name != node_y.name:
-                    continue
-                if node.value != node_y.value:
-                    continue
-            if isinstance(node, Input) and node.name != node_y.name:
-                    continue
-            # note that sequences always match
-
-            candidates.append(node_y)
+        candidates: list[Node] = [
+            node_y
+            for node_y in root_y.nodes()
+            if node_y not in matched_y and node.surface_equivalent_to(node_y)
+        ]
 
         if not candidates:
             return

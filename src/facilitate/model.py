@@ -58,6 +58,14 @@ class Node(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def surface_equivalent_to(self, other: Node) -> bool:
+        """Determines whether the surface-level attributes of this node are equivalent to another.
+
+        Does not check the children of the nodes.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def children(self) -> t.Iterator[Node]:
         """Iterates over all children of this node."""
         raise NotImplementedError
@@ -111,6 +119,9 @@ class TerminalNode(Node, abc.ABC):
     def children(self) -> t.Iterator[Node]:
         yield from []
 
+    @overrides
+    def equivalent_to(self, other: Node) -> bool:
+        return self.surface_equivalent_to(other)
 
 @dataclass
 class Field(TerminalNode):
@@ -119,7 +130,7 @@ class Field(TerminalNode):
     value: str
 
     @overrides
-    def equivalent_to(self, other: Node) -> bool:
+    def surface_equivalent_to(self, other: Node) -> bool:
         if not isinstance(other, Field):
             return False
         if self.name != other.name:
@@ -141,7 +152,7 @@ class Literal(TerminalNode):
     value: str
 
     @overrides
-    def equivalent_to(self, other: Node) -> bool:
+    def surface_equivalent_to(self, other: Node) -> bool:
         return isinstance(other, Literal) and self.value == other.value
 
     @overrides
@@ -160,10 +171,12 @@ class Input(Node):
     expression: Node
 
     @overrides
+    def surface_equivalent_to(self, other: Node) -> bool:
+        return isinstance(other, Input) and self.name == other.name
+
+    @overrides
     def equivalent_to(self, other: Node) -> bool:
-        if not isinstance(other, Input):
-            return False
-        if self.name != other.name:
+        if not self.surface_equivalent_to(other):
             return False
         return self.expression.equivalent_to(other.expression)
 
@@ -187,6 +200,10 @@ class Sequence(Node):
     """Represents a sequence of blocks."""
     parent: Node | None
     blocks: list[Block]
+
+    @overrides
+    def surface_equivalent_to(self, other: Node) -> bool:
+        return isinstance(other, Sequence)
 
     @overrides
     def equivalent_to(self, other: Node) -> bool:
@@ -254,13 +271,16 @@ class Block(Node):
         return True
 
     @overrides
+    def surface_equivalent_to(self, other: Node) -> bool:
+        return isinstance(other, Block) and self.opcode == other.opcode
+
+    @overrides
     def equivalent_to(self, other: Node) -> bool:
         """Determines whether this block is equivalent to another."""
-        if not isinstance(other, Block):
+        if not self.surface_equivalent_to(other):
             return False
 
-        if self.opcode != other.opcode:
-            return False
+        assert isinstance(other, Block)
 
         if not self._fields_are_equivalent(other):
             return False
@@ -304,6 +324,10 @@ class Program(Node):
             id_="PROGRAM",
             top_level_nodes=top_level_nodes,
         )
+
+    @overrides
+    def surface_equivalent_to(self, other: Node) -> bool:
+        return isinstance(other, Program)
 
     @overrides
     def equivalent_to(self, other: Node) -> bool:
