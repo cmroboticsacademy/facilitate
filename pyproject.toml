@@ -72,6 +72,7 @@ extend-ignore = [
     "C901",     # function is too complex (cyclomatic complexity)
     "PLR0912",  # too many branches
     "PGH003",   # use specific rule codes when ignoring type issues
+    "FBT001",   # boolean typed positional argument in function definition
 ]
 
 [build-system]
