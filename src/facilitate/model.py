@@ -183,12 +183,6 @@ class Input(Node):
 
 
 @dataclass
-class VarRef(TerminalNode):
-    """Represents a reference to a named variable."""
-    variable: str
-
-
-@dataclass
 class Sequence(Node):
     """Represents a sequence of blocks."""
     id_: str
