@@ -67,7 +67,8 @@ def dice(
         for node_x_, node_y in mappings:
             if node_x_ == node_x:
                 return node_y
-        raise ValueError(f"no mapping found for {node_x.id_}")
+        error = f"no mapping found for {node_x.id_}"
+        raise ValueError(error)
 
     def coefficient(
         common_elements: int,
@@ -79,7 +80,7 @@ def dice(
     descendants_x = set(root_x.descendants())
     descendants_y = set(root_y.descendants())
 
-    mapped_x = set(node for node, _ in mappings)
+    mapped_x = {node for node, _ in mappings}
     mapped_descendants = 0
 
     for node_x in descendants_x:
@@ -210,13 +211,8 @@ def compute_bottom_up_mappings(
         if isinstance(node, TerminalNode):
             return
 
-        # FIXME is this necessary?
-        # if not any(child in matched_x for child in node.descendants()):
-        #     return
-
         # A node c ∈ T2 is a candidate for t1 if label(t1) = label(c), c is unmatched, and t1
         # and c have some matching descendants.
-        # NOTE Leo's code had an extra check for node.surface_equivalent_to(node_y) here
         candidates: list[Node] = [
             node_y
             for node_y in root_y.nodes()
