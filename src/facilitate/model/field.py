@@ -18,9 +18,12 @@ class Field(TerminalNode):
     name: str
     value: str
 
+    @classmethod
+    def determine_id(cls, block_id: str, field_name: str) -> str:
+        return f":field[{field_name}]@{block_id}",
+
     def __hash__(self) -> int:
         return hash(self.id_)
-
 
     @overrides
     def copy(self: t.Self) -> t.Self:

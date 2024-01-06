@@ -176,7 +176,7 @@ def _build_program_from_node_descriptions(
 
             fields: list[Field] = [
                 Field(
-                    id_=f":field[{name}]@{id_}",
+                    id_=Field.determine_id(id_, name),
                     name=name,
                     value=value_arr[0],
                 )
