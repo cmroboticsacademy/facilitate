@@ -6,7 +6,9 @@ from dataclasses import dataclass, field
 from itertools import product
 
 from loguru import logger
+from pprint import pprint
 
+from facilitate.mappings import NodeMappings as NewNodeMappings
 from facilitate.model.node import Node, TerminalNode
 
 # NOTE change to a set?
@@ -50,16 +52,10 @@ class HeightIndexedPriorityList:
 def dice(
     root_x: Node,
     root_y: Node,
-    mappings: NodeMappings,
+    old_mappings: NodeMappings,
 ) -> float:
     """Measures the ratio of common descendants between two nodes given a set of mappings."""
-
-    def get_y_for_x(node_x: Node) -> Node:
-        for node_x_, node_y in mappings:
-            if node_x_ == node_x:
-                return node_y
-        error = f"no mapping found for {node_x.id_}"
-        raise ValueError(error)
+    mappings = NewNodeMappings.from_tuples(old_mappings)
 
     def coefficient(
         common_elements: int,
@@ -71,14 +67,12 @@ def dice(
     descendants_x = set(root_x.descendants())
     descendants_y = set(root_y.descendants())
 
-    mapped_x = {node for node, _ in mappings}
     mapped_descendants = 0
 
     for node_x in descendants_x:
-        if node_x in mapped_x:
-            node_y = get_y_for_x(node_x)
-            if node_y in descendants_y:
-                mapped_descendants += 1
+        node_y = mappings.source_is_mapped_to(node_x)
+        if node_y and node_y in descendants_y:
+            mapped_descendants += 1
 
     return coefficient(
         mapped_descendants,
@@ -87,23 +81,19 @@ def dice(
     )
 
 
-def _add_children_to_mappings(
+def _add_descendants_to_mappings(
     node_x: Node,
     node_y: Node,
     mappings: NodeMappings,
 ) -> None:
     """Adds all children of given nodes to the mappings."""
-    children_x = list(node_x.children())
-    children_y = list(node_y.children())
-
-    for child_x, child_y in zip(
-        children_x,
-        children_y,
+    for descendant_x, descendant_y in zip(
+        node_x.descendants(),
+        node_y.descendants(),
         strict=True,
     ):
-        if (child_x, child_y) not in mappings:
-            mappings.append((child_x, child_y))
-            _add_children_to_mappings(child_x, child_y, mappings)
+        if (descendant_x, descendant_y) not in mappings:
+            mappings.add(descendant_x, descendant_y)
 
 
 def compute_topdown_mappings(
@@ -112,8 +102,8 @@ def compute_topdown_mappings(
     *,
     min_height: int = 2,
 ) -> NodeMappings:
-    mappings: NodeMappings = []
-    candidates: NodeMappings = []
+    new_mappings = NewNodeMappings()
+    old_candidates: NodeMappings = []
 
     hlist_x = HeightIndexedPriorityList()
     hlist_x.push(root_x)
@@ -145,9 +135,9 @@ def compute_topdown_mappings(
                     match_y = any(node.equivalent_to(node_x) and node != node_y for node in nodes_y)
 
                     if match_x or match_y:
-                        candidates.append((node_x, node_y))
+                        old_candidates.insert(0, (node_x, node_y))
                     else:
-                        mappings.append((node_x, node_y))
+                        new_mappings.add(node_x, node_y)
 
                     added_trees_x.add(node_x)
                     added_trees_y.add(node_y)
@@ -162,41 +152,43 @@ def compute_topdown_mappings(
 
     def sort_key(map_entry: tuple[Node, Node]) -> float:
         node_x, node_y = map_entry
-        return dice(node_x, node_y, mappings)
+        return dice(node_x, node_y, old_mappings)
 
-    candidates.sort(key=sort_key)
+    logger.trace(f"mappings (before candidates): {new_mappings}")
+    old_mappings = list(new_mappings.as_tuples())
+    old_candidates.sort(key=sort_key)
 
-    while candidates:
-        node_x, node_y = candidates.pop(0)
-        mappings.append((node_x, node_y))
-        candidates = [
+    while old_candidates:
+        node_x, node_y = old_candidates.pop(0)
+        old_mappings.append((node_x, node_y))
+        old_candidates = [
             (from_x, to_y)
-            for from_x, to_y in candidates
+            for from_x, to_y in old_candidates
             if from_x != node_x and to_y != node_y
         ]
 
-    # FIXME we shouldn't be able to mutate mappings while we're iterating over it!
-    for node_x, node_y in mappings:
-        _add_children_to_mappings(node_x, node_y, mappings)
+    new_mappings = NewNodeMappings.from_tuples(old_mappings)
+    logger.trace(f"mappings (before descendants): {new_mappings}")
+    for node_x, node_y in old_mappings:
+        _add_descendants_to_mappings(node_x, node_y, new_mappings)
+    old_mappings = new_mappings.as_tuples()
 
-    return mappings
+    return old_mappings
 
 
 def compute_bottom_up_mappings(
     root_x: Node,
     root_y: Node,
-    mappings: NodeMappings,
+    old_mappings: NodeMappings,
     *,
     min_dice: float = 0.5,
 ) -> NodeMappings:
-    mappings = mappings.copy()
-    matched_x = {node_x for node_x, _ in mappings}
-    matched_y = {node_y for _, node_y in mappings}
+    mappings = NewNodeMappings.from_tuples(old_mappings)
 
     # to find the container mappings, the nodes of T1 are processed in postorder
     # for each unmatched non-leaf node of T1, we extract a list of candidate nodes from T2
     def visit(node: Node) -> None:
-        if node in matched_x:
+        if mappings.source_is_mapped(node):
             return
 
         if isinstance(node, TerminalNode):
@@ -207,7 +199,7 @@ def compute_bottom_up_mappings(
         candidates: list[Node] = [
             node_y
             for node_y in root_y.nodes()
-            if node_y not in matched_y and type(node) == type(node_y)
+            if not mappings.destination_is_mapped(node_y) and type(node) == type(node_y)
         ]
 
         if not candidates:
@@ -220,7 +212,7 @@ def compute_bottom_up_mappings(
         top_candidate = candidates[0]
 
         if dice(node, top_candidate, mappings) > min_dice:
-            mappings.append((node, top_candidate))
+            mappings.add(node, top_candidate)
 
     for node in root_x.postorder():
         visit(node)
@@ -229,28 +221,13 @@ def compute_bottom_up_mappings(
     # additional mappings (called recovery mappings) among their descendants.
     # - uses RTED without move actions
 
-    return mappings
+    return mappings.as_tuples()
 
 
 def sanity_check_mappings(
-    mappings: NodeMappings,
+    old_mappings: NodeMappings,
 ) -> None:
-    mapped_from: set[Node] = set()
-    mapped_to: set[Node] = set()
-
-    for (node_from, node_to) in mappings:
-        # both nodes must have identical labels
-        assert type(node_from) == type(node_to)
-
-        if node_from in mapped_from:
-            error = f"source node {node_from.__class__.__name__}({node_from.id_}) already mapped"
-            raise ValueError(error)
-        mapped_from.add(node_from)
-
-        if node_to in mapped_to:
-            error = f"destination node {node_to.__class__.__name__}({node_to.id_}) already mapped"
-            raise ValueError(error)
-        mapped_to.add(node_to)
+    NewNodeMappings.from_tuples(old_mappings).check()
 
 
 def compute_gumtree_mappings(
