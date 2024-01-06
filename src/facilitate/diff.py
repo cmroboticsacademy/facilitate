@@ -21,7 +21,8 @@ def compute_edit_script(
 ) -> EditScript:
     """Computes an edit script to transform one tree into another."""
     script = EditScript()
-    mappings = compute_gumtree_mappings(tree_from, tree_to)
+    new_mappings = compute_gumtree_mappings(tree_from, tree_to)
+    mappings = new_mappings.as_tuples()
 
     nodes_from = set(tree_from.nodes())
     matched_nodes_from = {node_from for node_from, _ in mappings}
