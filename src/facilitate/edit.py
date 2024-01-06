@@ -4,7 +4,12 @@ import abc
 import typing as t
 from dataclasses import dataclass, field
 
-from facilitate.model import Block, Field, Literal, Node
+from facilitate.model.block import Block
+from facilitate.model.field import Field
+from facilitate.model.literal import Literal
+
+if t.TYPE_CHECKING:
+    from facilitate.model.node import Node
 
 
 class Edit(abc.ABC):

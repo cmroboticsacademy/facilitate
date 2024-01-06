@@ -45,6 +45,7 @@ src = ["src"]
 select = [
     "ALL",  # includes all rules (including new ones)
 ]
+per-file-ignores = {"*/__init__.py" = ["F401"]}
 extend-ignore = [
     "ANN101",   # missing type annotation for 'self' in method
     "ANN102",   # missing type annotation for 'cls' in classmethod

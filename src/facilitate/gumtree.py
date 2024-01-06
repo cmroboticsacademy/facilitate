@@ -7,7 +7,7 @@ from itertools import product
 
 from loguru import logger
 
-from facilitate.model import Node
+from facilitate.model.node import Node
 
 # NOTE change to a set?
 NodeMappings = list[tuple[Node, Node]]
@@ -175,8 +175,8 @@ def compute_bottom_up_mappings(
     min_dice: float = 0.5,
 ) -> NodeMappings:
     mappings = mappings.copy()
-    matched_x = [node_x for node_x, _ in mappings]
-    matched_y = [node_y for _, node_y in mappings]
+    matched_x = {node_x for node_x, _ in mappings}
+    matched_y = {node_y for _, node_y in mappings}
 
     def visit(node: Node) -> None:
         if node in matched_x:

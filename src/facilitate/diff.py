@@ -11,7 +11,7 @@ from facilitate.edit import (
 from facilitate.gumtree import compute_gumtree_mappings
 
 if t.TYPE_CHECKING:
-    from facilitate.model import Node
+    from facilitate.model.node import Node
 
 
 def compute_edit_script(

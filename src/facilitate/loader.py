@@ -7,15 +7,15 @@ from pathlib import Path
 import networkx as nx
 from loguru import logger
 
-from facilitate.model import (
-    Block,
-    Field,
-    Input,
-    Literal,
-    Node,
-    Program,
-    Sequence,
-)
+from facilitate.model.block import Block
+from facilitate.model.field import Field
+from facilitate.model.input import Input
+from facilitate.model.literal import Literal
+from facilitate.model.program import Program
+from facilitate.model.sequence import Sequence
+
+if t.TYPE_CHECKING:
+    from facilitate.model.node import Node
 
 _NodeDescription = dict[str, t.Any]
 
