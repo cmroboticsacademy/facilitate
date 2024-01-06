@@ -9,6 +9,7 @@ from facilitate.edit import (
     Update,
 )
 from facilitate.gumtree import compute_gumtree_mappings
+from facilitate.model.sequence import Sequence
 
 if t.TYPE_CHECKING:
     from facilitate.model.node import Node
@@ -39,25 +40,28 @@ def compute_edit_script(
     # - look for pairs (x, y) where their values differ
     # - for each such pair, create an update edit: x -> y
     for (node_from, node_to) in mappings:
-
-        print(f"considering {node_from.id_} -> {node_to.id_}")
-        print(f"- {node_from.__class__.__name__} -> {node_to.__class__.__name__}")
-
         maybe_update = Update.compute(node_from, node_to)
         if maybe_update:
-            print(f"created Update: {maybe_update}")
             script.append(maybe_update)
 
     # align phase:
     # - check each pair (x, y) to see if their children are misaligned
     # - create a move edit to align them if so
     #
-    # FIXME children of x and y are misaligned if:
-    # ...
+    # note that, within the context of Scratch, this is only possible for sequences
+    #
+    # children of x and y are misaligned if:
+    # - x has matched children u and v
+    # - u is to the left of v in x but the partner of u is to the right of the partner of v in y
     for (_node_from, _node_to) in mappings:
-        # We say that the children of x and y are misaligned if x has matched children u and v
-        # such that u is to the left of v in T1 but the partner of u is to the right of the partner of v in T2
-        pass
+        if not isinstance(_node_from, Sequence):
+            continue
+        assert isinstance(_node_to, Sequence)
+
+        _indexed_children_from = list(enumerate(_node_from.blocks))
+        _indexed_children_to = list(enumerate(_node_to.blocks))
+
+        raise NotImplementedError
 
     # (3) insert phase
     # look for nodes in tree_to that are unmatched but have a matched parent
@@ -65,9 +69,16 @@ def compute_edit_script(
         if node.parent not in matched_nodes_to:
             continue
         print(f"create Insert({node.__class__.__name__}) for {node.id_}")
+        raise NotImplementedError
 
     # (4) move phase
+    # - look for matched pairs (x, y) for which (p(x), p(y)) is not matched,
+    #   where p(x) is the parent of x
+
     # (5) delete phase
+    # - look for unmatched leaf nodes in tree_from
+    for _node in tree_from.postorder():
+        pass
 
     raise NotImplementedError
 

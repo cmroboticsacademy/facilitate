@@ -4,6 +4,8 @@ import abc
 import typing as t
 from dataclasses import dataclass, field
 
+from loguru import logger
+
 from facilitate.model.block import Block
 from facilitate.model.field import Field
 from facilitate.model.literal import Literal
@@ -129,6 +131,7 @@ class EditScript(t.Iterable[Edit]):
         return len(self._edits)
 
     def append(self, edit: Edit) -> None:
+        logger.trace("added edit to script: {}", edit)
         self._edits.append(edit)
 
     def apply(self, root: Node) -> Node:
