@@ -47,15 +47,6 @@ class HeightIndexedPriorityList:
             self.push(child)
 
 
-def _dice_coefficient(
-    common_elements: int,
-    elements_in_x: int,
-    elements_in_y: int,
-) -> float:
-    """Computes the dice coefficient between two sets."""
-    return 2 * common_elements / (elements_in_x + elements_in_y)
-
-
 def dice(
     root_x: Node,
     root_y: Node,
