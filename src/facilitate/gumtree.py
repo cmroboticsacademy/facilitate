@@ -7,7 +7,7 @@ from itertools import product
 
 from loguru import logger
 
-from facilitate.model.node import Node
+from facilitate.model.node import Node, TerminalNode
 
 # NOTE change to a set?
 NodeMappings = list[tuple[Node, Node]]
@@ -47,29 +47,52 @@ class HeightIndexedPriorityList:
             self.push(child)
 
 
-# FIXME this doesn't look quite right; original paper contains an error in formula
-# TODO write some tests for this method
+def _dice_coefficient(
+    common_elements: int,
+    elements_in_x: int,
+    elements_in_y: int,
+) -> float:
+    """Computes the dice coefficient between two sets."""
+    return 2 * common_elements / (elements_in_x + elements_in_y)
+
+
 def dice(
     root_x: Node,
     root_y: Node,
     mappings: NodeMappings,
 ) -> float:
-    """Computes ratio of common descendants between two nodes based on given mappings."""
+    """Measures the ratio of common descendants between two nodes given a set of mappings."""
+
+    def get_y_for_x(node_x: Node) -> Node:
+        for node_x_, node_y in mappings:
+            if node_x_ == node_x:
+                return node_y
+        raise ValueError(f"no mapping found for {node_x.id_}")
+
+    def coefficient(
+        common_elements: int,
+        elements_in_x: int,
+        elements_in_y: int,
+    ) -> float:
+        return 2 * common_elements / (elements_in_x + elements_in_y)
+
     descendants_x = set(root_x.descendants())
     descendants_y = set(root_y.descendants())
 
-    contained_mappings: NodeMappings = []
+    mapped_x = set(node for node, _ in mappings)
+    mapped_descendants = 0
 
-    for (node_x, node_y) in mappings:
-        contains_x = any(node.equivalent_to(node_x) for node in descendants_x)
-        contains_y = any(node.equivalent_to(node_y) for node in descendants_y)
-        if contains_x and contains_y:
-            contained_mappings.append((node_x, node_y))
+    for node_x in descendants_x:
+        if node_x in mapped_x:
+            node_y = get_y_for_x(node_x)
+            if node_y in descendants_y:
+                mapped_descendants += 1
 
-    # NOTE Leo's code had an extra multiplication by 2 (if root_x and root_y have the same block ID) here
-    numerator = 2 * len(contained_mappings)
-    denominator = len(descendants_x) + len(descendants_y)
-    return numerator / denominator
+    return coefficient(
+        mapped_descendants,
+        len(descendants_x),
+        len(descendants_y),
+    )
 
 
 def _add_children_to_mappings(
@@ -178,17 +201,26 @@ def compute_bottom_up_mappings(
     matched_x = {node_x for node_x, _ in mappings}
     matched_y = {node_y for _, node_y in mappings}
 
+    # to find the container mappings, the nodes of T1 are processed in postorder
+    # for each unmatched non-leaf node of T1, we extract a list of candidate nodes from T2
     def visit(node: Node) -> None:
         if node in matched_x:
             return
 
-        if not any(child in matched_x for child in node.descendants()):
+        if isinstance(node, TerminalNode):
             return
 
+        # FIXME is this necessary?
+        # if not any(child in matched_x for child in node.descendants()):
+        #     return
+
+        # A node c ∈ T2 is a candidate for t1 if label(t1) = label(c), c is unmatched, and t1
+        # and c have some matching descendants.
+        # NOTE Leo's code had an extra check for node.surface_equivalent_to(node_y) here
         candidates: list[Node] = [
             node_y
             for node_y in root_y.nodes()
-            if node_y not in matched_y and node.surface_equivalent_to(node_y)
+            if node_y not in matched_y and type(node) == type(node_y)
         ]
 
         if not candidates:
@@ -206,8 +238,9 @@ def compute_bottom_up_mappings(
     for node in root_x.postorder():
         visit(node)
 
-    # NOTE original GumTree algo uses RTED algorithm to find edit script
-    # without move actions; possibly unnecessary given small size of trees
+    # When two nodes matches, we finally apply an optimal algorithm to search for
+    # additional mappings (called recovery mappings) among their descendants.
+    # - uses RTED without move actions
 
     return mappings
 
