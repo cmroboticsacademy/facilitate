@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import typing as t
 
-from loguru import logger
-
 from facilitate.edit import (
+    Delete,
     EditScript,
     Update,
 )
@@ -21,29 +20,24 @@ def compute_edit_script(
 ) -> EditScript:
     """Computes an edit script to transform one tree into another."""
     script = EditScript()
-    new_mappings = compute_gumtree_mappings(tree_from, tree_to)
-    mappings = new_mappings.as_tuples()
+    mappings = compute_gumtree_mappings(tree_from, tree_to)
 
     nodes_from = set(tree_from.nodes())
-    matched_nodes_from = {node_from for node_from, _ in mappings}
+    matched_nodes_from = set(mappings.sources())
     _unmatched_nodes_from = nodes_from - matched_nodes_from
 
     nodes_to = set(tree_to.nodes())
-    matched_nodes_to = {node_to for _, node_to in mappings}
+    matched_nodes_to = set(mappings.destinations())
     unmatched_nodes_to = nodes_to - matched_nodes_to
 
-    logger.trace(
-        "matched nodes:\n{}",
-        "\n".join(f"* {node_from.id_} -> {node_to.id_}" for (node_from, node_to) in mappings),
-    )
-
     # update phase:
-    # - look for pairs (x, y) where their values differ
+    # - for pairs (x, y) where their values differ
     # - for each such pair, create an update edit: x -> y
     for (node_from, node_to) in mappings:
         maybe_update = Update.compute(node_from, node_to)
         if maybe_update:
             script.append(maybe_update)
+            maybe_update.apply(tree_from)
 
     # align phase:
     # - check each pair (x, y) to see if their children are misaligned
@@ -76,12 +70,12 @@ def compute_edit_script(
     # - look for matched pairs (x, y) for which (p(x), p(y)) is not matched,
     #   where p(x) is the parent of x
 
-    # (5) delete phase
-    # - look for unmatched leaf nodes in tree_from
-    for _node in tree_from.postorder():
-        pass
-
-    raise NotImplementedError
+    # delete phase
+    for node_ in tree_from.postorder():
+        if not mappings.source_is_mapped(node_):
+            edit = Delete(node_id=node_.id_)
+            edit.apply(tree_from)
+            script.append(edit)
 
     # TODO ensure that edit script works!
 

@@ -104,6 +104,7 @@ class Update(Edit):
         raise NotImplementedError
 
 
+@dataclass(frozen=True, kw_only=True)
 class Delete(Edit):
     """Deletes a node from the tree.
 
