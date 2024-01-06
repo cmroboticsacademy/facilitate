@@ -5,6 +5,7 @@ import typing as t
 from dataclasses import dataclass, field
 
 from loguru import logger
+from overrides import overrides
 
 from facilitate.model.block import Block
 from facilitate.model.field import Field
@@ -16,37 +17,41 @@ if t.TYPE_CHECKING:
 
 class Edit(abc.ABC):
     @abc.abstractmethod
-    def apply(self, root: Node) -> None:
+    def apply(self, root: Node) -> Node | None:
         ...
 
 
+class Addition(Edit):
+    """Represents an additive edit."""
+
+
 @dataclass(frozen=True, kw_only=True)
-class InsertField(Edit):
+class AddInputToBlock(Addition):
+    """Inserts a (bare) named input into a block."""
+    block_id: str
+    name: str
+
+    @overrides
+    def apply(self, root: Node) -> Node | None:
+        """Inserts and returns the given input."""
+        parent = root.find(self.block_id)
+        assert isinstance(parent, Block)
+        return parent.add_input(self.name)
+
+
+@dataclass(frozen=True, kw_only=True)
+class AddFieldToBlock(Addition):
     """Inserts a named field into a block."""
     block_id: str
     name: str
+    value: str
 
-
-@dataclass(frozen=True, kw_only=True)
-class InsertInput(Edit):
-    """Inserts an input into a block.
-
-    Attributes
-    ----------
-    block_id
-        the id of the block to insert the input into
-    created_id
-        the id of the input to create
-    name
-        the name of the input to create
-    """
-    block_id: str
-    created_id: str
-    name: str
-
-    def apply(self, root: Node) -> None:
+    @overrides
+    def apply(self, root: Node) -> Node | None:
+        """Inserts and returns the given field."""
         parent = root.find(self.block_id)
         assert isinstance(parent, Block)
+        return parent.add_field(self.name, self.value)
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -100,6 +105,7 @@ class Update(Edit):
             value=value_to,
         )
 
+    @overrides
     def apply(self, root: Node) -> None:
         node = root.find(self.node_id)
         if isinstance(node, Block):
@@ -122,6 +128,7 @@ class Delete(Edit):
     """
     node_id: str
 
+    @overrides
     def apply(self, root: Node) -> None:
         node = root.find(self.node_id)
         if not node:
