@@ -166,9 +166,8 @@ def _build_program_from_node_descriptions(
                     error = f"invalid input value: {input_value_arr[1]}"
                     raise TypeError(error)
 
-                input_id = f":input[{input_name}]@{id_}"
                 input_ = Input(
-                    id_=input_id,
+                    id_=Input.determine_id(id_, input_name),
                     name=input_name,
                     expression=expression,
                 )

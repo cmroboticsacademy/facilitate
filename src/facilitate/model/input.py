@@ -22,6 +22,10 @@ class Input(Node):
     def __hash__(self) -> int:
         return hash(self.id_)
 
+    @classmethod
+    def determine_id(cls, block_id: str, input_name: str) -> str:
+        return f":input[{input_name}]@{block_id}"
+
     @overrides
     def copy(self: t.Self) -> t.Self:
         expression = None if self.expression is None else self.expression

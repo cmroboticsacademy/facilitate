@@ -100,6 +100,18 @@ class Block(Node):
         bisect.insort(self.fields, field, key=lambda field: field.name)
         return field
 
+    def add_input(self, name: str) -> Input:
+        input_ = Input(
+            id_=Input.determine_id(self.id_, name),
+            name=name,
+            expression=None,
+        )
+        input_.parent = self
+
+        # insert input in alphabetical order
+        bisect.insort(self.inputs, input_, key=lambda input_: input_.name)
+        return input_
+
     @overrides
     def remove_child(self, child: Node) -> None:
         if isinstance(child, Field):
