@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 import typing as t
 from dataclasses import dataclass
 
@@ -86,6 +87,18 @@ class Block(Node):
     @property
     def category(self) -> BlockCategory:
         return BlockCategory.from_opcode(self.opcode)
+
+    def add_field(self, name: str, value: str) -> Field:
+        field = Field(
+            id_=Field.determine_id(self.id_, name),
+            name=name,
+            value=value,
+        )
+        field.parent = self
+
+        # insert field in alphabetical order
+        bisect.insort(self.fields, field, key=lambda field: field.name)
+        return field
 
     @overrides
     def remove_child(self, child: Node) -> None:

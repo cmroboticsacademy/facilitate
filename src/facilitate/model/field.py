@@ -20,7 +20,7 @@ class Field(TerminalNode):
 
     @classmethod
     def determine_id(cls, block_id: str, field_name: str) -> str:
-        return f":field[{field_name}]@{block_id}",
+        return f":field[{field_name}]@{block_id}"
 
     def __hash__(self) -> int:
         return hash(self.id_)

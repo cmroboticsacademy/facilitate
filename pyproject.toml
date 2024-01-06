@@ -74,6 +74,7 @@ extend-ignore = [
     "PLR0912",  # too many branches
     "PGH003",   # use specific rule codes when ignoring type issues
     "FBT001",   # boolean typed positional argument in function definition
+    "ARG001",   # unused function argument
 ]
 
 [build-system]
