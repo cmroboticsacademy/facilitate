@@ -101,12 +101,19 @@ class Update(Edit):
         )
 
     def apply(self, root: Node) -> None:
-        raise NotImplementedError
+        node = root.find(self.node_id)
+        if isinstance(node, Block):
+            node.opcode = self.value
+        elif isinstance(node, Field | Literal):
+            node.value = self.value
+        else:
+            error = f"cannot update node of type {type(node)}"
+            raise TypeError(error)
 
 
 @dataclass(frozen=True, kw_only=True)
 class Delete(Edit):
-    """Deletes a node from the tree.
+    """Deletes a leaf node from the tree.
 
     Attributes
     ----------
@@ -116,9 +123,22 @@ class Delete(Edit):
     node_id: str
 
     def apply(self, root: Node) -> None:
-        # TODO locate node
-        # TODO find parent of node [node.parent]
-        ...
+        node = root.find(self.node_id)
+        if not node:
+            error = f"cannot delete node {self.node_id}: not found."
+            raise ValueError(error)
+
+        if node.has_children():
+            error = f"cannot delete node {self.node_id}: has children."
+            raise ValueError(error)
+
+        parent = node.parent
+
+        if not parent:
+            error = f"cannot delete node {self.node_id}: no parent."
+            raise ValueError(error)
+
+        parent.remove_child(node)
 
 
 @dataclass

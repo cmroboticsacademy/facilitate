@@ -5,13 +5,12 @@ from dataclasses import dataclass
 
 from overrides import overrides
 
+from facilitate.model.block import Block
 from facilitate.model.node import Node
 from facilitate.util import quote
 
 if t.TYPE_CHECKING:
     import networkx as nx
-
-    from facilitate.model.block import Block
 
 
 @dataclass(kw_only=True)
@@ -47,6 +46,14 @@ class Sequence(Node):
             if not block.equivalent_to(other_block):
                 return False
         return True
+
+    @overrides
+    def remove_child(self, child: Node) -> None:
+        if not isinstance(child, Block):
+            error = f"cannot remove child {child.id_}: not a block."
+            raise TypeError(error)
+        self.blocks.remove(child)
+        child.parent = None
 
     @overrides
     def children(self) -> t.Iterator[Node]:

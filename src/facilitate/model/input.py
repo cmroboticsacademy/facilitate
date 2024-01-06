@@ -17,17 +17,18 @@ if t.TYPE_CHECKING:
 @dataclass(kw_only=True)
 class Input(Node):
     name: str
-    expression: Node
+    expression: Node | None
 
     def __hash__(self) -> int:
         return hash(self.id_)
 
     @overrides
     def copy(self: t.Self) -> t.Self:
+        expression = None if self.expression is None else self.expression
         return self.__class__(
             id_=self.id_,
             name=self.name,
-            expression=self.expression.copy(),
+            expression=expression,
         )
 
     @overrides
@@ -39,14 +40,33 @@ class Input(Node):
         if not self.surface_equivalent_to(other):
             return False
         assert isinstance(other, Input)
+
+        if self.expression is None:
+            return other.expression is None
+        assert other.expression is not None
         return self.expression.equivalent_to(other.expression)
 
     @overrides
     def children(self) -> t.Iterator[Node]:
-        yield self.expression
+        if self.expression is not None:
+            yield self.expression
+        else:
+            yield from ()
+
+    @overrides
+    def remove_child(self, child: Node) -> None:
+        if self.expression is None:
+            error = f"cannot remove child {child.id_}: no expression of {self.id_}."
+            raise ValueError(error)
+        if self.expression is not child:
+            error = f"cannot remove child {child.id_}: not expression of {self.id_}."
+            raise ValueError(error)
+        child.parent = None
+        self.expression = None
 
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        assert self.expression is not None
         label = f'"input:{self.name}"'
         graph.add_node(
             quote(self.id_),

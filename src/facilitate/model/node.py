@@ -47,6 +47,13 @@ class Node(abc.ABC):
         """
         raise NotImplementedError
 
+    @final
+    def has_children(self) -> bool:
+        """Determines whether this node has any children."""
+        for _ in self.children():
+            return True
+        return False
+
     @abc.abstractmethod
     def children(self) -> t.Iterator[Node]:
         """Iterates over all children of this node."""
@@ -86,6 +93,11 @@ class Node(abc.ABC):
         yield self
 
     @abc.abstractmethod
+    def remove_child(self, child: Node) -> None:
+        """Removes a child from this node."""
+        ...
+
+    @abc.abstractmethod
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         """Adds the subtree rooted as this node to a digraph."""
         raise NotImplementedError
@@ -118,3 +130,7 @@ class TerminalNode(Node, abc.ABC):
     def equivalent_to(self, other: Node) -> bool:
         return self.surface_equivalent_to(other)
 
+    @overrides
+    def remove_child(self, child: Node) -> None:
+        error = f"cannot remove child {child.id_} from terminal node ({self.id_})"
+        raise NotImplementedError(error)

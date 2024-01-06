@@ -6,14 +6,13 @@ from dataclasses import dataclass
 from overrides import overrides
 
 from facilitate.model.block_category import BlockCategory
+from facilitate.model.field import Field
+from facilitate.model.input import Input
 from facilitate.model.node import Node
 from facilitate.util import quote
 
 if t.TYPE_CHECKING:
     import networkx as nx
-
-    from facilitate.model.field import Field
-    from facilitate.model.input import Input
 
 
 @dataclass(kw_only=True)
@@ -87,6 +86,18 @@ class Block(Node):
     @property
     def category(self) -> BlockCategory:
         return BlockCategory.from_opcode(self.opcode)
+
+    @overrides
+    def remove_child(self, child: Node) -> None:
+        if isinstance(child, Field):
+            self.fields.remove(child)
+        elif isinstance(child, Input):
+            self.inputs.remove(child)
+        else:
+            error = f"cannot remove child {child.id_}: not field or input of {self.id_}."
+            raise TypeError(error)
+
+        child.parent = None
 
     @overrides
     def children(self) -> t.Iterator[Node]:

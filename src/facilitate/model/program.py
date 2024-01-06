@@ -57,6 +57,11 @@ class Program(Node):
         yield from self.top_level_nodes
 
     @overrides
+    def remove_child(self, child: Node) -> None:
+        self.top_level_nodes.remove(child)
+        child.parent = None
+
+    @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         graph.add_node(
             quote(self.id_),
