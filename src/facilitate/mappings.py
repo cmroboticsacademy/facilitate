@@ -85,6 +85,14 @@ class NodeMappings:
         self._source_to_destination[source] = destination
         self._destination_to_source[destination] = source
 
+    def add_with_descendants(self, source: Node, destination: Node) -> None:
+        for node_source, node_destination in zip(
+            source.nodes(),
+            destination.nodes(),
+            strict=True,
+        ):
+            self.add(node_source, node_destination)
+
     def __str__(self) -> str:
         description = "\n".join(f" {before.id_} -> {after.id_}" for (before, after) in self)
         return f"NodeMappings(\n{description}\n)"
