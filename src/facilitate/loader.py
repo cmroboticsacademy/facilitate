@@ -39,11 +39,6 @@ def _extract_input_names_to_id(description: _NodeDescription) -> dict[str, str]:
     return name_to_id
 
 
-def _extract_input_ids(description: _NodeDescription) -> list[str]:
-    """Retrieves a list of the IDs of all inputs to a block."""
-    return list(_extract_input_names_to_id(description).values())
-
-
 def _toposort(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> list[_NodeDescription]:
