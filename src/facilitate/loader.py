@@ -22,23 +22,6 @@ _NodeDescription = dict[str, t.Any]
 _INPUT_VALUE_ARRAY_LENGTH = 2
 
 
-def _extract_input_names_to_id(description: _NodeDescription) -> dict[str, str]:
-    """Retrives a mapping from input names to block IDs."""
-    name_to_id: dict[str, str] = {}
-
-    if description["type"] != "block":
-        return {}
-
-    for name, input_values in description["inputs"].items():
-       if len(input_values) != _INPUT_VALUE_ARRAY_LENGTH:
-           continue
-       if not isinstance(input_values[1], str):
-           continue
-       name_to_id[name] = input_values[1]
-
-    return name_to_id
-
-
 def _toposort(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> list[_NodeDescription]:
