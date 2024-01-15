@@ -25,14 +25,20 @@ _INPUT_VALUE_ARRAY_LENGTH = 2
 def _toposort(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> list[_NodeDescription]:
+    expected_num_nodes = len(id_to_node_description)
     graph = nx.DiGraph()
     for id_, description in id_to_node_description.items():
+        if description["type"] == "sequence":
+            logger.trace("skipping sequence {}", id_)
         parent_id: str | None = description["parent"]
         if parent_id:
             graph.add_edge(parent_id, id_)
     # NOTE networkx stubs are incorrect here; topological_sort returns a generator
     sorted_ids = list(nx.topological_sort(graph))  # type: ignore
-    return [id_to_node_description[id_] for id_ in sorted_ids]
+    sorted_descriptions = [id_to_node_description[id_] for id_ in sorted_ids]
+    actual_num_nodes = len(sorted_descriptions)
+    assert actual_num_nodes == expected_num_nodes
+    return sorted_descriptions
 
 
 def _inject_parent_into_block_descriptions(
@@ -80,12 +86,19 @@ def _extract_sequence_descriptions(
         parent_id = id_to_node_description[starts_at]["parent"]
         for id_ in sequence[1:]:
             assert id_to_node_description[id_]["parent"] == parent_id
+
+        sequence_id = f":seq@{starts_at}"
         description = {
             "type": "sequence",
-            "id_": f":seq@{starts_at}",
+            "id_": sequence_id,
             "blocks": sequence,
             "parent": parent_id,
         }
+
+        # update child block descriptions to point to sequence
+        for id_ in sequence:
+            id_to_node_description[id_]["parent"] = sequence_id
+
         descriptions.append(description)
 
     return descriptions
@@ -115,7 +128,7 @@ def _build_program_from_node_descriptions(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> Program:
     node_descriptions = _toposort(id_to_node_description)
-    logger.trace("toposorted blocks for parsing")
+    logger.trace("toposorted nodes for parsing (nodes: {})", len(node_descriptions))
 
     id_to_node: dict[str, Node] = {}
     for description in reversed(node_descriptions):
@@ -183,6 +196,7 @@ def _build_program_from_node_descriptions(
                 parent=None,
                 blocks=blocks,
             )
+            logger.trace("constructed sequence {}", sequence.id_)
             id_to_node[id_] = sequence
 
         else:
@@ -217,14 +231,21 @@ def load_program_from_block_descriptions(
     for description in sequence_descriptions:
         sequence_id = description["id_"]
         id_to_node_description[sequence_id] = description
-
-    logger.trace("extracted {} sequences", len(sequence_descriptions))
+        for block_id in description["blocks"]:
+            block_parent_id = id_to_node_description[block_id]["parent"]
+            assert block_parent_id == sequence_id
 
     # update block reference in "inputs" fields for the start of each sequence
     _fix_input_block_references(sequence_descriptions, id_to_node_description)
     logger.trace("fixed input block references to account for sequences")
 
-    return _build_program_from_node_descriptions(id_to_node_description)
+    program = _build_program_from_node_descriptions(id_to_node_description)
+
+    num_expected_sequences = len(sequence_descriptions)
+    num_actual_sequences = sum(1 for node in program.nodes() if isinstance(node, Sequence))
+    assert num_expected_sequences == num_actual_sequences
+
+    return program
 
 
 def load_from_file(filename_or_path: str | Path) -> Program:
