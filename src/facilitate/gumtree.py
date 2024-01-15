@@ -68,26 +68,20 @@ def dice(
         if node_y and node_y in descendants_y:
             mapped_descendants += 1
 
-    return coefficient(
+
+    num_descendants_x = len(descendants_x)
+    num_descendants_y = len(descendants_y)
+
+    score = coefficient(
         mapped_descendants,
-        len(descendants_x),
-        len(descendants_y),
+        num_descendants_x,
+        num_descendants_y,
     )
-
-
-def _add_descendants_to_mappings(
-    node_x: Node,
-    node_y: Node,
-    mappings: NodeMappings,
-) -> None:
-    """Adds all children of given nodes to the mappings."""
-    for descendant_x, descendant_y in zip(
-        node_x.descendants(),
-        node_y.descendants(),
-        strict=True,
-    ):
-        if (descendant_x, descendant_y) not in mappings:
-            mappings.add(descendant_x, descendant_y)
+    logger.trace(
+        f"dice(common={mapped_descendants}, x={num_descendants_x}, y={num_descendants_y})"
+        f" = {score:.2f} @ ({root_x.id_}, {root_y.id_})",
+    )
+    return score
 
 
 def compute_topdown_mappings(
@@ -144,18 +138,17 @@ def compute_topdown_mappings(
                 if node not in added_trees_y:
                     hlist_y.add_children(node)
 
-    logger.trace(f"mappings (before candidates): {mappings}")
-
     def sort_key(map_entry: tuple[Node, Node]) -> float:
         node_x, node_y = map_entry
-        return dice(node_x, node_y, mappings)
+        score = dice(node_x, node_y, mappings)
+        logger.trace(f"score [{node_x.id_} -> {node_y.id_}]: {score}")
+        return score
 
     candidates.sort(key=sort_key)
 
     while candidates:
         node_x, node_y = candidates.pop(0)
-        mappings.add(node_x, node_y)
-        _add_descendants_to_mappings(node_x, node_y, mappings)
+        mappings.add_with_descendants(node_x, node_y)
         candidates = [
             (from_x, to_y)
             for from_x, to_y in candidates
