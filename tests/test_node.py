@@ -1,5 +1,7 @@
 import pytest
 
+from loguru import logger
+
 from facilitate.model.node import Node
 
 
@@ -20,3 +22,10 @@ def test_has_children(good_tree: Node) -> None:
 
     node = good_tree.find(":field[SPIN_DIRECTIONS]@x:e}MT(JcdrCU9-b]!D?")
     assert not node.has_children()
+
+
+def test_parent(good_tree: Node) -> None:
+    assert good_tree.parent is None
+    for node in good_tree.nodes():
+        for child in node.children():
+            assert child.parent == node

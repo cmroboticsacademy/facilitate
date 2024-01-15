@@ -211,12 +211,6 @@ def _build_program_from_node_descriptions(
             error = f"invalid node type: {description['type']}"
             raise ValueError(error)
 
-    # update each description with correct parent pointers
-    for id_, description in id_to_node_description.items():
-        parent_id: str | None = description["parent"]
-        if parent_id:
-            id_to_node[id_].parent = id_to_node[parent_id]
-
     top_level_nodes: list[Node] = [
         node for node in id_to_node.values() if node.parent is None
     ]
