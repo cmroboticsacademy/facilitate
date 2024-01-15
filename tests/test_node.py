@@ -29,3 +29,11 @@ def test_parent(good_tree: Node) -> None:
     for node in good_tree.nodes():
         for child in node.children():
             assert child.parent == node
+
+
+def test_size(good_tree: Node) -> None:
+    node = good_tree.find("0z(.tYRa{!SepmI$)#U,")
+    assert node.size() == 4
+
+    node = good_tree.find(":input[DIRECTION]@0z(.tYRa{!SepmI$)#U,")
+    assert node.size() == 3

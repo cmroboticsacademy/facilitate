@@ -34,6 +34,10 @@ class Node(abc.ABC):
             max_child_height = max(max_child_height, child.height)
         return max_child_height + 1
 
+    def size(self) -> int:
+        """The size of the subtree rooted at this node."""
+        return sum(1 for _ in self.nodes())
+
     @abc.abstractmethod
     def equivalent_to(self, other: Node) -> bool:
         """Determines whether this node is equivalent to another."""
