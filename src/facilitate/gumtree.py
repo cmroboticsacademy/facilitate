@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import typing as t
 from collections import defaultdict
 from dataclasses import dataclass, field
 from itertools import product
@@ -8,7 +9,9 @@ from itertools import product
 from loguru import logger
 
 from facilitate.mappings import NodeMappings
-from facilitate.model.node import Node, TerminalNode
+
+if t.TYPE_CHECKING:
+    from facilitate.model.node import Node
 
 
 @dataclass
