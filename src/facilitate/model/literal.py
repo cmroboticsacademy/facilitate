@@ -20,6 +20,10 @@ class Literal(TerminalNode):
     def __hash__(self) -> int:
         return hash(self.id_)
 
+    @classmethod
+    def determine_id(cls, parent_id: str) -> str:
+        return f":literal@{parent_id}"
+
     @overrides
     def copy(self: t.Self) -> t.Self:
         return self.__class__(id_=self.id_, value=self.value)

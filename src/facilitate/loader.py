@@ -170,6 +170,8 @@ def _build_program_from_node_descriptions(
                 assert len(input_value_arr) == _INPUT_VALUE_ARRAY_LENGTH
                 assert isinstance(input_value_arr[0], int)
 
+                input_id = Input.determine_id(id_, input_name)
+
                 expression: Node
                 if isinstance(input_value_arr[1], str):
                     expression = id_to_node[input_value_arr[1]]
@@ -177,7 +179,7 @@ def _build_program_from_node_descriptions(
                     assert len(input_value_arr[1]) == _INPUT_VALUE_ARRAY_LENGTH
                     literal_value = input_value_arr[1][1]
                     assert isinstance(literal_value, str)
-                    literal_id = f":literal@input[{input_name}]@{id_}"
+                    literal_id = Literal.determine_id(input_id)
                     expression = Literal(
                         id_=literal_id,
                         value=literal_value,
@@ -187,7 +189,7 @@ def _build_program_from_node_descriptions(
                     raise TypeError(error)
 
                 input_ = Input(
-                    id_=Input.determine_id(id_, input_name),
+                    id_=input_id,
                     name=input_name,
                     expression=expression,
                 )
