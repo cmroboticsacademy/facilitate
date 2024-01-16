@@ -79,6 +79,11 @@ def dice(
         num_descendants_x,
         num_descendants_y,
     )
+
+    # prefer nodes with the same ID
+    if root_x.id_ == root_y.id_:
+        score *= 2
+
     logger.trace(
         f"dice(common={mapped_descendants}, x={num_descendants_x}, y={num_descendants_y})"
         f" = {score:.2f} @ ({root_x.id_}, {root_y.id_})",
@@ -105,6 +110,8 @@ def compute_topdown_mappings(
     nodes_y = list(root_y.nodes())
 
     while min(hlist_x.max_height, hlist_y.max_height) > min_height:
+        logger.debug(f"max height x vs. y: {hlist_x.max_height} vs. {hlist_y.max_height}")
+
         if hlist_x.max_height > hlist_y.max_height:
             for node in hlist_x.pop():
                 hlist_x.add_children(node)
@@ -115,18 +122,30 @@ def compute_topdown_mappings(
             max_height_nodes_x = hlist_x.pop()
             max_height_nodes_y = hlist_y.pop()
 
+            logger.debug(
+                f"max height nodes x: {", ".join(node.id_ for node in max_height_nodes_x)}",
+            )
+            logger.debug(
+                f"max height nodes y: {", ".join(node.id_ for node in max_height_nodes_y)}",
+            )
+
             added_trees_x: set[Node] = set()
             added_trees_y: set[Node] = set()
 
             for node_x, node_y in product(max_height_nodes_x, max_height_nodes_y):
                 if node_x.equivalent_to(node_y):
+                    logger.debug(f"equivalent: {node_x.id_} vs. {node_y.id_}")
+
                     # FIXME these queries can be cached
+                    # is there more than one possible match for either node?
                     match_x = any(node.equivalent_to(node_y) and node != node_x for node in nodes_x)
                     match_y = any(node.equivalent_to(node_x) and node != node_y for node in nodes_y)
 
                     if match_x or match_y:
+                        logger.debug(f"candidate match: {node_x.id_} vs. {node_y.id_}")
                         candidates.append((node_x, node_y))
                     else:
+                        logger.debug(f"isolated match: {node_x.id_} vs. {node_y.id_}")
                         mappings.add(node_x, node_y)
 
                     added_trees_x.add(node_x)
@@ -147,6 +166,11 @@ def compute_topdown_mappings(
         return score
 
     candidates.sort(key=sort_key)
+
+    logger.debug(
+        "sorted candidates:\n{}",
+        "\n".join(f"* {node_x.id_} -> {node_y.id_}" for (node_x, node_y) in candidates),
+    )
 
     while candidates:
         node_x, node_y = candidates.pop(0)
