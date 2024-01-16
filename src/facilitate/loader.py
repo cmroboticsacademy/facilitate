@@ -6,7 +6,6 @@ import typing as t
 from pathlib import Path
 
 import networkx as nx
-from icecream import ic
 from loguru import logger
 
 from facilitate.model.block import Block
