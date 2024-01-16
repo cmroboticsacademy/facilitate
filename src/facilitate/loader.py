@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import itertools
 import json
 import typing as t
 from pathlib import Path
 
 import networkx as nx
+from icecream import ic
 from loguru import logger
 
 from facilitate.model.block import Block
@@ -28,15 +30,16 @@ def _toposort(
     expected_num_nodes = len(id_to_node_description)
     graph = nx.DiGraph()
     for id_, description in id_to_node_description.items():
-        if description["type"] == "sequence":
-            logger.trace("skipping sequence {}", id_)
+        graph.add_node(id_)
         parent_id: str | None = description["parent"]
         if parent_id:
             graph.add_edge(parent_id, id_)
+
     # NOTE networkx stubs are incorrect here; topological_sort returns a generator
     sorted_ids = list(nx.topological_sort(graph))  # type: ignore
     sorted_descriptions = [id_to_node_description[id_] for id_ in sorted_ids]
     actual_num_nodes = len(sorted_descriptions)
+
     assert actual_num_nodes == expected_num_nodes
     return sorted_descriptions
 
@@ -65,27 +68,56 @@ def _inject_parent_into_block_descriptions(
         id_to_node_description[id_]["parent"] = parent_id
 
 
+def _join_sequences(
+    sequences: list[list[str]],
+) -> list[list[str]]:
+    """If the end of one sequence is the start of another, join them together."""
+    sequences = [sequence.copy() for sequence in sequences]
+
+    for seq_x, seq_y in itertools.product(sequences, repeat=2):
+        if not seq_x or not seq_y:
+            continue
+        if seq_x[-1] == seq_y[0]:
+            seq_x.extend(seq_y[1:])
+            seq_y.clear()
+
+    # destroy empty sequences
+    return [sequence for sequence in sequences if sequence]
+
+
 def _extract_sequence_descriptions(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> list[_NodeDescription]:
     sequences: list[list[str]] = []
+
     for id_, description in id_to_node_description.items():
         next_id = description["next"]
         if not next_id:
             continue
         for sequence in sequences:
             if sequence[-1] == id_:
+                logger.trace("extending sequence {} > {}", sequence, next_id)
                 sequence.append(next_id)
                 break
         else:
+            logger.trace("found new sequence starting at {} > {}", id_, next_id)
             sequences.append([id_, next_id])
+
+    # join together sequence fragments
+    sequences = _join_sequences(sequences)
+    logger.trace(
+        "extracted {} sequences:\n{}",
+        len(sequences),
+        "\n".join(" > ".join(sequence) for sequence in sequences),
+    )
 
     descriptions: list[_NodeDescription] = []
     for sequence in sequences:
         starts_at = sequence[0]
         parent_id = id_to_node_description[starts_at]["parent"]
         for id_ in sequence[1:]:
-            assert id_to_node_description[id_]["parent"] == parent_id
+            description = id_to_node_description[id_]
+            assert description["parent"] == parent_id
 
         sequence_id = f":seq@{starts_at}"
         description = {
