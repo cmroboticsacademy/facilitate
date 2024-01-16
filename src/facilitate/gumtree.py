@@ -68,7 +68,6 @@ def dice(
         if node_y and node_y in descendants_y:
             mapped_descendants += 1
 
-
     num_descendants_x = len(descendants_x)
     num_descendants_y = len(descendants_y)
 
@@ -171,7 +170,7 @@ def compute_bottom_up_mappings(
         if mappings.source_is_mapped(node):
             return
 
-        if isinstance(node, TerminalNode):
+        if not node.has_children():
             return
 
         # A node c ∈ T2 is a candidate for t1 if label(t1) = label(c), c is unmatched, and t1
