@@ -95,11 +95,9 @@ def _extract_sequence_descriptions(
             continue
         for sequence in sequences:
             if sequence[-1] == id_:
-                logger.trace("extending sequence {} > {}", sequence, next_id)
                 sequence.append(next_id)
                 break
         else:
-            logger.trace("found new sequence starting at {} > {}", id_, next_id)
             sequences.append([id_, next_id])
 
     # join together sequence fragments
