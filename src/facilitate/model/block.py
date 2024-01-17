@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import bisect
+import dataclasses
 import typing as t
 from dataclasses import dataclass
 
@@ -19,8 +20,8 @@ if t.TYPE_CHECKING:
 @dataclass(kw_only=True)
 class Block(Node):
     opcode: str
-    fields: list[Field]
-    inputs: list[Input]
+    fields: list[Field] = dataclasses.field(default_factory=list)
+    inputs: list[Input] = dataclasses.field(default_factory=list)
     is_shadow: bool
 
     def __hash__(self) -> int:

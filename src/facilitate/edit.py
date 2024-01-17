@@ -9,7 +9,9 @@ from overrides import overrides
 
 from facilitate.model.block import Block
 from facilitate.model.field import Field
+from facilitate.model.input import Input
 from facilitate.model.literal import Literal
+from facilitate.model.sequence import Sequence
 
 if t.TYPE_CHECKING:
     from facilitate.model.node import Node
@@ -37,6 +39,65 @@ class AddInputToBlock(Addition):
         parent = root.find(self.block_id)
         assert isinstance(parent, Block)
         return parent.add_input(self.name)
+
+
+@dataclass(frozen=True, kw_only=True)
+class AddLiteralToInput(Addition):
+    """Inserts a literal into an input."""
+    input_id: str
+    value: str
+
+    @overrides
+    def apply(self, root: Node) -> Node | None:
+        """Inserts and returns the given literal."""
+        parent = root.find(self.input_id)
+        assert isinstance(parent, Input)
+        return parent.add_literal(self.value)
+
+
+@dataclass(frozen=True, kw_only=True)
+class AddBlockToSequence(Addition):
+    """Inserts a block into a sequence."""
+    sequence_id: str
+    block_id: str
+    position: int
+    opcode: str
+    is_shadow: bool
+
+    @overrides
+    def apply(self, root: Node) -> Node | None:
+        """Inserts and returns the given block."""
+        parent = root.find(self.sequence_id)
+        assert isinstance(parent, Sequence)
+        return parent.insert_block(
+            id_=self.block_id,
+            opcode=self.opcode,
+            is_shadow=self.is_shadow,
+            position=self.position,
+        )
+
+
+@dataclass(frozen=True, kw_only=True)
+class AddBlockToInput(Addition):
+    """Inserts a block into an input as an expression."""
+    input_id: str
+    block_id: str
+    opcode: str
+    is_shadow: bool
+
+    @overrides
+    def apply(self, root: Node) -> Node | None:
+        """Inserts and returns the given block."""
+        parent = root.find(self.input_id)
+        assert isinstance(parent, Input)
+        block = Block(
+            id_=self.block_id,
+            opcode=self.opcode,
+            is_shadow=self.is_shadow,
+        )
+        block.parent = parent
+        parent.expression = block
+        return block
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -159,7 +220,7 @@ class EditScript(t.Iterable[Edit]):
         return len(self._edits)
 
     def append(self, edit: Edit) -> None:
-        logger.trace("added edit to script: {}", edit)
+        logger.debug("added edit to script: {}", edit)
         self._edits.append(edit)
 
     def apply(self, root: Node) -> Node:

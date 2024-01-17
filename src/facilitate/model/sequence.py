@@ -47,6 +47,25 @@ class Sequence(Node):
                 return False
         return True
 
+    def position_of_block(self, block: Block) -> int:
+        return self.blocks.index(block)
+
+    def insert_block(
+        self,
+        id_: str,
+        opcode: str,
+        is_shadow: bool,
+        position: int,
+    ) -> Block:
+        block = Block(
+            id_=id_,
+            opcode=opcode,
+            is_shadow=is_shadow,
+        )
+        self.blocks.insert(position, block)
+        block.parent = self
+        return block
+
     @overrides
     def remove_child(self, child: Node) -> None:
         if not isinstance(child, Block):

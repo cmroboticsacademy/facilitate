@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from overrides import overrides
 
+from facilitate.model.literal import Literal
 from facilitate.model.node import Node
 from facilitate.util import quote
 
@@ -21,6 +22,16 @@ class Input(Node):
 
     def __hash__(self) -> int:
         return hash(self.id_)
+
+    def add_literal(self, value: str) -> Literal:
+        if self.expression is not None:
+            error = f"cannot add literal to {self.id_}: already has expression."
+            raise ValueError(error)
+        literal_id = Literal.determine_id(self.id_)
+        literal = Literal(id_=literal_id, value=value)
+        literal.parent = self
+        self.expression = literal
+        return literal
 
     @classmethod
     def determine_id(cls, block_id: str, input_name: str) -> str:
