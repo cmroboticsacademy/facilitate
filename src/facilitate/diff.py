@@ -130,6 +130,22 @@ def update_insert_align_move_phase(
             script.append(insertion)
             mappings.add(added_node, node_to)
 
+        else:
+            if not _maybe_node_from.surface_equivalent_to(node_to):
+                update = Update.compute(_maybe_node_from, node_to)
+                assert update is not None
+                script.append(update)
+
+            parent_from = _maybe_node_from.parent
+            parent_to = node_to.parent
+            if parent_from is None or parent_to is None:
+                continue
+
+            # move stage
+            if (parent_from, parent_to) not in mappings:
+                print("TODO create move")
+
+        # align stage
 
     return script
 
@@ -146,23 +162,6 @@ def compute_edit_script(
     update_insert_align_move_phase(tree_from, tree_to, mappings)
 
     return script
-
-    nodes_from = set(tree_from.nodes())
-    matched_nodes_from = set(mappings.sources())
-    _unmatched_nodes_from = nodes_from - matched_nodes_from
-
-    nodes_to = set(tree_to.nodes())
-    matched_nodes_to = set(mappings.destinations())
-    unmatched_nodes_to = nodes_to - matched_nodes_to
-
-    # update phase:
-    # - for pairs (x, y) where their values differ
-    # - for each such pair, create an update edit: x -> y
-    for (node_from, node_to) in mappings:
-        maybe_update = Update.compute(node_from, node_to)
-        if maybe_update:
-            script.append(maybe_update)
-            maybe_update.apply(tree_from)
 
     # align phase:
     # - check each pair (x, y) to see if their children are misaligned
@@ -182,18 +181,6 @@ def compute_edit_script(
         _indexed_children_to = list(enumerate(_node_to.blocks))
 
         raise NotImplementedError
-
-    # (3) insert phase
-    # look for nodes in tree_to that are unmatched but have a matched parent
-    for node in unmatched_nodes_to:
-        if node.parent not in matched_nodes_to:
-            continue
-        print(f"create Insert({node.__class__.__name__}) for {node.id_}")
-        raise NotImplementedError
-
-    # (4) move phase
-    # - look for matched pairs (x, y) for which (p(x), p(y)) is not matched,
-    #   where p(x) is the parent of x
 
     # delete phase
     for node_ in tree_from.postorder():
