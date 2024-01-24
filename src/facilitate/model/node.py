@@ -93,7 +93,8 @@ class Node(abc.ABC):
     @final
     def postorder(self) -> t.Iterator[Node]:
         """Iterates over all nodes within the subtree rooted at this node in postorder."""
-        for child in self.children():
+        children = list(self.children())
+        for child in children:
             yield from child.postorder()
         yield self
 

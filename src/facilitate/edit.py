@@ -223,16 +223,16 @@ class Update(Edit):
         value_to: str
 
         if isinstance(node_from, Block) and isinstance(node_to, Block):
-            value_from = node_to.opcode
-            value_to = node_from.opcode
+            value_from = node_from.opcode
+            value_to = node_to.opcode
         elif isinstance(node_from, Literal) and isinstance(node_to, Literal):
-            value_from = node_to.value
-            value_to = node_from.value
+            value_from = node_from.value
+            value_to = node_to.value
         elif isinstance(node_from, Field) and isinstance(node_to, Field):
             if node_to.name != node_from.name:
                 return None
-            value_from = node_to.value
-            value_to = node_from.value
+            value_from = node_from.value
+            value_to = node_to.value
         else:
             return None
 

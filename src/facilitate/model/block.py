@@ -91,8 +91,10 @@ class Block(Node):
         return BlockCategory.from_opcode(self.opcode)
 
     def add_field(self, name: str, value: str) -> Field:
+        id_ = Field.determine_id(self.id_, name)
+        id_ = f"ADDED:{id_}"
         field = Field(
-            id_=Field.determine_id(self.id_, name),
+            id_=id_,
             name=name,
             value=value,
         )
@@ -103,8 +105,10 @@ class Block(Node):
         return field
 
     def add_input(self, name: str) -> Input:
+        id_ = Input.determine_id(self.id_, name)
+        id_ = f"ADDED:{id_}"
         input_ = Input(
-            id_=Input.determine_id(self.id_, name),
+            id_=id_,
             name=name,
             expression=None,
         )

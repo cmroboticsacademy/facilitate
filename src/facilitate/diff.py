@@ -204,20 +204,11 @@ def _insert_missing_node(
 def delete_phase(
     script: EditScript,
     tree_from: Node,
-    tree_to: Node,
     mappings: NodeMappings,
 ) -> EditScript:
     for node_ in tree_from.postorder():
-        print(f"deletion visiting: {node_.id_}")
         if not mappings.source_is_mapped(node_):
-            for descendant_from in node_.descendants():
-                descendant_to = mappings.source_is_mapped_to(descendant_from)
-                if descendant_to is not None:
-                    print(f"mapped descendant: {descendant_from.id_} -> {descendant_to.id_}")
-                else:
-                    print(f"unmapped descendant: {descendant_from.id_}")
-
-
+            node_.tags.append("DELETED")
             edit = Delete(node_id=node_.id_)
             edit.apply(tree_from)
             script.append(edit)
@@ -243,6 +234,8 @@ def update_insert_align_move_phase(
             )
             added_node = insertion.apply(tree_from)
             assert added_node is not None
+            added_node.tags.append("ADDED")
+            assert added_node is not None
             script.append(insertion)
             mappings.add(added_node, node_to)
 
@@ -250,6 +243,8 @@ def update_insert_align_move_phase(
             if not _maybe_node_from.surface_equivalent_to(node_to):
                 update = Update.compute(_maybe_node_from, node_to)
                 assert update is not None
+                _maybe_node_from.tags.append("UPDATED")
+                update.apply(tree_from)
                 script.append(update)
 
             parent_from = _maybe_node_from.parent
@@ -265,6 +260,7 @@ def update_insert_align_move_phase(
                     move_node_partner=node_to,
                     mappings=mappings,
                 )
+                _maybe_node_from.tags.append("MOVED")
                 edit.apply(tree_from)
                 script.append(edit)
 
@@ -282,10 +278,13 @@ def compute_edit_script(
 
     update_insert_align_move_phase(tree_from, tree_to, mappings)
 
+    delete_phase(
+        script=script,
+        tree_from=tree_from,
+        mappings=mappings,
+    )
+
     tree_from.to_dot_png("debug.dot.png")
-
-
-    delete_phase(script, tree_from, tree_to, mappings)
 
     # TODO ensure that edit script works
     assert tree_from.equivalent_to(tree_to)
