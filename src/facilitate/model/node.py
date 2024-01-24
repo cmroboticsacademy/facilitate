@@ -4,7 +4,7 @@ __all__ = ("Node", "TerminalNode")
 
 import abc
 import typing as t
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cached_property
 
 import networkx as nx
@@ -16,6 +16,7 @@ class Node(abc.ABC):
     """Represents a node in the abstract syntax tree."""
     id_: str
     parent: Node | None = None
+    tags: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         for child in self.children():

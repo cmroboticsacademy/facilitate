@@ -32,6 +32,7 @@ class Block(Node):
         return self.__class__(
             id_=self.id_,
             opcode=self.opcode,
+            tags=self.tags.copy(),
             fields=[field.copy() for field in self.fields],
             inputs=[input_.copy() for input_ in self.inputs],
             is_shadow=self.is_shadow,
@@ -123,6 +124,8 @@ class Block(Node):
         else:
             error = f"cannot add child {child.id_}: not field or input"
             raise TypeError(error)
+
+        return child
 
     @overrides
     def remove_child(self, child: Node) -> None:

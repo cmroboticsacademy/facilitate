@@ -42,6 +42,7 @@ class Input(Node):
         expression = None if self.expression is None else self.expression
         return self.__class__(
             id_=self.id_,
+            tags=self.tags.copy(),
             name=self.name,
             expression=expression,
         )

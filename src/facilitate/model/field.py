@@ -29,6 +29,7 @@ class Field(TerminalNode):
     def copy(self: t.Self) -> t.Self:
         return self.__class__(
             id_=self.id_,
+            tags=self.tags.copy(),
             name=self.name,
             value=self.value,
         )

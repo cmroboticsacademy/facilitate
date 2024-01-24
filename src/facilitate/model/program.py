@@ -23,6 +23,7 @@ class Program(Node):
     def copy(self: t.Self) -> t.Self:
         return self.__class__(
             id_=self.id_,
+            tags=self.tags.copy(),
             top_level_nodes=[node.copy() for node in self.top_level_nodes],
         )
 

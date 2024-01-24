@@ -26,7 +26,11 @@ class Literal(TerminalNode):
 
     @overrides
     def copy(self: t.Self) -> t.Self:
-        return self.__class__(id_=self.id_, value=self.value)
+        return self.__class__(
+            id_=self.id_,
+            tags=self.tags.copy(),
+            value=self.value,
+        )
 
     @overrides
     def surface_equivalent_to(self, other: Node) -> bool:
