@@ -18,11 +18,11 @@ def test_dice(good_tree: Node, bad_tree: Node) -> None:
 
     mappings.add_with_descendants(input_from, input_to)
 
-    score = dice(input_from, input_to, mappings)
-    assert score == 1.0
+    assert dice(input_from, input_to, mappings) == 1.0
 
 
-@pytest.mark.xfail(reason="bug in topdown mapping algorithm implementation")
+# FIXME fails non-deterministically!
+# @pytest.mark.xfail(reason="bug in topdown mapping algorithm implementation")
 def test_topdown_mappings(good_tree: Node, bad_tree: Node) -> None:
     tree_from = bad_tree
     tree_to = good_tree
@@ -36,4 +36,5 @@ def test_topdown_mappings(good_tree: Node, bad_tree: Node) -> None:
     y = ny("jR#!l0]kqB%K}fB9a_{O")
 
     assert x.equivalent_to(y)
+    assert dice(x, y, mappings) == 1.0
     assert (x, y) in mappings
