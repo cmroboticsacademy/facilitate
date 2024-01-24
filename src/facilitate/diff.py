@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing as t
 
+from loguru import logger
+
 from facilitate.algorithms import breadth_first_search
 from facilitate.edit import (
     AddBlockToInput,
@@ -11,7 +13,11 @@ from facilitate.edit import (
     Addition,
     AddLiteralToInput,
     Delete,
+    Edit,
     EditScript,
+    MoveBlockInSequence,
+    MoveFieldToBlock,
+    MoveInputToBlock,
     Update,
 )
 from facilitate.gumtree import compute_gumtree_mappings
@@ -20,6 +26,7 @@ from facilitate.model.field import Field
 from facilitate.model.input import Input
 from facilitate.model.literal import Literal
 from facilitate.model.sequence import Sequence
+from facilitate.util import longest_common_subsequence
 
 if t.TYPE_CHECKING:
     from facilitate.mappings import NodeMappings
@@ -49,6 +56,89 @@ def _find_insertion_position(
     assert insert_after_node is not None
     assert isinstance(insert_after_node, Block)
     return parent_from.position_of_block(insert_after_node) + 1
+
+
+def _align_children(
+    script: EditScript,
+    sequence_from: Sequence,
+    sequence_to: Sequence,
+    mappings: NodeMappings,
+) -> None:
+    """Aligns the children of two nodes."""
+    def equals(x: Node, y: Node) -> bool:
+        return (x, y) in mappings
+
+    mapped_node_from_children = [
+        block for block in sequence_from.blocks if mappings.destination_is_mapped(block)
+    ]
+    mapped_node_to_children = [
+        block for block in sequence_to.blocks if mappings.source_is_mapped(block)
+    ]
+
+    lcs: list[tuple[Block, Block]] = longest_common_subsequence(
+        mapped_node_from_children,
+        mapped_node_to_children,
+        equals,
+    )
+    lcs_node_to: list[Block] = [y for (_, y) in lcs]
+
+    for b in mapped_node_to_children:
+        if b in lcs_node_to:
+            continue
+
+        a = mappings.destination_is_mapped_to(b)
+        assert a is not None
+
+        position = _find_insertion_position(
+            tree_from=sequence_from,
+            tree_to=sequence_to,
+            missing_block=b,
+            mappings=mappings,
+        )
+
+        move = MoveBlockInSequence(
+            sequence_id=sequence_from.id_,
+            block_id=a.id_,
+            position=position,
+        )
+        script.append(move)
+        move.apply(sequence_from)
+
+
+def _move_node(
+    move_node: Node,
+    move_node_partner: Node,
+    mappings: NodeMappings,
+) -> Edit:
+    logger.debug("moving node: {} {}", move_node.id_, move_node.__class__.__name__)
+
+    move_from_parent = move_node.parent
+    logger.debug("moving from parent: {} {}", move_from_parent.id_, move_from_parent.__class__.__name__)
+
+    move_to_parent = mappings.destination_is_mapped_to(move_node_partner.parent)
+    assert move_to_parent is not None
+    logger.debug(f"moving to parent: {move_to_parent.id_} {move_to_parent.__class__.__name__}")
+
+    if isinstance(move_node, Input):
+        assert isinstance(move_from_parent, Block)
+        assert isinstance(move_to_parent, Block)
+        return MoveInputToBlock(
+            move_from_block_id=move_from_parent.id_,
+            move_to_block_id=move_to_parent.id_,
+            # NOTE is this dangerous?
+            input_id=move_node.id_,
+        )
+    if isinstance(move_node, Field):
+        assert isinstance(move_from_parent, Block)
+        assert isinstance(move_to_parent, Block)
+        return MoveFieldToBlock(
+            move_from_block_id=move_from_parent.id_,
+            move_to_block_id=move_to_parent.id_,
+            # NOTE is this dangerous?
+            field_id=move_node.id_,
+        )
+
+    raise NotImplementedError
 
 
 def _insert_missing_node(
@@ -108,6 +198,29 @@ def _insert_missing_node(
     raise NotImplementedError
 
 
+def delete_phase(
+    script: EditScript,
+    tree_from: Node,
+    tree_to: Node,
+    mappings: NodeMappings,
+) -> EditScript:
+    for node_ in tree_from.postorder():
+        print(f"deletion visiting: {node_.id_}")
+        if not mappings.source_is_mapped(node_):
+            for descendant_from in node_.descendants():
+                descendant_to = mappings.source_is_mapped_to(descendant_from)
+                if descendant_to is not None:
+                    print(f"mapped descendant: {descendant_from.id_} -> {descendant_to.id_}")
+                else:
+                    print(f"unmapped descendant: {descendant_from.id_}")
+
+
+            edit = Delete(node_id=node_.id_)
+            edit.apply(tree_from)
+            script.append(edit)
+    return script
+
+
 def update_insert_align_move_phase(
     tree_from: Node,
     tree_to: Node,
@@ -142,10 +255,17 @@ def update_insert_align_move_phase(
                 continue
 
             # move stage
+            # - if the parents of the node and its partner are not mapped, move the node
             if (parent_from, parent_to) not in mappings:
-                print("TODO create move")
+                edit = _move_node(
+                    move_node=_maybe_node_from,
+                    move_node_partner=node_to,
+                    mappings=mappings,
+                )
+                edit.apply(tree_from)
+                script.append(edit)
 
-        # align stage
+            # _align_children(added_node, node_to, mappings)
 
     return script
 
@@ -161,34 +281,12 @@ def compute_edit_script(
 
     update_insert_align_move_phase(tree_from, tree_to, mappings)
 
-    return script
+    tree_from.to_dot_png("debug.dot.png")
 
-    # align phase:
-    # - check each pair (x, y) to see if their children are misaligned
-    # - create a move edit to align them if so
-    #
-    # note that, within the context of Scratch, this is only possible for sequences
-    #
-    # children of x and y are misaligned if:
-    # - x has matched children u and v
-    # - u is to the left of v in x but the partner of u is to the right of the partner of v in y
-    for (_node_from, _node_to) in mappings:
-        if not isinstance(_node_from, Sequence):
-            continue
-        assert isinstance(_node_to, Sequence)
 
-        _indexed_children_from = list(enumerate(_node_from.blocks))
-        _indexed_children_to = list(enumerate(_node_to.blocks))
+    delete_phase(script, tree_from, tree_to, mappings)
 
-        raise NotImplementedError
-
-    # delete phase
-    for node_ in tree_from.postorder():
-        if not mappings.source_is_mapped(node_):
-            edit = Delete(node_id=node_.id_)
-            edit.apply(tree_from)
-            script.append(edit)
-
-    # TODO ensure that edit script works!
+    # TODO ensure that edit script works
+    assert tree_from.equivalent_to(tree_to)
 
     return script
