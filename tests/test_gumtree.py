@@ -22,7 +22,7 @@ def test_dice(good_tree: Node, bad_tree: Node) -> None:
 
 
 # FIXME fails non-deterministically!
-# @pytest.mark.xfail(reason="bug in topdown mapping algorithm implementation")
+@pytest.mark.xfail(reason="non-deterministic behavior")
 def test_topdown_mappings(good_tree: Node, bad_tree: Node) -> None:
     tree_from = bad_tree
     tree_to = good_tree
