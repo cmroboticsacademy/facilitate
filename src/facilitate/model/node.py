@@ -114,10 +114,10 @@ class Node(abc.ABC):
             attributes["fillcolor"] = "red"
             attributes["style"] = "filled"
             attributes["fontcolor"] = "white"
-        if "INSERTED" in self.tags:
+        if "ADDED" in self.tags:
             attributes["fillcolor"] = "green"
             attributes["style"] = "filled"
-            attributes["fontcolor"] = "white"
+            attributes["fontcolor"] = "black"
         if "MOVED" in self.tags:
             attributes["fillcolor"] = "purple"
             attributes["style"] = "filled"
