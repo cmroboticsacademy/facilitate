@@ -39,8 +39,10 @@ class Literal(TerminalNode):
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         label = f'"literal:{self.value}"'
+        node_attributes = self._nx_node_attributes()
         graph.add_node(
             quote(self.id_),
             label=label,
             shape="hexagon",
+            **node_attributes,
         )

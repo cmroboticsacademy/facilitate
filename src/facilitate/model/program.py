@@ -64,10 +64,12 @@ class Program(Node):
 
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
+        attributes = self._nx_node_attributes()
         graph.add_node(
             quote(self.id_),
             label="program",
             shape="plaintext",
+            **attributes,
         )
         for child in self.children():
             child._add_to_nx_digraph(graph)

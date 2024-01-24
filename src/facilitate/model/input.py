@@ -84,9 +84,11 @@ class Input(Node):
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         assert self.expression is not None
         label = f'"input:{self.name}"'
+        attributes = self._nx_node_attributes()
         graph.add_node(
             quote(self.id_),
             label=label,
+            **attributes,
         )
         self.expression._add_to_nx_digraph(graph)
         graph.add_edge(quote(self.id_), quote(self.expression.id_))

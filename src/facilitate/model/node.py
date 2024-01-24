@@ -102,6 +102,29 @@ class Node(abc.ABC):
         """Removes a child from this node."""
         ...
 
+    def _nx_node_attributes(self) -> dict[str, str]:
+        """Returns the attributes of this node to be used in a NetworkX graph."""
+        attributes: dict[str, str] = {}
+
+        if "UPDATED" in self.tags:
+            attributes["fillcolor"] = "blue"
+            attributes["style"] = "filled"
+            attributes["fontcolor"] = "white"
+        if "DELETED" in self.tags:
+            attributes["fillcolor"] = "red"
+            attributes["style"] = "filled"
+            attributes["fontcolor"] = "white"
+        if "INSERTED" in self.tags:
+            attributes["fillcolor"] = "green"
+            attributes["style"] = "filled"
+            attributes["fontcolor"] = "white"
+        if "MOVED" in self.tags:
+            attributes["fillcolor"] = "purple"
+            attributes["style"] = "filled"
+            attributes["fontcolor"] = "white"
+
+        return attributes
+
     @abc.abstractmethod
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         """Adds the subtree rooted as this node to a digraph."""

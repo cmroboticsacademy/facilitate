@@ -147,11 +147,13 @@ class Block(Node):
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
         label = f'"block:{self.opcode}\n{self.id_}"'
+        attributes = self._nx_node_attributes()
         graph.add_node(
             quote(self.id_),
             label=label,
             opcode=self.opcode,
             shape="box",
+            **attributes,
         )
         for child in self.children():
             child._add_to_nx_digraph(graph)
