@@ -73,6 +73,10 @@ def dice(
 
     num_descendants_x = len(descendants_x)
     num_descendants_y = len(descendants_y)
+    num_descendants_total = num_descendants_x + num_descendants_y
+
+    if num_descendants_total == 0:
+        return 1 if root_x.id_ == root_y.id_ else 0
 
     score = coefficient(
         mapped_descendants,
@@ -95,7 +99,7 @@ def compute_topdown_mappings(
     root_x: Node,
     root_y: Node,
     *,
-    min_height: int = 2,
+    min_height: int = 1,
 ) -> NodeMappings:
     mappings = NodeMappings()
     candidates: list[tuple[Node, Node]] = []
@@ -109,7 +113,10 @@ def compute_topdown_mappings(
     nodes_x = list(root_x.nodes())
     nodes_y = list(root_y.nodes())
 
-    while min(hlist_x.max_height, hlist_y.max_height) > min_height:
+    while True:
+        min_max_height = min(hlist_x.max_height, hlist_y.max_height)
+        if min_max_height < min_height:
+            break
         logger.debug(f"max height x vs. y: {hlist_x.max_height} vs. {hlist_y.max_height}")
 
         if hlist_x.max_height > hlist_y.max_height:
@@ -234,7 +241,7 @@ def compute_gumtree_mappings(
     root_x: Node,
     root_y: Node,
     *,
-    min_height: int = 2,
+    min_height: int = 1,
     min_dice: float = 0.5,
 ) -> NodeMappings:
     """Uses the GumTree algorithm to map nodes between two trees."""
