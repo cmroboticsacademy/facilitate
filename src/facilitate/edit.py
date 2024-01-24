@@ -27,6 +27,10 @@ class Addition(Edit):
     """Represents an additive edit."""
 
 
+class Move(Edit):
+    """Represents a move edit."""
+
+
 @dataclass(frozen=True, kw_only=True)
 class AddInputToBlock(Addition):
     """Inserts a (bare) named input into a block."""
@@ -116,6 +120,72 @@ class AddFieldToBlock(Addition):
 
 
 @dataclass(frozen=True, kw_only=True)
+class MoveFieldToBlock(Move):
+    move_from_block_id: str
+    move_to_block_id: str
+    field_id: str
+
+    @overrides
+    def apply(self, root: Node) -> Node | None:
+        move_from_block = root.find(self.move_from_block_id)
+        assert isinstance(move_from_block, Block)
+        move_to_block = root.find(self.move_to_block_id)
+        assert isinstance(move_to_block, Block)
+
+        field = root.find(self.field_id)
+        move_from_block.remove_child(field)
+        return move_to_block.add_child(field)
+
+
+@dataclass(frozen=True, kw_only=True)
+class MoveInputToBlock(Move):
+    move_from_block_id: str
+    move_to_block_id: str
+    input_id: str
+
+    @overrides
+    def apply(self, root: Node) -> Node | None:
+        move_from_block = root.find(self.move_from_block_id)
+        assert isinstance(move_from_block, Block)
+        move_to_block = root.find(self.move_to_block_id)
+        assert isinstance(move_to_block, Block)
+
+        input = root.find(self.input_id)
+        assert input is not None
+        assert isinstance(input, Input)
+
+        logger.debug("moving input {} from {} to {}", input.id_, move_from_block.id_, move_to_block.id_)
+        move_from_block.remove_child(input)
+        return move_to_block.add_child(input)
+
+
+@dataclass(frozen=True, kw_only=True)
+class MoveBlockInSequence(Move):
+    sequence_id: str
+    block_id: str
+    position: int
+
+    @overrides
+    def apply(self, root: Node) -> Node | None:
+        """Moves the block to the given position in the sequence."""
+        sequence = root.find(self.sequence_id)
+        assert isinstance(sequence, Sequence)
+        block = sequence.find(self.block_id)
+        assert isinstance(block, Block)
+        assert block.parent == sequence
+
+        current_position = sequence.blocks.index(block)
+        sequence.blocks.remove(block)
+
+        new_position = self.position
+        if new_position > current_position:
+            new_position -= 1
+
+        sequence.blocks.insert(new_position, block)
+        return block
+
+
+@dataclass(frozen=True, kw_only=True)
 class Update(Edit):
     """Updates the value (or opcode) of a node in the tree.
 
@@ -198,6 +268,7 @@ class Delete(Edit):
 
         if node.has_children():
             error = f"cannot delete node {self.node_id}: has children."
+            print(f"kids: {[c.id_ for c in node.children()]}")
             raise ValueError(error)
 
         parent = node.parent
