@@ -113,6 +113,17 @@ class Block(Node):
         bisect.insort(self.inputs, input_, key=lambda input_: input_.name)
         return input_
 
+    def add_child(self, child: Node) -> Node:
+        child.parent = self
+
+        if isinstance(child, Field):
+            bisect.insort(self.fields, child, key=lambda field: field.name)
+        elif isinstance(child, Input):
+            bisect.insort(self.inputs, child, key=lambda input_: input_.name)
+        else:
+            error = f"cannot add child {child.id_}: not field or input"
+            raise TypeError(error)
+
     @overrides
     def remove_child(self, child: Node) -> None:
         if isinstance(child, Field):
