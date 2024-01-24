@@ -133,6 +133,9 @@ class MoveFieldToBlock(Move):
         assert isinstance(move_to_block, Block)
 
         field = root.find(self.field_id)
+        assert field is not None
+        assert isinstance(field, Field)
+
         move_from_block.remove_child(field)
         return move_to_block.add_child(field)
 
@@ -150,13 +153,18 @@ class MoveInputToBlock(Move):
         move_to_block = root.find(self.move_to_block_id)
         assert isinstance(move_to_block, Block)
 
-        input = root.find(self.input_id)
-        assert input is not None
-        assert isinstance(input, Input)
+        input_ = root.find(self.input_id)
+        assert input_ is not None
+        assert isinstance(input_, Input)
 
-        logger.debug("moving input {} from {} to {}", input.id_, move_from_block.id_, move_to_block.id_)
-        move_from_block.remove_child(input)
-        return move_to_block.add_child(input)
+        logger.debug(
+            "moving input {} from {} to {}",
+            input_.id_,
+            move_from_block.id_,
+            move_to_block.id_,
+        )
+        move_from_block.remove_child(input_)
+        return move_to_block.add_child(input_)
 
 
 @dataclass(frozen=True, kw_only=True)

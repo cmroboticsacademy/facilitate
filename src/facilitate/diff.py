@@ -113,9 +113,12 @@ def _move_node(
     logger.debug("moving node: {} {}", move_node.id_, move_node.__class__.__name__)
 
     move_from_parent = move_node.parent
+    assert move_from_parent is not None
     logger.debug("moving from parent: {} {}", move_from_parent.id_, move_from_parent.__class__.__name__)
 
-    move_to_parent = mappings.destination_is_mapped_to(move_node_partner.parent)
+    move_node_partner_parent = move_node_partner.parent
+    assert move_node_partner_parent is not None
+    move_to_parent = mappings.destination_is_mapped_to(move_node_partner_parent)
     assert move_to_parent is not None
     logger.debug(f"moving to parent: {move_to_parent.id_} {move_to_parent.__class__.__name__}")
 
@@ -264,8 +267,6 @@ def update_insert_align_move_phase(
                 )
                 edit.apply(tree_from)
                 script.append(edit)
-
-            # _align_children(added_node, node_to, mappings)
 
     return script
 
