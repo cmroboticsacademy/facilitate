@@ -13,7 +13,7 @@ if t.TYPE_CHECKING:
     import networkx as nx
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, eq=False)
 class Sequence(Node):
     """Represents a sequence of blocks."""
     blocks: list[Block]

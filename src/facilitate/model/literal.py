@@ -12,7 +12,7 @@ if t.TYPE_CHECKING:
     import networkx as nx
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, eq=False)
 class Literal(TerminalNode):
     """Represents a literal value within the AST."""
     value: str

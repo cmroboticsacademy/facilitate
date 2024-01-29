@@ -11,7 +11,7 @@ import networkx as nx
 from overrides import final, overrides
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, eq=False)
 class Node(abc.ABC):
     """Represents a node in the abstract syntax tree."""
     id_: str

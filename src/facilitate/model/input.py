@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
     import networkx as nx
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, eq=False)
 class Input(Node):
     name: str
     expression: Node | None

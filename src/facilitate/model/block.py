@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
     import networkx as nx
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, eq=False)
 class Block(Node):
     opcode: str
     fields: list[Field] = dataclasses.field(default_factory=list)
