@@ -4,6 +4,7 @@ import abc
 import json
 import typing as t
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from loguru import logger
 from overrides import overrides
@@ -15,8 +16,6 @@ from facilitate.model.literal import Literal
 from facilitate.model.sequence import Sequence
 
 if t.TYPE_CHECKING:
-    from pathlib import Path
-
     from facilitate.model.node import Node
 
 
@@ -408,6 +407,8 @@ class EditScript(t.Iterable[Edit]):
             "edits": [edit.to_dict() for edit in self._edits],
         }
 
-    def save_to_json(self, filename: Path) -> None:
+    def save_to_json(self, filename: Path | str) -> None:
+        if isinstance(filename, str):
+            filename = Path(filename)
         with filename.open("w") as f:
             json.dump(self.to_dict(), f, indent=2)

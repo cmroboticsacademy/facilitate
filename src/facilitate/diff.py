@@ -283,11 +283,9 @@ def compute_edit_script(
     tree_to: Node,
 ) -> EditScript:
     """Computes an edit script to transform one tree into another."""
-    script = EditScript()
     mappings = compute_gumtree_mappings(tree_from, tree_to)
 
-    update_insert_align_move_phase(tree_from, tree_to, mappings)
-
+    script = update_insert_align_move_phase(tree_from, tree_to, mappings)
     delete_phase(
         script=script,
         tree_from=tree_from,
@@ -295,6 +293,7 @@ def compute_edit_script(
     )
 
     tree_from.to_dot_pdf("debug.dot.pdf")
+    script.save_to_json("debug.edits.json")
 
     # TODO ensure that edit script works
     assert tree_from.equivalent_to(tree_to)
