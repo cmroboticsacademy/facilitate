@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import json
 import typing as t
 from dataclasses import dataclass, field
 
@@ -14,12 +15,18 @@ from facilitate.model.literal import Literal
 from facilitate.model.sequence import Sequence
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from facilitate.model.node import Node
 
 
 class Edit(abc.ABC):
     @abc.abstractmethod
     def apply(self, root: Node) -> Node | None:
+        ...
+
+    @abc.abstractmethod
+    def to_dict(self) -> dict[str, t.Any]:
         ...
 
 
@@ -44,6 +51,14 @@ class AddInputToBlock(Addition):
         assert isinstance(parent, Block)
         return parent.add_input(self.name)
 
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "AddInputToBlock",
+            "block-id": self.block_id,
+            "name": self.name,
+        }
+
 
 @dataclass(frozen=True, kw_only=True)
 class AddLiteralToInput(Addition):
@@ -57,6 +72,14 @@ class AddLiteralToInput(Addition):
         parent = root.find(self.input_id)
         assert isinstance(parent, Input)
         return parent.add_literal(self.value)
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "AddLiteralToInput",
+            "input-id": self.input_id,
+            "value": self.value,
+        }
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -79,6 +102,17 @@ class AddBlockToSequence(Addition):
             is_shadow=self.is_shadow,
             position=self.position,
         )
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "AddBlockToSequence",
+            "sequence-id": self.sequence_id,
+            "block-id": self.block_id,
+            "position": self.position,
+            "opcode": self.opcode,
+            "is-shadow": self.is_shadow,
+        }
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -103,6 +137,16 @@ class AddBlockToInput(Addition):
         parent.expression = block
         return block
 
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "AddBlockToInput",
+            "input-id": self.input_id,
+            "block-id": self.block_id,
+            "opcode": self.opcode,
+            "is-shadow": self.is_shadow,
+        }
+
 
 @dataclass(frozen=True, kw_only=True)
 class AddFieldToBlock(Addition):
@@ -117,6 +161,15 @@ class AddFieldToBlock(Addition):
         parent = root.find(self.block_id)
         assert isinstance(parent, Block)
         return parent.add_field(self.name, self.value)
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "AddFieldToBlock",
+            "block-id": self.block_id,
+            "name": self.name,
+            "value": self.value,
+        }
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -138,6 +191,15 @@ class MoveFieldToBlock(Move):
 
         move_from_block.remove_child(field)
         return move_to_block.add_child(field)
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "MoveFieldToBlock",
+            "move-from-block-id": self.move_from_block_id,
+            "move-to-block-id": self.move_to_block_id,
+            "field-id": self.field_id,
+        }
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -166,6 +228,15 @@ class MoveInputToBlock(Move):
         move_from_block.remove_child(input_)
         return move_to_block.add_child(input_)
 
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "MoveInputToBlock",
+            "move-from-block-id": self.move_from_block_id,
+            "move-to-block-id": self.move_to_block_id,
+            "input-id": self.input_id,
+        }
+
 
 @dataclass(frozen=True, kw_only=True)
 class MoveBlockInSequence(Move):
@@ -191,6 +262,15 @@ class MoveBlockInSequence(Move):
 
         sequence.blocks.insert(new_position, block)
         return block
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "MoveBlockInSequence",
+            "sequence-id": self.sequence_id,
+            "block-id": self.block_id,
+            "position": self.position,
+        }
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -255,6 +335,14 @@ class Update(Edit):
             error = f"cannot update node of type {type(node)}"
             raise TypeError(error)
 
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "Update",
+            "node-id": self.node_id,
+            "value": self.value,
+        }
+
 
 @dataclass(frozen=True, kw_only=True)
 class Delete(Edit):
@@ -287,6 +375,13 @@ class Delete(Edit):
 
         parent.remove_child(node)
 
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "Delete",
+            "node-id": self.node_id,
+        }
+
 
 @dataclass
 class EditScript(t.Iterable[Edit]):
@@ -307,3 +402,12 @@ class EditScript(t.Iterable[Edit]):
         for edit in self._edits:
             edit.apply(root)
         return root
+
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "edits": [edit.to_dict() for edit in self._edits],
+        }
+
+    def save_to_json(self, filename: Path) -> None:
+        with filename.open("w") as f:
+            json.dump(self.to_dict(), f, indent=2)
