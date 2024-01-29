@@ -264,6 +264,16 @@ def update_insert_align_move_phase(
                 edit.apply(tree_from)
                 script.append(edit)
 
+            # align stage
+            if isinstance(_maybe_node_from, Sequence):
+                assert isinstance(node_to, Sequence)
+                _align_children(
+                    script=script,
+                    sequence_from=_maybe_node_from,
+                    sequence_to=node_to,
+                    mappings=mappings,
+                )
+
     return script
 
 

@@ -18,6 +18,9 @@ def longest_common_subsequence(
     m = len(lx)
     n = len(ly)
 
+    if m == 0 or n == 0:
+        return []
+
     table: list[list[list[tuple[T, T]]]] = [
         [] * (n + 1) for i in range(m + 1)
     ]
