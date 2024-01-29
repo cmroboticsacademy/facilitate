@@ -39,10 +39,22 @@ def cli(verbose: bool) -> None:
     help="Output file name.",
     type=click.Path(),
 )
-def draw(program: str, output: str) -> None:
+@click.option(
+    "-f", "--format", "format_",
+    default="png",
+    help="Output file format.",
+    type=click.Choice(["png", "pdf"]),
+)
+def draw(program: str, output: str, format_: str) -> None:
     """Draws a given Scratch program as a PNG image."""
     ast = load_from_file(program)
-    ast.to_dot_png(output)
+    if format_ == "pdf":
+        ast.to_dot_pdf(output)
+    elif format_ == "png":
+        ast.to_dot_png(output)
+    else:
+        error = f"unknown format: {format}"
+        raise ValueError(error)
 
 
 @cli.command()

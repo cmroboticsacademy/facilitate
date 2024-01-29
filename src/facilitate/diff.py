@@ -294,7 +294,7 @@ def compute_edit_script(
         mappings=mappings,
     )
 
-    tree_from.to_dot_png("debug.dot.png")
+    tree_from.to_dot_pdf("debug.dot.pdf")
 
     # TODO ensure that edit script works
     assert tree_from.equivalent_to(tree_to)

@@ -148,6 +148,11 @@ class Node(abc.ABC):
         graph = self.to_nx_digraph()
         nx.drawing.nx_pydot.to_pydot(graph).write_png(filename)  # type: ignore
 
+    def to_dot_pdf(self, filename: str) -> None:
+        """Writes the graph rooted as this node to a PDF file."""
+        graph = self.to_nx_digraph()
+        nx.drawing.nx_pydot.to_pydot(graph).write_pdf(filename)  # type: ignore
+
 
 class TerminalNode(Node, abc.ABC):
     """Represents a node in the abstract syntax tree that has no children."""
