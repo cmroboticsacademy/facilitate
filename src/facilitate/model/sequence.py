@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import typing as t
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from overrides import overrides
 
@@ -16,7 +16,7 @@ if t.TYPE_CHECKING:
 @dataclass(kw_only=True, eq=False)
 class Sequence(Node):
     """Represents a sequence of blocks."""
-    blocks: list[Block]
+    blocks: list[Block] = field(default_factory=list)
 
     def __hash__(self) -> int:
         return hash(self.id_)
