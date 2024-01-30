@@ -57,7 +57,6 @@ class Sequence(Node):
         is_shadow: bool,
         position: int,
     ) -> Block:
-        id_ = f"ADDED:{id_}"
         block = Block(
             id_=id_,
             opcode=opcode,

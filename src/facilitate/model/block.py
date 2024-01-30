@@ -92,7 +92,6 @@ class Block(Node):
 
     def add_field(self, name: str, value: str) -> Field:
         id_ = Field.determine_id(self.id_, name)
-        id_ = f"ADDED:{id_}"
         field = Field(
             id_=id_,
             name=name,
@@ -106,7 +105,6 @@ class Block(Node):
 
     def add_input(self, name: str) -> Input:
         id_ = Input.determine_id(self.id_, name)
-        id_ = f"ADDED:{id_}"
         input_ = Input(
             id_=id_,
             name=name,

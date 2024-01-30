@@ -208,7 +208,6 @@ def delete_phase(
 ) -> EditScript:
     for node_ in tree_from.postorder():
         if not mappings.source_is_mapped(node_):
-            node_.tags.append("DELETED")
             edit = Delete(node_id=node_.id_)
             edit.apply(tree_from)
             script.append(edit)
@@ -234,8 +233,6 @@ def update_insert_align_move_phase(
             )
             added_node = insertion.apply(tree_from)
             assert added_node is not None
-            added_node.tags.append("ADDED")
-            assert added_node is not None
             script.append(insertion)
             mappings.add(added_node, node_to)
 
@@ -243,7 +240,6 @@ def update_insert_align_move_phase(
             if not _maybe_node_from.surface_equivalent_to(node_to):
                 update = Update.compute(_maybe_node_from, node_to)
                 assert update is not None
-                _maybe_node_from.tags.append("UPDATED")
                 update.apply(tree_from)
                 script.append(update)
 
@@ -260,7 +256,6 @@ def update_insert_align_move_phase(
                     move_node_partner=node_to,
                     mappings=mappings,
                 )
-                _maybe_node_from.tags.append("MOVED")
                 edit.apply(tree_from)
                 script.append(edit)
 
@@ -295,6 +290,7 @@ def compute_edit_script(
 
     tree_from.to_dot_pdf("debug.dot.pdf")
     script.save_to_json("debug.edits.json")
+    print("COOOL")
     script.save_to_dot_gif("debug.edits.dot.gif", original_tree_from)
 
     # TODO ensure that edit script works

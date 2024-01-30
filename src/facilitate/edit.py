@@ -23,7 +23,7 @@ if t.TYPE_CHECKING:
 
 class Edit(abc.ABC):
     @abc.abstractmethod
-    def apply(self, root: Node) -> Node | None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:
         ...
 
     @abc.abstractmethod
@@ -46,11 +46,13 @@ class AddInputToBlock(Addition):
     name: str
 
     @overrides
-    def apply(self, root: Node) -> Node | None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
         """Inserts and returns the given input."""
         parent = root.find(self.block_id)
         assert isinstance(parent, Block)
-        return parent.add_input(self.name)
+        added = parent.add_input(self.name)
+        added.tags.append("ADDED")
+        return added
 
     @overrides
     def to_dict(self) -> dict[str, t.Any]:
@@ -68,11 +70,13 @@ class AddLiteralToInput(Addition):
     value: str
 
     @overrides
-    def apply(self, root: Node) -> Node | None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
         """Inserts and returns the given literal."""
         parent = root.find(self.input_id)
         assert isinstance(parent, Input)
-        return parent.add_literal(self.value)
+        added = parent.add_literal(self.value)
+        added.tags.append("ADDED")
+        return added
 
     @overrides
     def to_dict(self) -> dict[str, t.Any]:
@@ -93,16 +97,18 @@ class AddBlockToSequence(Addition):
     is_shadow: bool
 
     @overrides
-    def apply(self, root: Node) -> Node | None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
         """Inserts and returns the given block."""
         parent = root.find(self.sequence_id)
         assert isinstance(parent, Sequence)
-        return parent.insert_block(
+        added = parent.insert_block(
             id_=self.block_id,
             opcode=self.opcode,
             is_shadow=self.is_shadow,
             position=self.position,
         )
+        added.tags.append("ADDED")
+        return added
 
     @overrides
     def to_dict(self) -> dict[str, t.Any]:
@@ -125,7 +131,7 @@ class AddBlockToInput(Addition):
     is_shadow: bool
 
     @overrides
-    def apply(self, root: Node) -> Node | None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
         """Inserts and returns the given block."""
         parent = root.find(self.input_id)
         assert isinstance(parent, Input)
@@ -136,6 +142,7 @@ class AddBlockToInput(Addition):
         )
         block.parent = parent
         parent.expression = block
+        block.tags.append("ADDED")
         return block
 
     @overrides
@@ -157,11 +164,13 @@ class AddFieldToBlock(Addition):
     value: str
 
     @overrides
-    def apply(self, root: Node) -> Node | None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
         """Inserts and returns the given field."""
         parent = root.find(self.block_id)
         assert isinstance(parent, Block)
-        return parent.add_field(self.name, self.value)
+        added = parent.add_field(self.name, self.value)
+        added.tags.append("ADDED")
+        return added
 
     @overrides
     def to_dict(self) -> dict[str, t.Any]:
@@ -180,7 +189,7 @@ class MoveFieldToBlock(Move):
     field_id: str
 
     @overrides
-    def apply(self, root: Node) -> Node | None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
         move_from_block = root.find(self.move_from_block_id)
         assert isinstance(move_from_block, Block)
         move_to_block = root.find(self.move_to_block_id)
@@ -189,6 +198,8 @@ class MoveFieldToBlock(Move):
         field = root.find(self.field_id)
         assert field is not None
         assert isinstance(field, Field)
+
+        field.tags.append("MOVED")
 
         move_from_block.remove_child(field)
         return move_to_block.add_child(field)
@@ -210,7 +221,7 @@ class MoveInputToBlock(Move):
     input_id: str
 
     @overrides
-    def apply(self, root: Node) -> Node | None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
         move_from_block = root.find(self.move_from_block_id)
         assert isinstance(move_from_block, Block)
         move_to_block = root.find(self.move_to_block_id)
@@ -219,6 +230,8 @@ class MoveInputToBlock(Move):
         input_ = root.find(self.input_id)
         assert input_ is not None
         assert isinstance(input_, Input)
+
+        input_.tags.append("MOVED")
 
         logger.debug(
             "moving input {} from {} to {}",
@@ -246,7 +259,7 @@ class MoveBlockInSequence(Move):
     position: int
 
     @overrides
-    def apply(self, root: Node) -> Node | None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
         """Moves the block to the given position in the sequence."""
         sequence = root.find(self.sequence_id)
         assert isinstance(sequence, Sequence)
@@ -326,8 +339,9 @@ class Update(Edit):
         )
 
     @overrides
-    def apply(self, root: Node) -> None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
         node = root.find(self.node_id)
+
         if isinstance(node, Block):
             node.opcode = self.value
         elif isinstance(node, Field | Literal):
@@ -335,6 +349,9 @@ class Update(Edit):
         else:
             error = f"cannot update node of type {type(node)}"
             raise TypeError(error)
+
+        node.tags.append("UPDATED")
+        return node
 
     @overrides
     def to_dict(self) -> dict[str, t.Any]:
@@ -357,13 +374,13 @@ class Delete(Edit):
     node_id: str
 
     @overrides
-    def apply(self, root: Node) -> None:
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:
         node = root.find(self.node_id)
         if not node:
             error = f"cannot delete node {self.node_id}: not found."
             raise ValueError(error)
 
-        if node.has_children():
+        if not no_delete and node.has_children():
             error = f"cannot delete node {self.node_id}: has children."
             print(f"kids: {[c.id_ for c in node.children()]}")
             raise ValueError(error)
@@ -374,7 +391,12 @@ class Delete(Edit):
             error = f"cannot delete node {self.node_id}: no parent."
             raise ValueError(error)
 
-        parent.remove_child(node)
+        if not no_delete:
+            parent.remove_child(node)
+
+        node.tags.append("DELETED")
+
+        return None
 
     @overrides
     def to_dict(self) -> dict[str, t.Any]:
@@ -428,7 +450,7 @@ class EditScript(t.Iterable[Edit]):
         # draw state of tree after each edit
         for edit in self._edits:
             logger.debug(f"GIF: applying edit: {edit}")
-            edit.apply(tree)
+            edit.apply(tree, no_delete=True)
             frames.append(tree.to_dot_pil_image())
 
         # convert frames to GIF
