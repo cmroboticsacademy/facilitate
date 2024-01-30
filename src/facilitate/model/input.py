@@ -39,7 +39,7 @@ class Input(Node):
 
     @overrides
     def copy(self: t.Self) -> t.Self:
-        expression = None if self.expression is None else self.expression
+        expression = None if self.expression is None else self.expression.copy()
         return self.__class__(
             id_=self.id_,
             tags=self.tags.copy(),
