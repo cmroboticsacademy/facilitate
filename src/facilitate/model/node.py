@@ -3,11 +3,14 @@ from __future__ import annotations
 __all__ = ("Node", "TerminalNode")
 
 import abc
+import tempfile
 import typing as t
 from dataclasses import dataclass, field
 from functools import cached_property
+from pathlib import Path
 
 import networkx as nx
+import PIL
 from overrides import final, overrides
 
 
@@ -142,6 +145,16 @@ class Node(abc.ABC):
         """Writes the graph rooted as this node to a DOT file."""
         graph = self.to_nx_digraph()
         nx.drawing.nx_pydot.write_dot(graph, filename)
+
+    def to_dot_pil_image(self) -> PIL.Image.Image:
+        """Renders the graph rooted as this node to a PIL image."""
+        png_filename = tempfile.mkstemp(suffix=".png")[1]
+        png_path = Path(png_filename)
+        try:
+            self.to_dot_png(png_filename)
+            return PIL.Image.open(png_filename)
+        finally:
+            png_path.unlink(missing_ok=True)
 
     def to_dot_png(self, filename: str) -> None:
         """Writes the graph rooted as this node to a PNG file."""

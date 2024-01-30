@@ -16,6 +16,8 @@ from facilitate.model.literal import Literal
 from facilitate.model.sequence import Sequence
 
 if t.TYPE_CHECKING:
+    from PIL.Image import Image
+
     from facilitate.model.node import Node
 
 
@@ -406,6 +408,37 @@ class EditScript(t.Iterable[Edit]):
         return {
             "edits": [edit.to_dict() for edit in self._edits],
         }
+
+    def save_to_dot_gif(
+        self,
+        filename: Path | str,
+        tree_from: Node,
+    ) -> None:
+        if isinstance(filename, str):
+            filename = Path(filename)
+
+        tree = tree_from.copy()
+
+        # create temporary directory to store intermediate PNGs
+        frames: list[Image] = []
+
+        # draw initial tree
+        frames.append(tree.to_dot_pil_image())
+
+        # draw state of tree after each edit
+        for edit in self._edits:
+            edit.apply(tree)
+            frames.append(tree.to_dot_pil_image())
+
+        # convert frames to GIF
+        frames[0].save(
+            filename,
+            append_images=frames[1:],
+            save_all=True,
+            optimize=False,
+            loop=0,
+            duration=1000,
+        )
 
     def save_to_json(self, filename: Path | str) -> None:
         if isinstance(filename, str):
