@@ -5,6 +5,13 @@ from loguru import logger
 from facilitate.model.node import Node
 
 
+def test_copy(good_tree: Node) -> None:
+    copied_tree = good_tree.copy()
+    assert copied_tree is not good_tree
+    assert copied_tree.equivalent_to(good_tree)
+    assert good_tree.equivalent_to(copied_tree)
+
+
 def test_height(good_tree: Node) -> None:
     node = good_tree.find(":input[DIRECTION]@0z(.tYRa{!SepmI$)#U,")
     assert node.height == 3
