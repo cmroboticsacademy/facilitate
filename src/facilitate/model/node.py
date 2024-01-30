@@ -10,7 +10,7 @@ from functools import cached_property
 from pathlib import Path
 
 import networkx as nx
-import PIL
+import PIL.Image
 from overrides import final, overrides
 
 
