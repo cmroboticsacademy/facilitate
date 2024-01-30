@@ -427,6 +427,7 @@ class EditScript(t.Iterable[Edit]):
 
         # draw state of tree after each edit
         for edit in self._edits:
+            logger.debug(f"GIF: applying edit: {edit}")
             edit.apply(tree)
             frames.append(tree.to_dot_pil_image())
 
