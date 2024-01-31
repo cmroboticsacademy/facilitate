@@ -39,6 +39,7 @@ def _find_insertion_position(
     missing_block: Block,
     mappings: NodeMappings,
 ) -> int:
+    logger.debug("finding insertion position for {}", missing_block.id_)
     parent_to = missing_block.parent
     assert parent_to is not None
     parent_from = mappings.destination_is_mapped_to(parent_to)
@@ -50,6 +51,8 @@ def _find_insertion_position(
 
     if missing_block_position == 0:
         return 0
+
+    logger.debug("missing block position: {}", missing_block_position)
 
     node_before_missing_block = parent_to.blocks[missing_block_position - 1]
     insert_after_node = mappings.destination_is_mapped_to(node_before_missing_block)
@@ -86,7 +89,7 @@ def _align_children(
         equals,
     )
     lcs_node_to: list[Block] = [y for (_, y) in lcs]
-    logger.debug(f"lcs (node to): {', '.join(block.id_ for block in lcs_node_to)}")
+    logger.debug(f"lcs (node to) [{len(lcs_node_to)}]: {', '.join(block.id_ for block in lcs_node_to)}")
 
     for b in mapped_node_to_children:
         if b in lcs_node_to:
