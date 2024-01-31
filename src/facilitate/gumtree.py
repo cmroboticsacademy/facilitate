@@ -16,8 +16,8 @@ if t.TYPE_CHECKING:
 
 @dataclass
 class HeightIndexedPriorityList:
-    _height_to_nodes: dict[int, set[Node]] = field(
-        default_factory=functools.partial(defaultdict, set),
+    _height_to_nodes: dict[int, list[Node]] = field(
+        default_factory=functools.partial(defaultdict, list),
     )
 
     @property
@@ -33,9 +33,9 @@ class HeightIndexedPriorityList:
 
     def push(self, node: Node) -> None:
         """Adds a node to the list."""
-        self._height_to_nodes[node.height].add(node)
+        self._height_to_nodes[node.height].append(node)
 
-    def pop(self) -> set[Node]:
+    def pop(self) -> list[Node]:
         """Removes and returns the set of nodes with maximal height."""
         max_height = self.peek_max()
         nodes = self._height_to_nodes[max_height]
@@ -136,8 +136,8 @@ def compute_topdown_mappings(
                 f"max height nodes y: {", ".join(node.id_ for node in max_height_nodes_y)}",
             )
 
-            added_trees_x: set[Node] = set()
-            added_trees_y: set[Node] = set()
+            added_trees_x: list[Node] = []
+            added_trees_y: list[Node] = []
 
             for node_x, node_y in product(max_height_nodes_x, max_height_nodes_y):
                 if node_x.equivalent_to(node_y):
@@ -155,8 +155,8 @@ def compute_topdown_mappings(
                         logger.debug(f"isolated match: {node_x.id_} vs. {node_y.id_}")
                         mappings.add(node_x, node_y)
 
-                    added_trees_x.add(node_x)
-                    added_trees_y.add(node_y)
+                    added_trees_x.append(node_x)
+                    added_trees_y.append(node_y)
 
             for node in max_height_nodes_x:
                 if node not in added_trees_x:
