@@ -65,15 +65,20 @@ def _align_children(
     mappings: NodeMappings,
 ) -> None:
     """Aligns the children of two nodes."""
+    logger.debug("aligning children of {} and {}", sequence_from.id_, sequence_to.id_)
+
     def equals(x: Node, y: Node) -> bool:
         return (x, y) in mappings
 
     mapped_node_from_children = [
-        block for block in sequence_from.blocks if mappings.destination_is_mapped(block)
+        block for block in sequence_from.blocks if mappings.source_is_mapped(block)
     ]
     mapped_node_to_children = [
-        block for block in sequence_to.blocks if mappings.source_is_mapped(block)
+        block for block in sequence_to.blocks if mappings.destination_is_mapped(block)
     ]
+
+    logger.debug(f"mapped node from children [{len(mapped_node_from_children)}]: {', '.join(block.id_ for block in mapped_node_from_children)}")
+    logger.debug(f"mapped node to children [{len(mapped_node_to_children)}]: {', '.join(block.id_ for block in mapped_node_to_children)}")
 
     lcs: list[tuple[Block, Block]] = longest_common_subsequence(
         mapped_node_from_children,
@@ -81,6 +86,7 @@ def _align_children(
         equals,
     )
     lcs_node_to: list[Block] = [y for (_, y) in lcs]
+    logger.debug(f"lcs (node to): {', '.join(block.id_ for block in lcs_node_to)}")
 
     for b in mapped_node_to_children:
         if b in lcs_node_to:
@@ -280,6 +286,7 @@ def compute_edit_script(
     """Computes an edit script to transform one tree into another."""
     original_tree_from = tree_from.copy()
     mappings = compute_gumtree_mappings(tree_from, tree_to)
+    logger.debug("mappings: {}", mappings)
 
     script = update_insert_align_move_phase(tree_from, tree_to, mappings)
     delete_phase(
@@ -290,7 +297,6 @@ def compute_edit_script(
 
     tree_from.to_dot_pdf("debug.dot.pdf")
     script.save_to_json("debug.edits.json")
-    print("COOOL")
     script.save_to_dot_gif("debug.edits.dot.gif", original_tree_from)
 
     # TODO ensure that edit script works
