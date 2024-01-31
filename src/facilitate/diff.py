@@ -80,8 +80,14 @@ def _align_children(
         block for block in sequence_to.blocks if mappings.destination_is_mapped(block)
     ]
 
-    logger.debug(f"mapped node from children [{len(mapped_node_from_children)}]: {', '.join(block.id_ for block in mapped_node_from_children)}")
-    logger.debug(f"mapped node to children [{len(mapped_node_to_children)}]: {', '.join(block.id_ for block in mapped_node_to_children)}")
+    logger.debug(
+        f"mapped node from children [{len(mapped_node_from_children)}]: "
+        f"{', '.join(block.id_ for block in mapped_node_from_children)}",
+    )
+    logger.debug(
+        f"mapped node to children [{len(mapped_node_to_children)}]: "
+        f"{', '.join(block.id_ for block in mapped_node_to_children)}",
+    )
 
     lcs: list[tuple[Block, Block]] = longest_common_subsequence(
         mapped_node_from_children,

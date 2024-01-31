@@ -21,7 +21,7 @@ def longest_common_subsequence(
     if m == 0 or n == 0:
         return []
 
-    table: list[list[list[tuple[T, T]]]] = [
+    table: list[list[list[tuple[T, T]] | None]] = [
         [None] * (n + 1) for i in range(m + 1)
     ]
 
@@ -32,11 +32,16 @@ def longest_common_subsequence(
             if i == 0 or j == 0:
                 table[i][j] = []
             elif criteria(x, y):
-                assert table[i - 1][j - 1] is not None
-                table[i][j] = table[i - 1][j - 1] + [(x, y)]
+                prev = table[i - 1][j - 1]
+                assert prev is not None
+                table[i][j] = [*prev, (x, y)]
             else:
                 a = table[i - 1][j]
                 b = table[i][j - 1]
+                assert a is not None
+                assert b is not None
                 table[i][j] = a if len(a) > len(b) else b
 
-    return table[m][n]
+    result = table[m][n]
+    assert result is not None
+    return result
