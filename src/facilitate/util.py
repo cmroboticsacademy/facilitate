@@ -22,7 +22,7 @@ def longest_common_subsequence(
         return []
 
     table: list[list[list[tuple[T, T]]]] = [
-        [] * (n + 1) for i in range(m + 1)
+        [None] * (n + 1) for i in range(m + 1)
     ]
 
     for i in range(m + 1):
