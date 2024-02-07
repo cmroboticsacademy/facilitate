@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import abc
+import inspect
 import json
 import typing as t
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from loguru import logger
-from overrides import overrides
+from overrides import final, overrides
 
 from facilitate.model.block import Block
 from facilitate.model.field import Field
@@ -22,6 +23,8 @@ if t.TYPE_CHECKING:
 
 
 class Edit(abc.ABC):
+    _name_to_edit_class: t.ClassVar[dict[str, type[Edit]]] = {}
+
     @abc.abstractmethod
     def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:
         ...
@@ -29,6 +32,25 @@ class Edit(abc.ABC):
     @abc.abstractmethod
     def to_dict(self) -> dict[str, t.Any]:
         ...
+
+    @classmethod
+    @final
+    def from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        type_name: str = dict_["type"]
+        type_cls = cls._name_to_edit_class[type_name]
+        return type_cls._from_dict(dict_)
+
+    @classmethod
+    @abc.abstractmethod
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        ...
+
+    @classmethod
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+        if inspect.isabstract(cls):
+            return
+        Edit._name_to_edit_class[cls.__name__] = cls
 
 
 class Addition(Edit):
@@ -62,6 +84,17 @@ class AddInputToBlock(Addition):
             "name": self.name,
         }
 
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "AddInputToBlock"
+        block_id = dict_["block-id"]
+        name = dict_["name"]
+        return AddInputToBlock(
+            block_id=block_id,
+            name=name,
+        )
+
 
 @dataclass(frozen=True, kw_only=True)
 class AddLiteralToInput(Addition):
@@ -85,6 +118,17 @@ class AddLiteralToInput(Addition):
             "input-id": self.input_id,
             "value": self.value,
         }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "AddLiteralToInput"
+        input_id = dict_["input-id"]
+        value = dict_["value"]
+        return AddLiteralToInput(
+            input_id=input_id,
+            value=value,
+        )
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -121,6 +165,23 @@ class AddBlockToSequence(Addition):
             "is-shadow": self.is_shadow,
         }
 
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "AddBlockToSequence"
+        sequence_id = dict_["sequence-id"]
+        block_id = dict_["block-id"]
+        position = dict_["position"]
+        opcode = dict_["opcode"]
+        is_shadow = dict_["is-shadow"]
+        return AddBlockToSequence(
+            sequence_id=sequence_id,
+            block_id=block_id,
+            position=position,
+            opcode=opcode,
+            is_shadow=is_shadow,
+        )
+
 
 @dataclass(frozen=True, kw_only=True)
 class AddBlockToInput(Addition):
@@ -155,6 +216,21 @@ class AddBlockToInput(Addition):
             "is-shadow": self.is_shadow,
         }
 
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "AddBlockToInput"
+        input_id = dict_["input-id"]
+        block_id = dict_["block-id"]
+        opcode = dict_["opcode"]
+        is_shadow = dict_["is-shadow"]
+        return AddBlockToInput(
+            input_id=input_id,
+            block_id=block_id,
+            opcode=opcode,
+            is_shadow=is_shadow,
+        )
+
 
 @dataclass(frozen=True, kw_only=True)
 class AddFieldToBlock(Addition):
@@ -180,6 +256,19 @@ class AddFieldToBlock(Addition):
             "name": self.name,
             "value": self.value,
         }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "AddFieldToBlock"
+        block_id = dict_["block-id"]
+        name = dict_["name"]
+        value = dict_["value"]
+        return AddFieldToBlock(
+            block_id=block_id,
+            name=name,
+            value=value,
+        )
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -212,6 +301,19 @@ class MoveFieldToBlock(Move):
             "move-to-block-id": self.move_to_block_id,
             "field-id": self.field_id,
         }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "MoveFieldToBlock"
+        move_from_block_id = dict_["move-from-block-id"]
+        move_to_block_id = dict_["move-to-block-id"]
+        field_id = dict_["field-id"]
+        return MoveFieldToBlock(
+            move_from_block_id=move_from_block_id,
+            move_to_block_id=move_to_block_id,
+            field_id=field_id,
+        )
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -251,6 +353,19 @@ class MoveInputToBlock(Move):
             "input-id": self.input_id,
         }
 
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "MoveInputToBlock"
+        move_from_block_id = dict_["move-from-block-id"]
+        move_to_block_id = dict_["move-to-block-id"]
+        input_id = dict_["input-id"]
+        return MoveInputToBlock(
+            move_from_block_id=move_from_block_id,
+            move_to_block_id=move_to_block_id,
+            input_id=input_id,
+        )
+
 
 @dataclass(frozen=True, kw_only=True)
 class MoveBlockInSequence(Move):
@@ -285,6 +400,19 @@ class MoveBlockInSequence(Move):
             "block-id": self.block_id,
             "position": self.position,
         }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "MoveBlockInSequence"
+        sequence_id = dict_["sequence-id"]
+        block_id = dict_["block-id"]
+        position = dict_["position"]
+        return MoveBlockInSequence(
+            sequence_id=sequence_id,
+            block_id=block_id,
+            position=position,
+        )
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -361,6 +489,17 @@ class Update(Edit):
             "value": self.value,
         }
 
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "Update"
+        node_id = dict_["node-id"]
+        value = dict_["value"]
+        return Update(
+            node_id=node_id,
+            value=value,
+        )
+
 
 @dataclass(frozen=True, kw_only=True)
 class Delete(Edit):
@@ -405,6 +544,15 @@ class Delete(Edit):
             "node-id": self.node_id,
         }
 
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "Delete"
+        node_id = dict_["node-id"]
+        return Delete(
+            node_id=node_id,
+        )
+
 
 @dataclass
 class EditScript(t.Iterable[Edit]):
@@ -430,6 +578,11 @@ class EditScript(t.Iterable[Edit]):
         return {
             "edits": [edit.to_dict() for edit in self._edits],
         }
+
+    @classmethod
+    def from_dict(cls, dict_: dict[str, t.Any]) -> EditScript:
+        edits = [Edit.from_dict(edit_dict) for edit_dict in dict_["edits"]]
+        return EditScript(edits)
 
     def save_to_dot_gif(
         self,
