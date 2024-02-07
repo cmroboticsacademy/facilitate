@@ -304,11 +304,6 @@ def compute_edit_script(
         mappings=mappings,
     )
 
-    tree_from.to_dot_pdf("debug.dot.pdf")
-    script.save_to_json("debug.edits.json")
-    script.save_to_dot_gif("debug.edits.dot.gif", original_tree_from)
-
-    # TODO ensure that edit script works
     assert tree_from.equivalent_to(tree_to)
 
     return script

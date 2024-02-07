@@ -61,13 +61,19 @@ def draw(program: str, output: str, format_: str) -> None:
 @cli.command()
 @click.argument("before", type=click.Path(exists=True))
 @click.argument("after", type=click.Path(exists=True))
-def diff(before: str, after: str) -> None:
+@click.option(
+    "-o", "--output",
+    default="edit_script.json",
+    help="Output file name.",
+    type=click.Path(),
+)
+def diff(before: str, after: str, output: str) -> None:
     """Computes an edit script between two version of a Scratch program."""
     ast_before = load_from_file(before)
     ast_after = load_from_file(after)
 
     edits = compute_edit_script(ast_before, ast_after)
-    edits.save_to_json("edit_script.json")
+    edits.save_to_json(output)
 
 
 @cli.command()
