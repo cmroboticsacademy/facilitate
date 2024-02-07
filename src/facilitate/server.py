@@ -11,6 +11,9 @@ from apiflask.fields import (
     String,
 )
 
+from facilitate.diff import compute_edit_script
+from facilitate.loader import load_program_from_block_descriptions
+
 app = APIFlask(__name__)
 
 
@@ -19,6 +22,7 @@ class Block(Schema):
     next_ = String(
         allow_none=True,
         data_key="next",
+        attribute="next",
     )
     parent = String(allow_none=True)
     inputs = Dict(keys=String())
@@ -50,7 +54,11 @@ class DiffRequest(Schema):
 @app.get("/diff")
 @app.input(DiffRequest, location="json")
 def diff(json_data: dict[str, t.Any]) -> dict[str, str]:
-    print(json_data)
-    return {
-        "todo": "implement",
-    }
+    jsn_from_program = json_data["from_program"]
+    jsn_to_program = json_data["to_program"]
+
+    from_program = load_program_from_block_descriptions(jsn_from_program)
+    to_program = load_program_from_block_descriptions(jsn_to_program)
+
+    edit_script = compute_edit_script(from_program, to_program)
+    return edit_script.to_dict()
