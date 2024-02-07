@@ -7,6 +7,7 @@ import click
 from loguru import logger
 
 from facilitate.diff import compute_edit_script
+from facilitate.edit import EditScript
 from facilitate.loader import load_from_file
 
 
@@ -65,4 +66,29 @@ def diff(before: str, after: str) -> None:
     ast_before = load_from_file(before)
     ast_after = load_from_file(after)
 
-    compute_edit_script(ast_before, ast_after)
+    edits = compute_edit_script(ast_before, ast_after)
+    edits.save_to_json("edit_script.json")
+
+
+@cli.command()
+@click.argument("script", type=click.Path(exists=True))
+@click.argument("before", type=click.Path(exists=True))
+@click.option(
+    "-o", "--output",
+    default="animation.gif",
+    help="Output file name.",
+    type=click.Path(),
+)
+def animate(
+    script: str,
+    before: str,
+    output: str,
+) -> None:
+    """Animates the effects of applying an edit script to a Scratch program."""
+    edit_script = EditScript.load(script)
+    ast_before = load_from_file(before)
+
+    edit_script.save_to_dot_gif(
+        output,
+        ast_before,
+    )

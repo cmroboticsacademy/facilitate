@@ -581,8 +581,17 @@ class EditScript(t.Iterable[Edit]):
 
     @classmethod
     def from_dict(cls, dict_: dict[str, t.Any]) -> EditScript:
+        assert "edits" in dict_
         edits = [Edit.from_dict(edit_dict) for edit_dict in dict_["edits"]]
         return EditScript(edits)
+
+    @classmethod
+    def load(cls, filename: Path | str) -> EditScript:
+        if isinstance(filename, str):
+            filename = Path(filename)
+        with filename.open("r") as f:
+            dict_ = json.load(f)
+        return cls.from_dict(dict_)
 
     def save_to_dot_gif(
         self,
