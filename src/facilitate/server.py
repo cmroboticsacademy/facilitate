@@ -26,7 +26,11 @@ class Block(Schema):
     )
     parent = String(allow_none=True)
     inputs = Dict(keys=String())
-    fields = Dict(keys=String())
+    fields_ = Dict(
+        keys=String(),
+        data_key="fields",
+        attribute="fields",
+    )
     shadow = Boolean(required=True)
     top_level = Boolean(
         required=True,
@@ -51,7 +55,7 @@ class DiffRequest(Schema):
     )
 
 
-@app.get("/diff")
+@app.get("/diff")  # type: ignore
 @app.input(DiffRequest, location="json")
 def diff(json_data: dict[str, t.Any]) -> dict[str, str]:
     jsn_from_program = json_data["from_program"]
