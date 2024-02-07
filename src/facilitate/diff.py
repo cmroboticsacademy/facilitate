@@ -293,7 +293,6 @@ def compute_edit_script(
     tree_to: Node,
 ) -> EditScript:
     """Computes an edit script to transform one tree into another."""
-    original_tree_from = tree_from.copy()
     mappings = compute_gumtree_mappings(tree_from, tree_to)
     logger.debug("mappings: {}", mappings)
 
