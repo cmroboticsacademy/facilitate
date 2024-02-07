@@ -19,7 +19,7 @@ To deploy the server, run the following command:
 
 .. code:: shell
 
-    poetry run flask run --app facilitate.server run
+    poetry run flask --app facilitate.server run
 
 While the server is running, you can use the example script to simulate a call to the /diff endpoint:
 
