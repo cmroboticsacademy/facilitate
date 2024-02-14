@@ -11,11 +11,13 @@ from apiflask.fields import (
     String,
 )
 import flask
+import flask_cors
 
 from facilitate.diff import compute_edit_script
 from facilitate.loader import load_program_from_block_descriptions
 
 app = APIFlask(__name__)
+flask_cors.CORS(app)
 
 
 class Block(Schema):

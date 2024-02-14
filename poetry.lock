@@ -619,6 +619,20 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "flask-cors"
+version = "4.0.0"
+description = "A Flask extension adding a decorator for CORS support"
+optional = false
+python-versions = "*"
+files = [
+    {file = "Flask-Cors-4.0.0.tar.gz", hash = "sha256:f268522fcb2f73e2ecdde1ef45e2fd5c71cc48fe03cffb4b441c6d1b40684eb0"},
+    {file = "Flask_Cors-4.0.0-py2.py3-none-any.whl", hash = "sha256:bc3492bfd6368d27cfe79c7821df5a8a319e1a6d5eab277a3794be19bdc51783"},
+]
+
+[package.dependencies]
+Flask = ">=0.9"
+
+[[package]]
 name = "flask-httpauth"
 version = "4.8.0"
 description = "HTTP authentication for Flask routes"
@@ -2256,4 +2270,4 @@ wheel = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "572e5db0d5c1b3bcda1e6d5f009b43924af6de4429fbcbb3fc1c10f6d494eb4c"
+content-hash = "ea355254eea0fcf97ad46e6a0501875b6d8d7713a3ed77e3b77f9c648501c4b4"
