@@ -10,6 +10,7 @@ from apiflask.fields import (
     Nested,
     String,
 )
+import flask
 
 from facilitate.diff import compute_edit_script
 from facilitate.loader import load_program_from_block_descriptions
@@ -65,4 +66,6 @@ def diff(json_data: dict[str, t.Any]) -> dict[str, str]:
     to_program = load_program_from_block_descriptions(jsn_to_program)
 
     edit_script = compute_edit_script(from_program, to_program)
-    return edit_script.to_dict()
+    response = flask.jsonify(edit_script.to_dict())
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
