@@ -26,7 +26,7 @@ def main() -> None:
         "to": good,
     }
 
-    response = requests.get(URL_API, json=request)
+    response = requests.put(URL_API, json=request)
     jsn = response.json()
     print(jsn)
 

@@ -55,7 +55,7 @@ class DiffRequest(Schema):
     )
 
 
-@app.get("/diff")  # type: ignore
+@app.put("/diff")  # type: ignore
 @app.input(DiffRequest, location="json")
 def diff(json_data: dict[str, t.Any]) -> dict[str, str]:
     jsn_from_program = json_data["from_program"]
