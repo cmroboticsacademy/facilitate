@@ -1,0 +1,208 @@
+{
+  "io9Jcf3?[Z3`[$L)5Zbd": {
+    "opcode": "event_whenprogramstarts",
+    "next": "Y!JRDur.[+fZ7g7{L@!}",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true,
+    "x": 69,
+    "y": 53
+  },
+  "Y!JRDur.[+fZ7g7{L@!}": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "E/817{xDdN,ihs?r1r}k",
+    "parent": "io9Jcf3?[Z3`[$L)5Zbd",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "jFocN!iC.5KajIP!/A*S"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "10"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "jFocN!iC.5KajIP!/A*S": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "Y!JRDur.[+fZ7g7{L@!}",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "%N@J{jHTQ!),(@%CkG^L": {
+    "opcode": "spike_movemenet_direction",
+    "next": "p1E##?Z;nx;a55uC.XP9",
+    "parent": "E/817{xDdN,ihs?r1r}k",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "bz3uO_?3=H)y43{IQJYa"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "bz3uO_?3=H)y43{IQJYa": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "%N@J{jHTQ!),(@%CkG^L",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "I2W3EPO/#STOZqLZC[b-": {
+    "opcode": "spike_movement_stopMoving",
+    "next": null,
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true,
+    "x": 208,
+    "y": 562
+  },
+  "E/817{xDdN,ihs?r1r}k": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "%N@J{jHTQ!),(@%CkG^L",
+    "parent": "Y!JRDur.[+fZ7g7{L@!}",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "~vdc.9/{0s$]ex7@KlAZ"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "10"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "~vdc.9/{0s$]ex7@KlAZ": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "E/817{xDdN,ihs?r1r}k",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "3Kkm$wQCiTAD9,r}7[m5": {
+    "opcode": "spike_sensor_is_color",
+    "next": null,
+    "parent": null,
+    "inputs": {
+      "PORT": [
+        1,
+        "05*u9~VUUVk68pza3{Mb"
+      ],
+      "COLOR": [
+        1,
+        "vC8joHV]}zb3HnuJjIV?"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": true,
+    "x": 126,
+    "y": 674
+  },
+  "05*u9~VUUVk68pza3{Mb": {
+    "opcode": "spike_sensor_port_menu",
+    "next": null,
+    "parent": "3Kkm$wQCiTAD9,r}7[m5",
+    "inputs": {},
+    "fields": {
+      "PORT": [
+        "F",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "vC8joHV]}zb3HnuJjIV?": {
+    "opcode": "spike_sensor_color_menu",
+    "next": null,
+    "parent": "3Kkm$wQCiTAD9,r}7[m5",
+    "inputs": {},
+    "fields": {
+      "COLOR": [
+        "red",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "p1E##?Z;nx;a55uC.XP9": {
+    "opcode": "spike_movemenet_direction",
+    "next": null,
+    "parent": "%N@J{jHTQ!),(@%CkG^L",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "flZZkG5KEEs,SpCSK;P="
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "flZZkG5KEEs,SpCSK;P=": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "p1E##?Z;nx;a55uC.XP9",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}
