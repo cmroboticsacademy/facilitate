@@ -18,6 +18,17 @@ class Sequence(Node):
     """Represents a sequence of blocks."""
     blocks: list[Block] = field(default_factory=list)
 
+    @classmethod
+    def build(cls, blocks: list[Block]) -> Sequence:
+        return cls(
+            id_=cls.determine_id(blocks[0].id_),
+            blocks=blocks,
+        )
+
+    @classmethod
+    def determine_id(cls, starts_at_id: str) -> str:
+        return f":seq@{starts_at_id}"
+
     def __hash__(self) -> int:
         return hash(self.id_)
 
