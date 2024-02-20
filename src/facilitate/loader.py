@@ -116,7 +116,7 @@ def _extract_sequence_descriptions(
             description = id_to_node_description[id_]
             assert description["parent"] == parent_id
 
-        sequence_id = f":seq@{starts_at}"
+        sequence_id = Sequence.determine_id(starts_at)
         description = {
             "type": "sequence",
             "id_": sequence_id,
@@ -271,11 +271,6 @@ def load_program_from_block_descriptions(
     logger.trace("fixed input block references to account for sequences")
 
     program = _build_program_from_node_descriptions(id_to_node_description)
-
-    num_expected_sequences = len(sequence_descriptions)
-    num_actual_sequences = sum(1 for node in program.nodes() if isinstance(node, Sequence))
-    assert num_expected_sequences == num_actual_sequences
-
     return program
 
 
