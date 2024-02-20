@@ -1,0 +1,13 @@
+{
+  "9QjVuYDhN]nxRQi1KR9+": {
+    "opcode": "event_whenprogramstarts",
+    "next": null,
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true,
+    "x": 20,
+    "y": 60
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "9QjVuYDhN]nxRQi1KR9+": {
+    "opcode": "event_whenprogramstarts",
+    "next": "1)dr(A.xIXS:^|40xx}C",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true,
+    "x": 20,
+    "y": 60
+  },
+  "1)dr(A.xIXS:^|40xx}C": {
+    "opcode": "spike_movemenet_direction_for_duration_3",
+    "next": null,
+    "parent": "9QjVuYDhN]nxRQi1KR9+",
+    "inputs": {
+      "DIRECTION": [1, "#:Pk!lFw9TwJf=Slx!BW"],
+      "RATE": [1, [4, "10"]]
+    },
+    "fields": { "UNITS": ["cm", null] },
+    "shadow": false,
+    "topLevel": false
+  },
+  "#:Pk!lFw9TwJf=Slx!BW": {
+    "opcode": "spike_movement_direction_picker_3",
+    "next": null,
+    "parent": "1)dr(A.xIXS:^|40xx}C",
+    "inputs": {},
+    "fields": { "SPIN_DIRECTIONS": ["forward", null] },
+    "shadow": true,
+    "topLevel": false
+  }
+}

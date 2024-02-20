@@ -16,6 +16,8 @@ _EXAMPLES_DIR = _PROJECT_DIR / "examples"
 _GOOD_EXAMPLE_PATH = _EXAMPLES_DIR / "good.json"
 _BAD_EXAMPLE_PATH = _EXAMPLES_DIR / "bad.json"
 _UGLY_EXAMPLE_PATH = _EXAMPLES_DIR / "ugly.json"
+_MINIMAL_EXAMPLE_PATH = _EXAMPLES_DIR / "minimal.json"
+_MINIMAL_WITH_EXTRA_EXAMPLE_PATH = _EXAMPLES_DIR / "minimal_with_extra.json"
 
 
 @pytest.fixture
@@ -29,3 +31,11 @@ def bad_tree() -> Node:
 @pytest.fixture
 def ugly_tree() -> Node:
     return load_from_file(_UGLY_EXAMPLE_PATH)
+
+@pytest.fixture
+def minimal_tree() -> Node:
+    return load_from_file(_MINIMAL_EXAMPLE_PATH)
+
+@pytest.fixture
+def minimal_with_extra_tree() -> Node:
+    return load_from_file(_MINIMAL_WITH_EXTRA_EXAMPLE_PATH)
