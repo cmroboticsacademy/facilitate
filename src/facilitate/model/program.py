@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from overrides import overrides
 
 from facilitate.model.node import Node
+from facilitate.model.sequence import Sequence
 from facilitate.util import quote
 
 if t.TYPE_CHECKING:
@@ -29,6 +30,11 @@ class Program(Node):
 
     @classmethod
     def build(cls, top_level_nodes: list[Node]) -> Program:
+        # ensure that every top-level node is a sequence
+        top_level_nodes = [
+            Sequence.build([node]) if not isinstance(node, Sequence) else node
+            for node in top_level_nodes
+        ]
         return cls(
             id_="PROGRAM",
             top_level_nodes=top_level_nodes,
