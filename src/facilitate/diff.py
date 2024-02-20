@@ -165,6 +165,11 @@ def _insert_missing_node(
     missing_node: Node,
     mappings: NodeMappings,
 ) -> Addition:
+    logger.debug(
+        "inserting missing node: {} {}",
+        missing_node.id_,
+        missing_node.__class__.__name__,
+    )
     assert missing_node.parent is not None
     parent = mappings.destination_is_mapped_to(missing_node.parent)
     assert parent is not None
@@ -295,6 +300,9 @@ def compute_edit_script(
     """Computes an edit script to transform one tree into another."""
     mappings = compute_gumtree_mappings(tree_from, tree_to)
     logger.debug("mappings: {}", mappings)
+
+    # ensure root is mapped
+    mappings.add(tree_from, tree_to)
 
     script = update_insert_align_move_phase(tree_from, tree_to, mappings)
     delete_phase(
