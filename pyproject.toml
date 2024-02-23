@@ -9,7 +9,7 @@ readme = "README.md"
 facilitate = 'facilitate.cli:cli'
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 matplotlib = "^3.8.2"
 scikit-learn = "^1.3.2"
 seaborn = "^0.13.0"
@@ -49,7 +49,7 @@ strict = true
 
 [tool.ruff]
 line-length = 120
-target-version = "py312"
+target-version = "py311"
 src = ["src"]
 select = [
     "ALL",  # includes all rules (including new ones)
