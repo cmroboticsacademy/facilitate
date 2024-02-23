@@ -2101,6 +2101,20 @@ cfn-flip = ">=1.0.2"
 policy = ["awacs (>=2.0.0)"]
 
 [[package]]
+name = "types-flask-cors"
+version = "4.0.0.20240106"
+description = "Typing stubs for Flask-Cors"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-Flask-Cors-4.0.0.20240106.tar.gz", hash = "sha256:e49b29c4ba1de9496f7f43aab90f32393dd2599f87fab448cdebc481facca1a3"},
+    {file = "types_Flask_Cors-4.0.0.20240106-py3-none-any.whl", hash = "sha256:bc07707c8eae86b04d177bc19f4cbb128af6fc490de9c4ba4a4348e45c77406f"},
+]
+
+[package.dependencies]
+Flask = ">=2.0.0"
+
+[[package]]
 name = "types-pillow"
 version = "10.2.0.20240125"
 description = "Typing stubs for Pillow"
@@ -2270,4 +2284,4 @@ wheel = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "ea355254eea0fcf97ad46e6a0501875b6d8d7713a3ed77e3b77f9c648501c4b4"
+content-hash = "aaba4be281dc164b2806e3cba9a05671eeebd37a89616c23ecaa8b6100c1b44b"
