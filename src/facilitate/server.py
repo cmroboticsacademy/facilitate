@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing as t
 
+import flask
+import flask_cors
 from apiflask import APIFlask, Schema
 from apiflask.fields import (
     Boolean,
@@ -10,8 +12,6 @@ from apiflask.fields import (
     Nested,
     String,
 )
-import flask
-import flask_cors
 
 from facilitate.diff import compute_edit_script
 from facilitate.loader import load_program_from_block_descriptions
@@ -60,7 +60,7 @@ class DiffRequest(Schema):
 
 @app.put("/diff")  # type: ignore
 @app.input(DiffRequest, location="json")
-def diff(json_data: dict[str, t.Any]) -> dict[str, str]:
+def diff(json_data: dict[str, t.Any]) -> flask.Response:
     jsn_from_program = json_data["from_program"]
     jsn_to_program = json_data["to_program"]
 
