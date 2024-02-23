@@ -132,10 +132,10 @@ def compute_topdown_mappings(
             max_height_nodes_y = hlist_y.pop()
 
             logger.debug(
-                f"max height nodes x: {", ".join(node.id_ for node in max_height_nodes_x)}",
+                f"max height nodes x: {', '.join(node.id_ for node in max_height_nodes_x)}",
             )
             logger.debug(
-                f"max height nodes y: {", ".join(node.id_ for node in max_height_nodes_y)}",
+                f"max height nodes y: {', '.join(node.id_ for node in max_height_nodes_y)}",
             )
 
             added_trees_x: list[Node] = []
