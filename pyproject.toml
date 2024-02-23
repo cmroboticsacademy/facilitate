@@ -47,6 +47,10 @@ nox = "^2023.4.22"
 ignore_missing_imports = false
 strict = true
 
+[[tool.mypy.overrides]]
+module = "ijson.*"
+ignore_missing_imports = true
+
 [tool.ruff]
 line-length = 120
 target-version = "py311"
