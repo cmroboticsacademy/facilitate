@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from overrides import overrides
 
+from facilitate.model.block import Block
 from facilitate.model.node import Node
 from facilitate.model.sequence import Sequence
 from facilitate.util import quote
@@ -15,7 +16,7 @@ if t.TYPE_CHECKING:
 
 @dataclass(kw_only=True, eq=False)
 class Program(Node):
-    top_level_nodes: list[Node]
+    top_level_nodes: list[Sequence]
 
     def __hash__(self) -> int:
         return hash(self.id_)
@@ -31,13 +32,19 @@ class Program(Node):
     @classmethod
     def build(cls, top_level_nodes: list[Node]) -> Program:
         # ensure that every top-level node is a sequence
-        top_level_nodes = [
-            Sequence.build([node]) if not isinstance(node, Sequence) else node
-            for node in top_level_nodes
-        ]
+        wrapped_top_level_nodes: list[Sequence] = []
+        for node in top_level_nodes:
+            if isinstance(node, Sequence):
+                wrapped_top_level_nodes.append(node)
+            elif isinstance(node, Block):
+                wrapped_top_level_nodes.append(Sequence.build([node]))
+            else:
+                message = f"invalid top-level node: {node}"
+                raise TypeError(message)
+
         return cls(
             id_="PROGRAM",
-            top_level_nodes=top_level_nodes,
+            top_level_nodes=wrapped_top_level_nodes,
         )
 
     @overrides
@@ -65,6 +72,7 @@ class Program(Node):
 
     @overrides
     def remove_child(self, child: Node) -> None:
+        assert isinstance(child, Sequence)
         self.top_level_nodes.remove(child)
         child.parent = None
 
