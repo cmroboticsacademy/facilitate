@@ -72,6 +72,7 @@ extend-ignore = [
     "D203",     # one-blank-line-before-class
     "D213",     # multi-line-summary-second-line
     "D401",     # first line of docstring should be in imperative mood
+    "D413",     # missing blank line after last section
     "FIX001",   # unresolved FIXME
     "FIX002",   # TODO found
     "TD001",    # invalid TODO tag: `FIXME`
