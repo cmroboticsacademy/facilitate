@@ -3,7 +3,7 @@ name = "facilitate"
 version = "0.1.0"
 description = ""
 authors = ["Chris Timperley <ctimperley@cmu.edu>", "Leo Chen"]
-readme = "README.md"
+readme = "README.rst"
 
 [tool.poetry.scripts]
 facilitate = 'facilitate.cli:cli'
