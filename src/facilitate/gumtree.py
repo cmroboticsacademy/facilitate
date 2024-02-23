@@ -9,6 +9,7 @@ from itertools import product
 from loguru import logger
 
 from facilitate.mappings import NodeMappings
+from facilitate.model.program import Program
 from facilitate.model.sequence import Sequence
 
 if t.TYPE_CHECKING:
@@ -265,11 +266,12 @@ def compute_gumtree_mappings(
 
     # try to map top-level sequences
     # - if two top-level sequences share the same ID, they are mapped
-    for top_level_x in root_x.top_level_nodes:
-        assert isinstance(top_level_x, Sequence)
-        for top_level_y in root_y.top_level_nodes:
-            assert isinstance(top_level_y, Sequence)
-            if top_level_x.id_ == top_level_y.id_:
-                mappings.add(top_level_x, top_level_y)
+    if isinstance(root_x, Program) and isinstance(root_y, Program):
+        for top_level_x in root_x.top_level_nodes:
+            assert isinstance(top_level_x, Sequence)
+            for top_level_y in root_y.top_level_nodes:
+                assert isinstance(top_level_y, Sequence)
+                if top_level_x.id_ == top_level_y.id_:
+                    mappings.add(top_level_x, top_level_y)
 
     return mappings
