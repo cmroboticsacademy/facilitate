@@ -1,0 +1,9 @@
+{
+    "dev": {
+        "app_function": "facilitate.server.app",
+        "profile_name": null,
+        "project_name": "facilitate",
+        "runtime": "python3.11",
+        "s3_bucket": "zappa-g6wh3o7ky"
+    }
+}
