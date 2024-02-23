@@ -270,8 +270,7 @@ def load_program_from_block_descriptions(
     _fix_input_block_references(sequence_descriptions, id_to_node_description)
     logger.trace("fixed input block references to account for sequences")
 
-    program = _build_program_from_node_descriptions(id_to_node_description)
-    return program
+    return _build_program_from_node_descriptions(id_to_node_description)
 
 
 def load_from_file(filename_or_path: str | Path) -> Program:
