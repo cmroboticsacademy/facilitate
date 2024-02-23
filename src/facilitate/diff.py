@@ -25,6 +25,7 @@ from facilitate.model.block import Block
 from facilitate.model.field import Field
 from facilitate.model.input import Input
 from facilitate.model.literal import Literal
+from facilitate.model.program import Program
 from facilitate.model.sequence import Sequence
 from facilitate.util import longest_common_subsequence
 
@@ -218,6 +219,16 @@ def _insert_missing_node(
             is_shadow=missing_node.is_shadow,
         )
 
+    if isinstance(missing_node, Sequence) and isinstance(parent, Program):
+        raise NotImplementedError
+
+    logger.error(
+        "missing node: {}<{}>; parent: {}<{}>",
+        missing_node.__class__.__name__,
+        missing_node.id_,
+        parent.__class__.__name__,
+        parent.id_,
+    )
     raise NotImplementedError
 
 
@@ -300,9 +311,6 @@ def compute_edit_script(
     """Computes an edit script to transform one tree into another."""
     mappings = compute_gumtree_mappings(tree_from, tree_to)
     logger.debug("mappings: {}", mappings)
-
-    # ensure root is mapped
-    mappings.add(tree_from, tree_to)
 
     script = update_insert_align_move_phase(tree_from, tree_to, mappings)
     delete_phase(
