@@ -11,11 +11,10 @@ Once you have the necessary prerequisites, you can install the project by runnin
 
     poetry install
 
+Usage: Server (Local)
+---------------------
 
-Usage: Server
--------------
-
-To deploy the server, run the following command:
+To deploy the server locally, run the following command:
 
 .. code:: shell
 
@@ -26,3 +25,18 @@ While the server is running, you can use the example script to simulate a call t
 .. code:: shell
 
     poetry run scripts/invoke-diff.py
+
+Deployment
+----------
+
+To deploy the server to production (AWS Lambda) via Zappa, run the following command:
+
+.. code:: shell
+
+    poetry run zappa deploy
+
+To undeploy the server from production, run the following command:
+
+.. code:: shell
+
+    poetry run zappa undeploy
