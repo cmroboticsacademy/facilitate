@@ -95,6 +95,8 @@ extend-ignore = [
     "PGH003",   # use specific rule codes when ignoring type issues
     "FBT001",   # boolean typed positional argument in function definition
     "ARG001",   # unused function argument
+    "PLR0913",  # too many arguments in function definition
+    "PLR0911",  # too many return statements
 ]
 
 [build-system]

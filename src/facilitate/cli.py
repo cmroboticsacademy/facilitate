@@ -9,6 +9,7 @@ from loguru import logger
 from facilitate.diff import compute_edit_script
 from facilitate.edit import EditScript
 from facilitate.loader import load_from_file
+from facilitate.scraper import scrape as _scrape
 
 
 def setup_logging() -> None:
@@ -97,4 +98,19 @@ def animate(
     edit_script.save_to_dot_gif(
         output,
         ast_before,
+    )
+
+
+@cli.command()
+@click.argument("dump", type=click.Path(exists=True))
+@click.option(
+    "-o", "--output",
+    default="programs",
+    help="Output directory.",
+    type=click.Path(),
+)
+def scrape(dump: str, output: str) -> None:
+    _scrape(
+        dump_filename=dump,
+        output_to=output,
     )
