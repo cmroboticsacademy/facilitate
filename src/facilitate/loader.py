@@ -72,16 +72,31 @@ def _join_sequences(
 ) -> list[list[str]]:
     """If the end of one sequence is the start of another, join them together."""
     sequences = [sequence.copy() for sequence in sequences]
+    expected_items = {id_ for sequence in sequences for id_ in sequence}
 
-    for seq_x, seq_y in itertools.product(sequences, repeat=2):
-        if not seq_x or not seq_y:
-            continue
-        if seq_x[-1] == seq_y[0]:
-            seq_x.extend(seq_y[1:])
-            seq_y.clear()
+    while True:
+        for seq_x, seq_y in itertools.product(sequences, repeat=2):
+            if not seq_x or not seq_y:
+                continue
+            if seq_x[-1] == seq_y[0]:
+                seq_x.extend(seq_y[1:])
+                seq_y.clear()
+            elif seq_y[-1] == seq_x[0]:
+                seq_y.extend(seq_x[1:])
+                seq_x.clear()
 
-    # destroy empty sequences
-    return [sequence for sequence in sequences if sequence]
+        # destroy empty sequences
+        updated_sequences = [sequence.copy() for sequence in sequences if sequence]
+
+        # keep joining sequences until reaching a fixed point
+        if updated_sequences == sequences:
+            break
+        sequences = updated_sequences
+
+    # ensure that no IDs were lost during joining
+    actual_items = {id_ for sequence in sequences for id_ in sequence}
+    assert actual_items == expected_items
+    return sequences
 
 
 def _extract_sequence_descriptions(
@@ -101,6 +116,11 @@ def _extract_sequence_descriptions(
             sequences.append([id_, next_id])
 
     # join together sequence fragments
+    logger.trace(
+        "extracted initial {} sequences:\n{}",
+        len(sequences),
+        "\n".join(" > ".join(sequence) for sequence in sequences),
+    )
     sequences = _join_sequences(sequences)
     logger.trace(
         "extracted {} sequences:\n{}",
@@ -111,12 +131,12 @@ def _extract_sequence_descriptions(
     descriptions: list[_NodeDescription] = []
     for sequence in sequences:
         starts_at = sequence[0]
+        sequence_id = Sequence.determine_id(starts_at)
         parent_id = id_to_node_description[starts_at]["parent"]
         for id_ in sequence[1:]:
             description = id_to_node_description[id_]
-            assert description["parent"] == parent_id
+            assert description["parent"] in (None, parent_id)
 
-        sequence_id = Sequence.determine_id(starts_at)
         description = {
             "type": "sequence",
             "id_": sequence_id,
