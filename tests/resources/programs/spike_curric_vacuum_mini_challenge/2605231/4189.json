@@ -1,0 +1,218 @@
+{
+  "io9Jcf3?[Z3`[$L)5Zbd": {
+    "opcode": "event_whenprogramstarts",
+    "next": "s!Nu(w0l8qy`*:YT`*0y",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "s!Nu(w0l8qy`*:YT`*0y": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "eaE]UFzr06/{y;`qfXq5",
+    "parent": "io9Jcf3?[Z3`[$L)5Zbd",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "qY$qHFST~8Fd@1E2o|GX"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "45"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "qY$qHFST~8Fd@1E2o|GX": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "s!Nu(w0l8qy`*:YT`*0y",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "eaE]UFzr06/{y;`qfXq5": {
+    "opcode": "control_wait_until",
+    "next": "~]$!:CRqb?)gOCtVw)4]",
+    "parent": "s!Nu(w0l8qy`*:YT`*0y",
+    "inputs": {
+      "CONDITION": [
+        1,
+        null
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "l}Nrviatw%Dxa,C)IO;f": {
+    "opcode": "spike_sensor_is_pressed",
+    "next": null,
+    "parent": null,
+    "inputs": {
+      "PORT": [
+        1,
+        "t_TRbz(oJlJNo}/vY~Vs"
+      ]
+    },
+    "fields": {
+      "STATE": [
+        "hard-pressed",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": true
+  },
+  "t_TRbz(oJlJNo}/vY~Vs": {
+    "opcode": "spike_sensor_port_menu",
+    "next": null,
+    "parent": "l}Nrviatw%Dxa,C)IO;f",
+    "inputs": {},
+    "fields": {
+      "PORT": [
+        "A",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "~]$!:CRqb?)gOCtVw)4]": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "p-{xTI1E3.VT?WvWKT}B",
+    "parent": "eaE]UFzr06/{y;`qfXq5",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "FCh(3T0Xr/ikAA-Vt8qj"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "25"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "FCh(3T0Xr/ikAA-Vt8qj": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "~]$!:CRqb?)gOCtVw)4]",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "reverse",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "p-{xTI1E3.VT?WvWKT}B": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "r`1hiE_a2C3b}@VM@`,|",
+    "parent": "~]$!:CRqb?)gOCtVw)4]",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "SvfwN@B@M8C=t)L8z$8#"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "8.5"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "SvfwN@B@M8C=t)L8z$8#": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "p-{xTI1E3.VT?WvWKT}B",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "r`1hiE_a2C3b}@VM@`,|": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": null,
+    "parent": "p-{xTI1E3.VT?WvWKT}B",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "|JiBS/U3qJ^/0A6v],VP"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "10"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "|JiBS/U3qJ^/0A6v],VP": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "r`1hiE_a2C3b}@VM@`,|",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}

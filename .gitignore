@@ -1,5 +1,7 @@
+data
+programs
 .DS_Store
+.vscode
 **.pyc
 **/.ipynb_checkpoints/**
 **/__pycache__/**
-*.json

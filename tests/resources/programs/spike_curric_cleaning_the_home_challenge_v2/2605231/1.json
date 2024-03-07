@@ -1,0 +1,1203 @@
+{
+  "a[c6l;66=_(l1 {xk6s.": {
+    "opcode": "procedures_definition",
+    "next": "xLLqnXK]7Pt#zxJ!182q",
+    "parent": null,
+    "inputs": {
+      "custom_block": [
+        1,
+        ",f03T_TW6IKYK.[NzkDR"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  ",f03T_TW6IKYK.[NzkDR": {
+    "opcode": "procedures_prototype",
+    "next": null,
+    "parent": "a[c6l;66=_(l1 {xk6s.",
+    "inputs": {},
+    "fields": {},
+    "shadow": true,
+    "topLevel": false,
+    "mutation": {
+      "tagName": "mutation",
+      "children": [],
+      "proccode": "retrieve fork",
+      "argumentids": "[]",
+      "argumentnames": "[]",
+      "argumentdefaults": "[]",
+      "warp": "false"
+    }
+  },
+  "/Xwe50{tuguvnU0jv/jF": {
+    "opcode": "event_whenprogramstarts",
+    "next": "%{VW6};]WTMr9e=aqq3]",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "xLLqnXK]7Pt#zxJ!182q": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "$nGp17SOH7{tXvKb}./t",
+    "parent": "a[c6l;66=_(l1 {xk6s.",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "D;*zH[HIhD`uZ()eTS8G"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "25"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "D;*zH[HIhD`uZ()eTS8G": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "xLLqnXK]7Pt#zxJ!182q",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "$nGp17SOH7{tXvKb}./t": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "1$JaAZ?e6S 6kE]G~-q ",
+    "parent": "xLLqnXK]7Pt#zxJ!182q",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "if_N,ZCYuE%h@1V}V;N*"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "8"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "if_N,ZCYuE%h@1V}V;N*": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "$nGp17SOH7{tXvKb}./t",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "left",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "1$JaAZ?e6S 6kE]G~-q ": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "s3p,yCs{~fbr1]0Hzz8u",
+    "parent": "$nGp17SOH7{tXvKb}./t",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "]}!S%}GBlpF,5gF_@_pD"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "40"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "]}!S%}GBlpF,5gF_@_pD": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "1$JaAZ?e6S 6kE]G~-q ",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "s3p,yCs{~fbr1]0Hzz8u": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "v^[hulR6e_MJ#9=Ba_If",
+    "parent": "1$JaAZ?e6S 6kE]G~-q ",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        ":)5DYrQ1,c,1n^S[36P/"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "8"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  ":)5DYrQ1,c,1n^S[36P/": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "s3p,yCs{~fbr1]0Hzz8u",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "v^[hulR6e_MJ#9=Ba_If": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "FL)oNEd9ne^qrUMR,KCB",
+    "parent": "s3p,yCs{~fbr1]0Hzz8u",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "hDoQ`-AIx*OdsuV:q%7["
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "30"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "hDoQ`-AIx*OdsuV:q%7[": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "v^[hulR6e_MJ#9=Ba_If",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "FL)oNEd9ne^qrUMR,KCB": {
+    "opcode": "spike_motor_runForDirectionTimes",
+    "next": "5_EAD@/3W6lkUyi=Gjo1",
+    "parent": "v^[hulR6e_MJ#9=Ba_If",
+    "inputs": {
+      "MOTOR": [
+        1,
+        "Q9=ATg_8n2RybiGW.*5Y"
+      ],
+      "SPIN_DIRECTIONS": [
+        1,
+        "rH@rEp!N!aeI-)#59fty"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "70"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "degrees",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "Q9=ATg_8n2RybiGW.*5Y": {
+    "opcode": "spike_sensor_motor_menu",
+    "next": null,
+    "parent": "FL)oNEd9ne^qrUMR,KCB",
+    "inputs": {},
+    "fields": {
+      "MOTOR": [
+        "A",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "rH@rEp!N!aeI-)#59fty": {
+    "opcode": "spike_direction_picker",
+    "next": null,
+    "parent": "FL)oNEd9ne^qrUMR,KCB",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "clockwise",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "5_EAD@/3W6lkUyi=Gjo1": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "iLbNDuR*J$Pl|[W 4tnH",
+    "parent": "FL)oNEd9ne^qrUMR,KCB",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "0u.g WI*?m?a79tl=M O"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "30"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "0u.g WI*?m?a79tl=M O": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "5_EAD@/3W6lkUyi=Gjo1",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "reverse",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "iLbNDuR*J$Pl|[W 4tnH": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "I9M_D}G).bEhRR3_5S/-",
+    "parent": "5_EAD@/3W6lkUyi=Gjo1",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "C~9Yyk_sN(^]NeiO}Bx0"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "8"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "C~9Yyk_sN(^]NeiO}Bx0": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "iLbNDuR*J$Pl|[W 4tnH",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "I9M_D}G).bEhRR3_5S/-": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "%726Fayu%F2$7;8IZsyc",
+    "parent": "iLbNDuR*J$Pl|[W 4tnH",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "oc~acoc3RD}3jx(}iM9t"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "70"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "oc~acoc3RD}3jx(}iM9t": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "I9M_D}G).bEhRR3_5S/-",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "%726Fayu%F2$7;8IZsyc": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": null,
+    "parent": "I9M_D}G).bEhRR3_5S/-",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "wc^C:~d*s~9$A`ldH=M/"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "9"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "wc^C:~d*s~9$A`ldH=M/": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "%726Fayu%F2$7;8IZsyc",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "VK{|Wti|pPw6BK5c1Bb!": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "X;ZfhjNw)xyG^KI(SFq6",
+    "parent": "OYt.fwD^t8bqw}P*kht%",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "J p,0kiC_NZQ`Y!:H8mY"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "10"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "J p,0kiC_NZQ`Y!:H8mY": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "VK{|Wti|pPw6BK5c1Bb!",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "R,QP:;92JCtR ~)I-2v(": {
+    "opcode": "spike_motor_runForDirectionTimes",
+    "next": null,
+    "parent": null,
+    "inputs": {
+      "MOTOR": [
+        1,
+        "24Bc!iDY)qhb 65zSY D"
+      ],
+      "SPIN_DIRECTIONS": [
+        1,
+        "b^q~#a!p7/JM;}.$TW#k"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "20"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "degrees",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": true
+  },
+  "24Bc!iDY)qhb 65zSY D": {
+    "opcode": "spike_sensor_motor_menu",
+    "next": null,
+    "parent": "R,QP:;92JCtR ~)I-2v(",
+    "inputs": {},
+    "fields": {
+      "MOTOR": [
+        "A",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "b^q~#a!p7/JM;}.$TW#k": {
+    "opcode": "spike_direction_picker",
+    "next": null,
+    "parent": "R,QP:;92JCtR ~)I-2v(",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "clockwise",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "(DwG814k[ORK7.L(KEwf": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "OYt.fwD^t8bqw}P*kht%",
+    "parent": "%{VW6};]WTMr9e=aqq3]",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        ",n2!ct?!si#t.nSgp(21"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "18"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  ",n2!ct?!si#t.nSgp(21": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "(DwG814k[ORK7.L(KEwf",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "left",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "m@1_OoMdu5JSGzIwPF-3": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "Z[3FE.1kfDA?^|4qBdnS",
+    "parent": "dDJZOT^r,BCbfDSqHg*o",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "2SE2,}(xHOyu.(f;Yn*X"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "30"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "2SE2,}(xHOyu.(f;Yn*X": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "m@1_OoMdu5JSGzIwPF-3",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "left",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "dDJZOT^r,BCbfDSqHg*o": {
+    "opcode": "spike_motor_runForDirectionTimes",
+    "next": "m@1_OoMdu5JSGzIwPF-3",
+    "parent": null,
+    "inputs": {
+      "MOTOR": [
+        1,
+        ",c5Yx,(3a8PkpYdjM3zR"
+      ],
+      "SPIN_DIRECTIONS": [
+        1,
+        "*/nD2,P9JH(T[P9shbsx"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "65"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "degrees",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": true
+  },
+  ",c5Yx,(3a8PkpYdjM3zR": {
+    "opcode": "spike_sensor_motor_menu",
+    "next": null,
+    "parent": "dDJZOT^r,BCbfDSqHg*o",
+    "inputs": {},
+    "fields": {
+      "MOTOR": [
+        "A",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "*/nD2,P9JH(T[P9shbsx": {
+    "opcode": "spike_direction_picker",
+    "next": null,
+    "parent": "dDJZOT^r,BCbfDSqHg*o",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "counterclockwise",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "X;ZfhjNw)xyG^KI(SFq6": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "__3lOpGm^-#4oG%In#Kn",
+    "parent": "VK{|Wti|pPw6BK5c1Bb!",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "$z3RdnvTky]d~U-HQl0?"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "40"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "$z3RdnvTky]d~U-HQl0?": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "X;ZfhjNw)xyG^KI(SFq6",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "5lw`F~rH(,7Ww;R@-rf#": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": null,
+    "parent": "__3lOpGm^-#4oG%In#Kn",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "y*zWKkTevKIYu,b_4Bhh"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "110"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "y*zWKkTevKIYu,b_4Bhh": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "5lw`F~rH(,7Ww;R@-rf#",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "r]3J 3v~6-Viflfmd2fa": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "!#S(jjhsc)AI5:CGFaPw",
+    "parent": null,
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "zzAc^Gf]j4)#oXbs7(kv"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "8"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": true
+  },
+  "zzAc^Gf]j4)#oXbs7(kv": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "r]3J 3v~6-Viflfmd2fa",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "left",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "!#S(jjhsc)AI5:CGFaPw": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "cD1^%tqX$UIaD`RTy*`i",
+    "parent": "r]3J 3v~6-Viflfmd2fa",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "3o@M)0}-dd1xESj@{yc}"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "40"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "3o@M)0}-dd1xESj@{yc}": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "!#S(jjhsc)AI5:CGFaPw",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "uGiRJkzmt}kz4oHdfe9n": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "WM:$](e$:ZWtMe]G:Cd8",
+    "parent": "cD1^%tqX$UIaD`RTy*`i",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "nJ2m/BrB*sLw@04:e^a-"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "50"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "nJ2m/BrB*sLw@04:e^a-": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "uGiRJkzmt}kz4oHdfe9n",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "cD1^%tqX$UIaD`RTy*`i": {
+    "opcode": "spike_motor_runForDirectionTimes",
+    "next": "uGiRJkzmt}kz4oHdfe9n",
+    "parent": "!#S(jjhsc)AI5:CGFaPw",
+    "inputs": {
+      "MOTOR": [
+        1,
+        "swT:w2,WqO)b1np n7A@"
+      ],
+      "SPIN_DIRECTIONS": [
+        1,
+        "Gm86ZA:vTAH97AGDO)g)"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "70"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "degrees",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "swT:w2,WqO)b1np n7A@": {
+    "opcode": "spike_sensor_motor_menu",
+    "next": null,
+    "parent": "cD1^%tqX$UIaD`RTy*`i",
+    "inputs": {},
+    "fields": {
+      "MOTOR": [
+        "A",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "Gm86ZA:vTAH97AGDO)g)": {
+    "opcode": "spike_direction_picker",
+    "next": null,
+    "parent": "cD1^%tqX$UIaD`RTy*`i",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "counterclockwise",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "WM:$](e$:ZWtMe]G:Cd8": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "`G`c# SLDotAMAhW~(M{",
+    "parent": "uGiRJkzmt}kz4oHdfe9n",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "A8k j4=}Tcbv7]CO73Vc"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "8"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "A8k j4=}Tcbv7]CO73Vc": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "WM:$](e$:ZWtMe]G:Cd8",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "left",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "`G`c# SLDotAMAhW~(M{": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": null,
+    "parent": "WM:$](e$:ZWtMe]G:Cd8",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "_B[89K^l# TT(sx864w:"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "90"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "_B[89K^l# TT(sx864w:": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "`G`c# SLDotAMAhW~(M{",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  ")zDduu~$ c)MG1}[] ry": {
+    "opcode": "procedures_definition",
+    "next": null,
+    "parent": null,
+    "inputs": {
+      "custom_block": [
+        1,
+        "grOQqRN?VjOmS*ro=,GG"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "grOQqRN?VjOmS*ro=,GG": {
+    "opcode": "procedures_prototype",
+    "next": null,
+    "parent": ")zDduu~$ c)MG1}[] ry",
+    "inputs": {},
+    "fields": {},
+    "shadow": true,
+    "topLevel": false,
+    "mutation": {
+      "tagName": "mutation",
+      "children": [],
+      "proccode": "retrieve trash",
+      "argumentids": "[]",
+      "argumentnames": "[]",
+      "argumentdefaults": "[]",
+      "warp": "false"
+    }
+  },
+  "%{VW6};]WTMr9e=aqq3]": {
+    "opcode": "procedures_call",
+    "next": "(DwG814k[ORK7.L(KEwf",
+    "parent": "/Xwe50{tuguvnU0jv/jF",
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": false,
+    "mutation": {
+      "tagName": "mutation",
+      "children": [],
+      "proccode": "retrieve fork",
+      "argumentids": "[]",
+      "warp": "false"
+    }
+  },
+  "__3lOpGm^-#4oG%In#Kn": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "5lw`F~rH(,7Ww;R@-rf#",
+    "parent": "X;ZfhjNw)xyG^KI(SFq6",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "rS]if~vEkE9~Bn-@HE~o"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "21"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "rS]if~vEkE9~Bn-@HE~o": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "__3lOpGm^-#4oG%In#Kn",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "left",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "Z[3FE.1kfDA?^|4qBdnS": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": null,
+    "parent": "m@1_OoMdu5JSGzIwPF-3",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "W8]K5x10%X0Fdz%PsQZ!"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "80"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "W8]K5x10%X0Fdz%PsQZ!": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "Z[3FE.1kfDA?^|4qBdnS",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "OYt.fwD^t8bqw}P*kht%": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "VK{|Wti|pPw6BK5c1Bb!",
+    "parent": "(DwG814k[ORK7.L(KEwf",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "4{LedBni8;@(lUBV0Px:"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "67"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "4{LedBni8;@(lUBV0Px:": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "OYt.fwD^t8bqw}P*kht%",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}

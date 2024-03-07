@@ -204,6 +204,9 @@ def _build_program_from_node_descriptions(
                         id_=literal_id,
                         value=literal_value,
                     )
+                elif input_value_arr[1] is None:
+                    logger.trace("input {} has no expression", input_id)
+                    continue
                 else:
                     error = f"invalid input value: {input_value_arr[1]}"
                     raise TypeError(error)

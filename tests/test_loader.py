@@ -52,3 +52,4 @@ def test_load_from_file() -> None:
         load_from_file(_PATH_PROGRAMS / filename)
 
     load("spike_curric_cleaning_the_home_challenge_v2/2605231/1.json")
+    load("spike_curric_vacuum_mini_challenge/2605231/4189.json")
