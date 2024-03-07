@@ -1,6 +1,14 @@
 import pytest
 
-from facilitate.loader import _join_sequences
+from pathlib import Path
+
+from facilitate.loader import (
+    _join_sequences,
+    load_from_file,
+)
+
+_PATH_TESTS = Path(__file__).parent
+_PATH_PROGRAMS = _PATH_TESTS / "resources" / "programs"
 
 
 def test_join_sequences() -> None:
@@ -37,3 +45,10 @@ def test_join_sequences() -> None:
     actual = _join_sequences(sequences)
 
     assert actual == expected
+
+
+def test_load_from_file() -> None:
+    def load(filename: str) -> None:
+        load_from_file(_PATH_PROGRAMS / filename)
+
+    load("spike_curric_cleaning_the_home_challenge_v2/2605231/1.json")
