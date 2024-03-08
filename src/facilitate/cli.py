@@ -46,12 +46,6 @@ def fuzz() -> None:
 
 @fuzz.command()
 @click.option(
-    "-j", "--jobs",
-    type=int,
-    default=1,
-    help="number of parallel fuzzing jobs.",
-)
-@click.option(
     "-n", "--number",
     type=int,
     default=None,
