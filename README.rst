@@ -11,6 +11,27 @@ Once you have the necessary prerequisites, you can install the project by runnin
 
     poetry install
 
+Testing
+-------
+
+To run the regression tests, linters, and type checking, run the following command:
+
+.. code:: shell
+
+    make check
+
+To only run the regression tests, run the following command:
+
+.. code:: shell
+
+    make test
+
+To only run the linter and type checker, run the following command:
+
+.. code:: shell
+
+    make lint
+
 Server
 ------
 
