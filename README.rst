@@ -32,6 +32,8 @@ To only run the linter and type checker, run the following command:
 
     make lint
 
+Additionally, the :code:`facilitate` command-line interface provides a fuzzer, described in the Command-Line Interface section.
+
 Server
 ------
 
