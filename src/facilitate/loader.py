@@ -173,6 +173,43 @@ def _fix_input_block_references(
                 input_values[1] = input_block_id_to_sequence_id[input_values[1]]
 
 
+def _build_input(
+    name: str,
+    value_array: list[t.Any],
+    block_id: str,
+    id_to_node: dict[str, Node],
+) -> Input | None:
+    assert len(value_array) == _INPUT_VALUE_ARRAY_LENGTH
+    assert isinstance(value_array[0], int)
+
+    id_ = Input.determine_id(block_id, name)
+
+    expression: Node
+    if isinstance(value_array[1], str):
+        expression = id_to_node[value_array[1]]
+    elif isinstance(value_array[1], list):
+        assert len(value_array[1]) == _INPUT_VALUE_ARRAY_LENGTH
+        literal_value = value_array[1][1]
+        assert isinstance(literal_value, str)
+        literal_id = Literal.determine_id(id_)
+        expression = Literal(
+            id_=literal_id,
+            value=literal_value,
+        )
+    elif value_array[1] is None:
+        logger.trace("input {} has no expression", id_)
+        return None
+    else:
+        error = f"invalid input value: {value_array[1]}"
+        raise TypeError(error)
+
+    return Input(
+        id_=id_,
+        name=name,
+        expression=expression,
+    )
+
+
 def _build_program_from_node_descriptions(
     id_to_node_description: dict[str, _NodeDescription],
 ) -> Program:
@@ -187,36 +224,13 @@ def _build_program_from_node_descriptions(
         if node_type == "block":
             inputs: list[Input] = []
             for input_name, input_value_arr in description["inputs"].items():
-                assert len(input_value_arr) == _INPUT_VALUE_ARRAY_LENGTH
-                assert isinstance(input_value_arr[0], int)
-
-                input_id = Input.determine_id(id_, input_name)
-
-                expression: Node
-                if isinstance(input_value_arr[1], str):
-                    expression = id_to_node[input_value_arr[1]]
-                elif isinstance(input_value_arr[1], list):
-                    assert len(input_value_arr[1]) == _INPUT_VALUE_ARRAY_LENGTH
-                    literal_value = input_value_arr[1][1]
-                    assert isinstance(literal_value, str)
-                    literal_id = Literal.determine_id(input_id)
-                    expression = Literal(
-                        id_=literal_id,
-                        value=literal_value,
-                    )
-                elif input_value_arr[1] is None:
-                    logger.trace("input {} has no expression", input_id)
-                    continue
-                else:
-                    error = f"invalid input value: {input_value_arr[1]}"
-                    raise TypeError(error)
-
-                input_ = Input(
-                    id_=input_id,
+                if input_ := _build_input(
                     name=input_name,
-                    expression=expression,
-                )
-                inputs.append(input_)
+                    value_array=input_value_arr,
+                    block_id=id_,
+                    id_to_node=id_to_node,
+                ):
+                    inputs.append(input_)
 
             fields: list[Field] = [
                 Field(
