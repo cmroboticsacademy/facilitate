@@ -1,13 +1,19 @@
 """Provides a simple command-line interface for Facilitate."""
 from __future__ import annotations
 
+import csv
 import sys
+from pathlib import Path
 
 import click
 from loguru import logger
 
 from facilitate.diff import compute_edit_script
 from facilitate.edit import EditScript
+from facilitate.fuzzer.parse import (
+    ParserCrash,
+    ParserFuzzer,
+)
 from facilitate.loader import load_from_file
 from facilitate.scraper import scrape as _scrape
 
@@ -31,6 +37,68 @@ def setup_logging() -> None:
 def cli(verbose: bool) -> None:
     if verbose:
         setup_logging()
+
+
+@cli.group()
+def fuzz() -> None:
+    pass
+
+
+@fuzz.command()
+@click.option(
+    "-j", "--jobs",
+    type=int,
+    default=1,
+    help="number of parallel fuzzing jobs.",
+)
+@click.option(
+    "-n", "--number",
+    type=int,
+    default=None,
+    help="maximum number of programs to parse.",
+)
+@click.option(
+    "-i", "--input", "input_",
+    default="./programs",
+    type=click.Path(exists=True),
+    help="directory containing programs to parse.",
+)
+@click.option(
+    "-s", "--seed",
+    type=int,
+    default=None,
+    help="seed for random number generator.",
+)
+@click.option(
+    "-o", "--output",
+    type=click.Path(),
+    default="parsing_failures.csv",
+    help="file to which list of failed programs will be written.",
+)
+def parse(
+    jobs: int,
+    number: int,
+    input_: Path | str,
+    seed: int,
+    output: Path | str,
+) -> None:
+    """Fuzzes the parsing of Scratch programs."""
+    input_ = Path(input_)
+    output = Path(output)
+
+    crashes: list[ParserCrash] = []
+    for crash in ParserFuzzer.build(
+        jobs=jobs,
+        number=number,
+        program_directory=input_,
+        seed=seed,
+    ).run():
+        crashes.append(crash)  # noqa: PERF402
+
+    with output.open("w") as file:
+        writer = csv.writer(file)
+        for crash in crashes:
+            writer.writerow(crash.to_csv_row())
 
 
 @cli.command()
