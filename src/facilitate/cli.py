@@ -76,7 +76,6 @@ def fuzz() -> None:
     help="file to which list of failed programs will be written.",
 )
 def parse(
-    jobs: int,
     number: int,
     input_: Path | str,
     seed: int,
@@ -88,7 +87,6 @@ def parse(
 
     crashes: list[ParserCrash] = []
     for crash in ParserFuzzer.build(
-        jobs=jobs,
         number=number,
         program_directory=input_,
         seed=seed,

@@ -33,7 +33,6 @@ class ParserCrash:
 
 @dataclass
 class ParserFuzzer:
-    jobs: int
     number: int | None
     program_directory: Path
     _rng: random.Random
@@ -41,7 +40,6 @@ class ParserFuzzer:
     @classmethod
     def build(
         cls,
-        jobs: int,
         number: int,
         program_directory: Path,
         *,
@@ -49,7 +47,6 @@ class ParserFuzzer:
     ) -> ParserFuzzer:
         rng = random.Random(seed)
         return ParserFuzzer(
-            jobs=jobs,
             number=number,
             program_directory=Path(program_directory),
             _rng=rng,
@@ -57,10 +54,6 @@ class ParserFuzzer:
 
     def run(self) -> t.Iterator[ParserCrash]:
         """Runs fuzzer and yields paths to programs that failed to parse."""
-        if self.jobs != 1:
-            message = "parallel fuzzing is not supported"
-            raise NotImplementedError(message)
-
         program_files = list(self.program_directory.glob("**/*.json"))
         logger.debug(f"found {len(program_files)} programs to parse")
         self._rng.shuffle(program_files)
