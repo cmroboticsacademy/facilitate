@@ -35,6 +35,9 @@ To only run the linter and type checker, run the following command:
 Server
 ------
 
+Facilitate provides a simple web server that is used to compute edit scripts between Scratch programs.
+The server exposes a single endpoint, GET /diff, that accepts two Scratch programs within a JSON payload and returns the edit script between the two programs.
+
 Deployment: Local via Flask
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
