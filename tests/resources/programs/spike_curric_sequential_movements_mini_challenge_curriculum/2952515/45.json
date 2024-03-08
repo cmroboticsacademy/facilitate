@@ -1,0 +1,116 @@
+{
+  "io9Jcf3?[Z3`[$L)5Zbd": {
+    "opcode": "event_whenprogramstarts",
+    "next": ";_4/;(r0tSa5$O8W#)~b",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  ";_4/;(r0tSa5$O8W#)~b": {
+    "opcode": "spike_movement_setMovementSpeed",
+    "next": "k}r{b)]h}Xa.GK[I~6U%",
+    "parent": "io9Jcf3?[Z3`[$L)5Zbd",
+    "inputs": {
+      "SPEED": [
+        1,
+        [
+          4,
+          "20"
+        ]
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "k}r{b)]h}Xa.GK[I~6U%": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "Q8OJy,H8jYDMs3F|D^uw",
+    "parent": ";_4/;(r0tSa5$O8W#)~b",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "8Kz^JP=!1Kh[1KvB}7:;"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "20"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "8Kz^JP=!1Kh[1KvB}7:;": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "k}r{b)]h}Xa.GK[I~6U%",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "Q8OJy,H8jYDMs3F|D^uw": {
+    "opcode": "spike_light_turnOnForSeconds",
+    "next": null,
+    "parent": "k}r{b)]h}Xa.GK[I~6U%",
+    "inputs": {
+      "RATE": [
+        1,
+        [
+          5,
+          "2"
+        ]
+      ]
+    },
+    "fields": {
+      "GRID": [
+        [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          40,
+          40,
+          40,
+          40,
+          40,
+          30,
+          30,
+          30,
+          30,
+          30
+        ],
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  }
+}
