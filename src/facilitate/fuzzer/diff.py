@@ -6,6 +6,8 @@ import typing as t
 from dataclasses import dataclass
 from pathlib import Path
 
+from overrides import overrides
+
 from facilitate.diff import compute_edit_script
 from facilitate.loader import load_from_file
 from facilitate.util import exception_to_crash_description
@@ -46,28 +48,18 @@ class BaseDiffFuzzer(abc.ABC):
     program_directory: Path
     _rng: random.Random
 
-
-
-@dataclass
-class SuccessiveVersionDiffFuzzer(BaseDiffFuzzer):
-    @classmethod
-    def build(
-        cls,
-        number: int,
-        program_directory: Path,
-        *,
-        seed: int | None = None,
-    ) -> SuccessiveVersionDiffFuzzer:
-        rng = random.Random(seed)
-        return SuccessiveVersionDiffFuzzer(
-            number=number,
-            program_directory=Path(program_directory),
-            _rng=rng,
-        )
+    @abc.abstractmethod
+    def generate_pairs(self) -> t.Iterator[tuple[Path, Path]]:
+        ...
 
     def run(self) -> t.Iterator[DiffCrash]:
         """Runs fuzzer and yields pairs of program paths that failed to diff."""
-        raise NotImplementedError
+        pairs: list[tuple[Path, Path]] = list(self.generate_pairs())
+        if self.number:
+            pairs = pairs[:self.number]
+        for from_program_file, to_program_file in pairs:
+            if crash := self._run_one(from_program_file, to_program_file):
+                yield crash
 
     def _run_one(
         self,
@@ -89,3 +81,49 @@ class SuccessiveVersionDiffFuzzer(BaseDiffFuzzer):
                 exception=err,
             )
         return None
+
+
+@dataclass
+class SuccessiveVersionDiffFuzzer(BaseDiffFuzzer):
+    @classmethod
+    def build(
+        cls,
+        number: int,
+        program_directory: Path,
+        *,
+        seed: int | None = None,
+    ) -> SuccessiveVersionDiffFuzzer:
+        rng = random.Random(seed)
+        return SuccessiveVersionDiffFuzzer(
+            number=number,
+            program_directory=Path(program_directory),
+            _rng=rng,
+        )
+
+    @overrides
+    def generate_pairs(self) -> t.Iterator[tuple[Path, Path]]:
+        """Generates pairs of programs to diff."""
+        level_dirs = [
+            child for child in self.program_directory.iterdir() if child.is_dir()
+        ]
+        level_dir_to_student_dirs: dict[Path, list[Path]] = {
+            level_dir: [child for child in level_dir.iterdir() if child.is_dir()]
+            for level_dir in level_dirs
+        }
+
+        # ignore any student directory that doesn't have at least two programs
+        level_dir_to_student_dirs = {
+            level_dir: student_dirs
+            for level_dir, student_dirs in level_dir_to_student_dirs.items()
+            if len(student_dirs) >= 2  # noqa: PLR2004
+        }
+
+        for level_dir in level_dir_to_student_dirs:
+            student_dirs = level_dir_to_student_dirs[level_dir]
+            for student_dir in student_dirs:
+                program_files = list(student_dir.glob("*.json"))
+                for i in range(1, len(program_files)):
+                    from_program_file = program_files[i - 1]
+                    to_program_file = program_files[i]
+                    yield from_program_file, to_program_file
+
