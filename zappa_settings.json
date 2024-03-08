@@ -1,14 +1,22 @@
 {
     "dev": {
-        "app_function": "facilitate.server.app",
+        "app_function": "wrapper.app",
         "profile_name": "ctimperleyfacilitate",
         "project_name": "facilitate",
         "aws_region": "us-east-2",
         "runtime": "python3.11",
         "s3_bucket": "zappa-g6wh3o7ky",
         "slim_handler": false,
-        "use_precompiled_packages": true,
-        "exclude": ["data", "Makefile"],
+        "keep_warm": false,
+        "exclude": [
+            ".github",
+            ".mypy_cache",
+            ".pytest_cache",
+            ".ruff_cache",
+            "data",
+            "visualizations",
+            "Makefile"
+        ],
         "exclude_glob": ["*.zip", "*.tar.gz", "*.json", "*.png"]
     }
 }
