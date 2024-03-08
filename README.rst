@@ -11,31 +11,18 @@ Once you have the necessary prerequisites, you can install the project by runnin
 
     poetry install
 
-Testing
--------
+Usage: Command-Line Interface
+-----------------------------
 
-To run the regression tests, linters, and type checking, run the following command:
-
-.. code:: shell
-
-    make check
-
-To only run the regression tests, run the following command:
+Facilitate provides a command-line interface that is mostly intended for debugging and development purposes.
+To obtain a list of commands exposed by the CLI, run the following command:
 
 .. code:: shell
 
-    make test
+    poetry run facilitate --help
 
-To only run the linter and type checker, run the following command:
-
-.. code:: shell
-
-    make lint
-
-Additionally, the :code:`facilitate` command-line interface provides a fuzzer, described in the Command-Line Interface section.
-
-Server
-------
+Usage: Server
+-------------
 
 Facilitate provides a simple web server that is used to compute edit scripts between Scratch programs.
 The server exposes a single endpoint, GET /diff, that accepts two Scratch programs within a JSON payload and returns the edit script between the two programs.
@@ -69,3 +56,27 @@ To undeploy the server from production, run the following command:
 .. code:: shell
 
     poetry run zappa undeploy
+
+Testing
+-------
+
+To run the regression tests, linters, and type checking, run the following command:
+
+.. code:: shell
+
+    make check
+
+To only run the regression tests, run the following command:
+
+.. code:: shell
+
+    make test
+
+To only run the linter and type checker, run the following command:
+
+.. code:: shell
+
+    make lint
+
+Additionally, the :code:`facilitate` command-line interface provides a fuzzer, described in the Command-Line Interface section.
+
