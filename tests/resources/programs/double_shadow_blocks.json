@@ -1,0 +1,93 @@
+{
+    "9QjVuYDhN]nxRQi1KR9+": {
+        "opcode": "event_whenprogramstarts",
+        "next": "[*c3lpax^%8pD=O?KZWI",
+        "parent": null,
+        "inputs": {},
+        "fields": {},
+        "shadow": false,
+        "topLevel": true,
+        "x": 20,
+        "y": 60
+    },
+    "[*c3lpax^%8pD=O?KZWI": {
+        "opcode": "spike_movement_setMovementSpeed",
+        "next": null,
+        "parent": "9QjVuYDhN]nxRQi1KR9+",
+        "inputs": {
+            "SPEED": [
+                3,
+                "`pR(WmQx%$v!lG^UnXgE",
+                "jmUUu!UZ2Q6uJU!rf~#P"
+            ]
+        },
+        "fields": {},
+        "shadow": false,
+        "topLevel": false
+    },
+    "jmUUu!UZ2Q6uJU!rf~#P": {
+        "opcode": "math_power_clamp",
+        "next": null,
+        "parent": null,
+        "inputs": {},
+        "fields": {
+            "NUM": [
+                "100",
+                null
+            ]
+        },
+        "shadow": true,
+        "topLevel": true,
+        "x": 267,
+        "y": 120
+    },
+    "`pR(WmQx%$v!lG^UnXgE": {
+        "opcode": "operator_add",
+        "next": null,
+        "parent": "[*c3lpax^%8pD=O?KZWI",
+        "inputs": {
+            "NUM1": [
+                3,
+                "*m]iACWMbgWJg5`#-EKF",
+                [
+                    4,
+                    "200"
+                ]
+            ],
+            "NUM2": [
+                1,
+                [
+                    4,
+                    "200"
+                ]
+            ]
+        },
+        "fields": {},
+        "shadow": false,
+        "topLevel": false
+    },
+    "*m]iACWMbgWJg5`#-EKF": {
+        "opcode": "operator_add",
+        "next": null,
+        "parent": "`pR(WmQx%$v!lG^UnXgE",
+        "inputs": {
+            "NUM1": [
+                1,
+                [
+                    4,
+                    "100"
+                ]
+            ],
+            "NUM2": [
+                1,
+                [
+                    4,
+                    "100"
+                ]
+            ]
+        },
+        "fields": {},
+        "shadow": false,
+        "topLevel": false
+    }
+}

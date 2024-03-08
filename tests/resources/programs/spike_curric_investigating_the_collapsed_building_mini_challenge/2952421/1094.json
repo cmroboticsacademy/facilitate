@@ -1,0 +1,96 @@
+{
+  "LuI}H,`D.C4a5@A.Y5P{": {
+    "opcode": "event_whenprogramstarts",
+    "next": "?NBE_$d_lhw@]j$JjO;V",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "nvPx`xu_yZoXrbB-M-:X": {
+    "opcode": "spike_sensor_is_distance",
+    "next": null,
+    "parent": "?NBE_$d_lhw@]j$JjO;V",
+    "inputs": {
+      "PORT": [
+        1,
+        "fm(Do{0gb,^u/;!.721,"
+      ],
+      "DISTANCE": [
+        1,
+        [
+          4,
+          "20"
+        ]
+      ]
+    },
+    "fields": {
+      "COMPARATOR": [
+        "exactly (=)",
+        null
+      ],
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "fm(Do{0gb,^u/;!.721,": {
+    "opcode": "spike_sensor_port_menu",
+    "next": null,
+    "parent": "nvPx`xu_yZoXrbB-M-:X",
+    "inputs": {},
+    "fields": {
+      "PORT": [
+        "B",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "?NBE_$d_lhw@]j$JjO;V": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": null,
+    "parent": "LuI}H,`D.C4a5@A.Y5P{",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "i9u,1ycZ{8~?rmlT6L3g"
+      ],
+      "RATE": [
+        3,
+        "nvPx`xu_yZoXrbB-M-:X",
+        [
+          4,
+          "10"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "i9u,1ycZ{8~?rmlT6L3g": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "?NBE_$d_lhw@]j$JjO;V",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}

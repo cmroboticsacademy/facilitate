@@ -1,0 +1,51 @@
+{
+  "io9Jcf3?[Z3`[$L)5Zbd": {
+    "opcode": "event_whenprogramstarts",
+    "next": "p`It[D%hN]TnxXf;nC}%",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "p`It[D%hN]TnxXf;nC}%": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": null,
+    "parent": "io9Jcf3?[Z3`[$L)5Zbd",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "5_x%@W02@9.KPh4lGTDI"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          ""
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "5_x%@W02@9.KPh4lGTDI": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "p`It[D%hN]TnxXf;nC}%",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}
