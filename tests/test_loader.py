@@ -1,6 +1,7 @@
 
 from pathlib import Path
 
+from facilitate.model.block import Block
 from facilitate.loader import (
     _join_sequences,
     load_from_file,
@@ -44,6 +45,17 @@ def test_join_sequences() -> None:
     actual = _join_sequences(sequences)
 
     assert actual == expected
+
+
+def test_load_from_file_with_double_shadow_blocks() -> None:
+    program = load_from_file(_PATH_PROGRAMS / "double_shadow_blocks.json")
+    block_ids = set(node.id_ for node in program.nodes() if isinstance(node, Block))
+    assert block_ids == {
+        "9QjVuYDhN]nxRQi1KR9+",
+        "[*c3lpax^%8pD=O?KZWI",
+        "`pR(WmQx%$v!lG^UnXgE",
+        "*m]iACWMbgWJg5`#-EKF",
+    }
 
 
 def test_load_from_file() -> None:

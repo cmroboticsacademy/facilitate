@@ -277,6 +277,32 @@ def _build_program_from_node_descriptions(
     return Program.build(top_level_nodes)
 
 
+def _remove_inactive_blocks(
+    id_to_node_description: dict[str, _NodeDescription],
+) -> dict[str, _NodeDescription]:
+    """Removes all blocks that have been occluded by another block."""
+    inactive_blocks: set[str] = set()
+
+    for node_description in id_to_node_description.values():
+        if node_description["type"] != "block":
+            continue
+
+        for input_value_array in node_description["inputs"].values():
+            for removed_value in input_value_array[_INPUT_VALUE_ARRAY_LENGTH:]:
+                if isinstance(removed_value, str):
+                    inactive_blocks.add(removed_value)
+
+            input_value_array[:] = input_value_array[:_INPUT_VALUE_ARRAY_LENGTH]
+
+    logger.trace("removed {} inactive blocks", len(inactive_blocks))
+
+    return {
+        id_: description
+        for id_, description in id_to_node_description.items()
+        if id_ not in inactive_blocks
+    }
+
+
 def load_program_from_block_descriptions(
     id_to_raw_description: dict[str, _NodeDescription],
 ) -> Program:
@@ -291,6 +317,12 @@ def load_program_from_block_descriptions(
     }
     logger.trace("injected ID into block descriptions")
     logger.trace("program description contains {} blocks", len(id_to_node_description))
+
+    id_to_node_description = _remove_inactive_blocks(id_to_node_description)
+    logger.trace(
+        "removed inactive blocks from program description: contains {} blocks",
+        len(id_to_node_description),
+    )
 
     _inject_parent_into_block_descriptions(id_to_node_description)
     logger.trace("injected corrected parent field into block descriptions")
