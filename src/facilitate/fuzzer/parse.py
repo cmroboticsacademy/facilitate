@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import random
-import traceback
 import typing as t
 from dataclasses import dataclass
 from pathlib import Path
@@ -9,6 +8,7 @@ from pathlib import Path
 from loguru import logger
 
 from facilitate.loader import load_from_file
+from facilitate.util import exception_to_crash_description
 
 
 @dataclass(frozen=True)
@@ -25,18 +25,10 @@ class ParserCrash:
         )
 
     def to_csv_row(self) -> list[str]:
-        exception_kind = self.exception.__class__.__name__
-
-        tb = traceback.extract_tb(self.exception.__traceback__)
-        if tb is None:
-            crash_location = "unknown"
-        else:
-            tb_frame = tb[-1]
-            crash_filename = Path(tb_frame.filename).name
-            crash_line = tb_frame.lineno
-            crash_location = f"{crash_filename}:{crash_line}"
-
-        return [str(self.program), exception_kind, crash_location]
+        return [
+            str(self.program),
+            exception_to_crash_description(self.exception),
+        ]
 
 
 @dataclass

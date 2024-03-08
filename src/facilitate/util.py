@@ -1,8 +1,23 @@
 from __future__ import annotations
 
+import traceback
 import typing as t
+from pathlib import Path
 
 T = t.TypeVar("T")
+
+
+def exception_to_crash_description(exception: Exception) -> str:
+    exception_kind = exception.__class__.__name__
+
+    tb = traceback.extract_tb(exception.__traceback__)
+    if tb is None:
+        return "unknown"
+
+    tb_frame = tb[-1]
+    crash_filename = Path(tb_frame.filename).name
+    crash_line = tb_frame.lineno
+    return f"{exception_kind}@{crash_filename}:{crash_line}"
 
 
 def quote(s: str) -> str:
