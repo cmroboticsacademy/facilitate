@@ -10,7 +10,7 @@ from loguru import logger
 _Session = dict[str, t.Any]
 _Frame = dict[str, t.Any]
 _Block = dict[str, t.Any]
-_Blocks = list[_Block]
+_Blocks = dict[str, _Block]
 
 
 def _extract_blocks_from_frame(
@@ -56,7 +56,18 @@ def _extract_blocks_from_frame(
 
     target = program["targets"][0]
     blocks = target["blocks"]
-    assert isinstance(blocks, list)
+    assert isinstance(blocks, dict)
+
+    # remove x and y coordinates
+    def _clean_block(block: _Block) -> None:
+        if "x" in block:
+            del block["x"]
+        if "y" in block:
+            del block["y"]
+
+    for block in blocks.values():
+        _clean_block(block)
+
     return blocks
 
 
@@ -126,6 +137,8 @@ def _scrape_session(
     # determine data format version used by session
     log_version: str | None = frames[0].get("context", {}).get("version")
 
+    last_seen_blocks: _Blocks | None = None
+
     for index, frame in enumerate(frames):
         maybe_blocks: _Blocks | None = _extract_blocks_from_frame(
             level_id=level_id,
@@ -138,6 +151,12 @@ def _scrape_session(
             log_version=log_version,
         )
         if maybe_blocks:
+            if maybe_blocks == last_seen_blocks:
+                logger.debug(f"skipping frame [{level_id}/{user_id}/{index}]: no change")
+                continue
+
+            last_seen_blocks = maybe_blocks
+
             frame_filename = output_to / level_id / user_id / f"{index}.json"
             frame_filename.parent.mkdir(parents=True, exist_ok=True)
             with frame_filename.open("w") as file:
