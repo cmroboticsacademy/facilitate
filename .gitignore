@@ -1,5 +1,5 @@
 data
-programs
+./programs
 .DS_Store
 .vscode
 **.pyc
