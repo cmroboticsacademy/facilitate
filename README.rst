@@ -4,7 +4,7 @@ Facilitate
 Installation
 ------------
 
-Before beginning, you will need to install Python 3.12 and [Poetry](https://python-poetry.org).
+Before beginning, you will need to install Python 3.11 and [Poetry](https://python-poetry.org).
 Once you have the necessary prerequisites, you can install the project by running the following command:
 
 .. code:: shell
@@ -20,6 +20,16 @@ To obtain a list of commands exposed by the CLI, run the following command:
 .. code:: shell
 
     poetry run facilitate --help
+
+:code:`draw`
+~~~~~~~~~~~~
+
+The :code:`draw` command is used to visualize the AST of a Scratch program.
+It takes the path to a JSON-formatted Scratch program as input and outputs either a PNG or PDF (:code:`-f` / :code:`--format`) visualization of that program to the specified output path (:code:`-o` / :code:`--output`).
+
+.. code:: shell
+
+    poetry run facilitate draw examples/bad.json -f pdf -o ast.bad.pdf
 
 Usage: Server
 -------------
