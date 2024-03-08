@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import typing as t
+from pathlib import Path
 
 import pytest
 
@@ -20,22 +20,22 @@ _MINIMAL_EXAMPLE_PATH = _EXAMPLES_DIR / "minimal.json"
 _MINIMAL_WITH_EXTRA_EXAMPLE_PATH = _EXAMPLES_DIR / "minimal_with_extra.json"
 
 
-@pytest.fixture
+@pytest.fixture()
 def good_tree() -> Node:
     return load_from_file(_GOOD_EXAMPLE_PATH)
 
-@pytest.fixture
+@pytest.fixture()
 def bad_tree() -> Node:
     return load_from_file(_BAD_EXAMPLE_PATH)
 
-@pytest.fixture
+@pytest.fixture()
 def ugly_tree() -> Node:
     return load_from_file(_UGLY_EXAMPLE_PATH)
 
-@pytest.fixture
+@pytest.fixture()
 def minimal_tree() -> Node:
     return load_from_file(_MINIMAL_EXAMPLE_PATH)
 
-@pytest.fixture
+@pytest.fixture()
 def minimal_with_extra_tree() -> Node:
     return load_from_file(_MINIMAL_WITH_EXTRA_EXAMPLE_PATH)

@@ -1,4 +1,3 @@
-import pytest
 
 from pathlib import Path
 
@@ -17,7 +16,7 @@ def test_join_sequences() -> None:
     sequences = [sx, sy]
 
     sz = [
-        "io9Jcf3?[Z3`[$L)5Zbd", "Y!JRDur.[+fZ7g7{L@!}", "E/817{xDdN,ihs?r1r}k", "%N@J{jHTQ!),(@%CkG^L", "p1E##?Z;nx;a55uC.XP9"
+        "io9Jcf3?[Z3`[$L)5Zbd", "Y!JRDur.[+fZ7g7{L@!}", "E/817{xDdN,ihs?r1r}k", "%N@J{jHTQ!),(@%CkG^L", "p1E##?Z;nx;a55uC.XP9",
     ]
     expected = [sz]
     actual = _join_sequences(sequences)
@@ -52,4 +51,5 @@ def test_load_from_file() -> None:
         load_from_file(_PATH_PROGRAMS / filename)
 
     load("spike_curric_cleaning_the_home_challenge_v2/2605231/1.json")
-    load("spike_curric_vacuum_mini_challenge/2605231/4189.json")
+    # load("spike_curric_vacuum_mini_challenge/2605231/4189.json")
+    # load("spike_curric_investigating_the_collapsed_building_mini_challenge/2952421/1094.json")

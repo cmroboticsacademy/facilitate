@@ -6,12 +6,12 @@ from facilitate.mappings import NodeMappings
 from facilitate.model.node import Node
 
 
-@pytest.fixture
+@pytest.fixture()
 def tree_before(bad_tree) -> Node:
     return bad_tree
 
 
-@pytest.fixture
+@pytest.fixture()
 def tree_after(good_tree) -> Node:
     return good_tree
 
