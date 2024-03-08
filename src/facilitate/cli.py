@@ -10,6 +10,10 @@ from loguru import logger
 
 from facilitate.diff import compute_edit_script
 from facilitate.edit import EditScript
+from facilitate.fuzzer.diff import (
+    BaseDiffFuzzer,
+    SuccessiveVersionDiffFuzzer,
+)
 from facilitate.fuzzer.parse import (
     ParserCrash,
     ParserFuzzer,
@@ -44,7 +48,7 @@ def fuzz() -> None:
     pass
 
 
-@fuzz.command()
+@fuzz.command("parse")
 @click.option(
     "-n", "--number",
     type=int,
@@ -69,7 +73,7 @@ def fuzz() -> None:
     default="parsing_failures.csv",
     help="file to which list of failed programs will be written.",
 )
-def parse(
+def fuzz_parse(
     number: int,
     input_: Path | str,
     seed: int,
@@ -87,6 +91,66 @@ def parse(
     ).run():
         crashes.append(crash)  # noqa: PERF402
 
+    with output.open("w") as file:
+        writer = csv.writer(file)
+        for crash in crashes:
+            writer.writerow(crash.to_csv_row())
+
+
+@fuzz.command("diff")
+@click.option(
+    "-m", "--method",
+    type=click.Choice(["successive"]),
+    default="successive",
+    help="method that should be used to select program pairs.",
+)
+@click.option(
+    "-n", "--number",
+    type=int,
+    default=None,
+    help="maximum number of program pairs to diff.",
+)
+@click.option(
+    "-i", "--input", "input_",
+    default="./programs",
+    type=click.Path(exists=True),
+    help="directory containing programs to diff.",
+)
+@click.option(
+    "-s", "--seed",
+    type=int,
+    default=None,
+    help="seed for random number generator.",
+)
+@click.option(
+    "-o", "--output",
+    type=click.Path(),
+    default="diff_failures.csv",
+    help="file to which list of failed program pairs will be written.",
+)
+def fuzz_diff(
+    method: str,
+    number: int,
+    input_: Path | str,
+    seed: int,
+    output: Path | str,
+) -> None:
+    """Fuzzes the diffing of Scratch programs."""
+    input_ = Path(input_)
+    output = Path(output)
+
+    fuzzer: BaseDiffFuzzer
+    if method == "successive":
+        fuzzer = SuccessiveVersionDiffFuzzer.build(
+            number=number,
+            program_directory=input_,
+            seed=seed,
+        )
+    else:
+        error = f"unknown method for picking pairs: {method}"
+        raise ValueError(error)
+
+    crashes = list(fuzzer.run())
     with output.open("w") as file:
         writer = csv.writer(file)
         for crash in crashes:
