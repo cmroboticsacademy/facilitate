@@ -63,15 +63,16 @@ class Sequence(Node):
 
     def insert_block(
         self,
-        id_: str,
         opcode: str,
         is_shadow: bool,
         position: int,
+        *,
+        id_: str | None = None,
     ) -> Block:
-        block = Block(
-            id_=id_,
+        block = Block.create(
             opcode=opcode,
             is_shadow=is_shadow,
+            id_=id_,
         )
         self.blocks.insert(position, block)
         block.parent = self

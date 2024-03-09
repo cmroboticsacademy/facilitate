@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from overrides import overrides
 
 from facilitate.model.node import Node, TerminalNode
-from facilitate.util import quote
+from facilitate.util import generate_id, quote
 
 if t.TYPE_CHECKING:
     import networkx as nx
@@ -17,12 +17,15 @@ class Literal(TerminalNode):
     """Represents a literal value within the AST."""
     value: str
 
+    @classmethod
+    def create(cls, value: str, *, id_: str | None = None) -> Literal:
+        assert isinstance(value, str)
+        if not id_:
+            id_ = generate_id("literal")
+        return cls(id_=id_, value=value)
+
     def __hash__(self) -> int:
         return hash(self.id_)
-
-    @classmethod
-    def determine_id(cls, parent_id: str) -> str:
-        return f":literal@{parent_id}"
 
     @overrides
     def copy(self: t.Self) -> t.Self:

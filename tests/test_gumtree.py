@@ -12,8 +12,10 @@ from facilitate.model.node import Node
 def test_dice(good_tree: Node, bad_tree: Node) -> None:
     mappings = NodeMappings()
 
-    input_to = good_tree.find(":input[DIRECTION]@0z(.tYRa{!SepmI$)#U,")
-    input_from = bad_tree.find(":input[DIRECTION]@tJ6ev+AvtHAf*PZbI}7i")
+    input_to = good_tree.find("0z(.tYRa{!SepmI$)#U,").find_input("DIRECTION")
+    assert input_to is not None
+    input_from = bad_tree.find("tJ6ev+AvtHAf*PZbI}7i").find_input("DIRECTION")
+    assert input_from is not None
 
     mappings.add_with_descendants(input_from, input_to)
 

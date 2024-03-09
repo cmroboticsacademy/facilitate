@@ -176,13 +176,10 @@ def _fix_input_block_references(
 def _build_input(
     name: str,
     value_array: list[t.Any],
-    block_id: str,
     id_to_node: dict[str, Node],
 ) -> Input | None:
     assert len(value_array) == _INPUT_VALUE_ARRAY_LENGTH
     assert isinstance(value_array[0], int)
-
-    id_ = Input.determine_id(block_id, name)
 
     expression: Node
     if isinstance(value_array[1], str):
@@ -190,12 +187,7 @@ def _build_input(
     elif isinstance(value_array[1], list):
         assert len(value_array[1]) == _INPUT_VALUE_ARRAY_LENGTH
         literal_value = value_array[1][1]
-        assert isinstance(literal_value, str)
-        literal_id = Literal.determine_id(id_)
-        expression = Literal(
-            id_=literal_id,
-            value=literal_value,
-        )
+        expression = Literal.create(literal_value)
     elif value_array[1] is None:
         logger.trace("input {} has no expression", id_)
         return None
@@ -203,11 +195,7 @@ def _build_input(
         error = f"invalid input value: {value_array[1]}"
         raise TypeError(error)
 
-    return Input(
-        id_=id_,
-        name=name,
-        expression=expression,
-    )
+    return Input.create(name, expression)
 
 
 def _build_program_from_node_descriptions(
@@ -227,14 +215,12 @@ def _build_program_from_node_descriptions(
                 if input_ := _build_input(
                     name=input_name,
                     value_array=input_value_arr,
-                    block_id=id_,
                     id_to_node=id_to_node,
                 ):
                     inputs.append(input_)
 
             fields: list[Field] = [
-                Field(
-                    id_=Field.determine_id(id_, name),
+                Field.create(
                     name=name,
                     value=value_arr[0],
                 )

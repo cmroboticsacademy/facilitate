@@ -38,8 +38,10 @@ def test_sources_and_destinations(tree_before: Node, tree_after: Node) -> None:
 
 
 def test_add_nodes_with_different_types(tree_before: Node, tree_after: Node) -> None:
-    node_before = tree_before.find(":input[RATE]@f7NN)mvnvpU?d$C(PZTk")
-    node_after = tree_after.find(":field[SPIN_DIRECTIONS]@;UXN^kcB}()L,w3LFgoL")
+    node_before = tree_before.find("f7NN)mvnvpU?d$C(PZTk").find_input("RATE")
+    assert node_before is not None
+    node_after = tree_after.find(";UXN^kcB}()L,w3LFgoL").find_field("SPIN_DIRECTIONS")
+    assert node_after is not None
 
     mappings = NodeMappings()
 

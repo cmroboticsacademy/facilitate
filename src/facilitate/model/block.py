@@ -11,7 +11,7 @@ from facilitate.model.block_category import BlockCategory
 from facilitate.model.field import Field
 from facilitate.model.input import Input
 from facilitate.model.node import Node
-from facilitate.util import quote
+from facilitate.util import generate_id, quote
 
 if t.TYPE_CHECKING:
     import networkx as nx
@@ -23,6 +23,22 @@ class Block(Node):
     fields: list[Field] = dataclasses.field(default_factory=list)
     inputs: list[Input] = dataclasses.field(default_factory=list)
     is_shadow: bool
+
+    @classmethod
+    def create(
+        cls,
+        opcode: str,
+        is_shadow: bool,
+        *,
+        id_: str | None = None,
+    ) -> Block:
+        if not id_:
+            id_ = generate_id(f"block:{opcode}")
+        return cls(
+            id_=id_,
+            opcode=opcode,
+            is_shadow=is_shadow,
+        )
 
     def __hash__(self) -> int:
         return hash(self.id_)
@@ -90,18 +106,35 @@ class Block(Node):
     def category(self) -> BlockCategory:
         return BlockCategory.from_opcode(self.opcode)
 
-    def add_field(self, name: str, value: str) -> Field:
-        id_ = Field.determine_id(self.id_, name)
-        field = Field(
-            id_=id_,
+    def add_field(
+        self,
+        name: str,
+        value: str,
+        *,
+        id_: str | None = None,
+    ) -> Field:
+        field = Field.create(
             name=name,
             value=value,
+            id_=id_,
         )
         field.parent = self
 
         # insert field in alphabetical order
         bisect.insort(self.fields, field, key=lambda field: field.name)
         return field
+
+    def find_input(self, name: str) -> Input | None:
+        """Attempts to find an input to this block by its name.
+
+        Returns None if no input with the given name is found."""
+        return next((input_ for input_ in self.inputs if input_.name == name), None)
+
+    def find_field(self, name: str) -> Field | None:
+        """Attempts to find a field of this block by its name.
+
+        Returns None if no field with the given name is found."""
+        return next((field for field in self.fields if field.name == name), None)
 
     def add_input(self, name: str) -> Input:
         id_ = Input.determine_id(self.id_, name)

@@ -146,7 +146,6 @@ class AddBlockToSequence(Addition):
         parent = root.find(self.sequence_id)
         assert isinstance(parent, Sequence)
         added = parent.insert_block(
-            id_=self.block_id,
             opcode=self.opcode,
             is_shadow=self.is_shadow,
             position=self.position,

@@ -2,9 +2,17 @@ from __future__ import annotations
 
 import traceback
 import typing as t
+import uuid
 from pathlib import Path
 
 T = t.TypeVar("T")
+
+
+def generate_id(prefix: str | None = None) -> str:
+    id_ = f"{str(uuid.uuid4())}"
+    if prefix is not None:
+        id_ = f"{prefix}:{id_}"
+    return f"_G:{id_}"
 
 
 def exception_to_crash_description(exception: Exception) -> str:

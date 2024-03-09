@@ -9,7 +9,7 @@ from overrides import overrides
 
 from facilitate.model.literal import Literal
 from facilitate.model.node import Node
-from facilitate.util import quote
+from facilitate.util import generate_id, quote
 
 if t.TYPE_CHECKING:
     import networkx as nx
@@ -20,6 +20,18 @@ class Input(Node):
     name: str
     expression: Node | None
 
+    @classmethod
+    def create(
+        cls,
+        name: str,
+        expression: Node | None,
+        *,
+        id_: str | None = None,
+    ) -> Input:
+        if not id_:
+            id_ = generate_id(f"input:{name}")
+        return cls(id_=id_, name=name, expression=expression)
+
     def __hash__(self) -> int:
         return hash(self.id_)
 
@@ -27,8 +39,7 @@ class Input(Node):
         if self.expression is not None:
             error = f"cannot add literal to {self.id_}: already has expression."
             raise ValueError(error)
-        literal_id = Literal.determine_id(self.id_)
-        literal = Literal(id_=literal_id, value=value)
+        literal = Literal.create(value)
         literal.parent = self
         self.expression = literal
         return literal

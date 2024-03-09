@@ -19,8 +19,16 @@ class Field(TerminalNode):
     value: str
 
     @classmethod
-    def determine_id(cls, block_id: str, field_name: str) -> str:
-        return f":field[{field_name}]@{block_id}"
+    def create(
+        cls,
+        name: str,
+        value: str,
+        *,
+        id_: str | None = None,
+    ) -> Field:
+        if not id_:
+            id_ = f"field:{name}"
+        return cls(id_=id_, name=name, value=value)
 
     def __hash__(self) -> int:
         return hash(self.id_)
