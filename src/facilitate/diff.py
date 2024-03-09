@@ -251,7 +251,6 @@ def _insert_missing_node(
     if isinstance(missing_node, Block) and isinstance(parent, Input):
         return AddBlockToInput(
             input_id=parent.id_,
-            block_id=missing_node.id_,
             opcode=missing_node.opcode,
             is_shadow=missing_node.is_shadow,
         )

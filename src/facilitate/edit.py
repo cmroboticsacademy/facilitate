@@ -186,7 +186,6 @@ class AddBlockToSequence(Addition):
 class AddBlockToInput(Addition):
     """Inserts a block into an input as an expression."""
     input_id: str
-    block_id: str
     opcode: str
     is_shadow: bool
 
@@ -195,8 +194,7 @@ class AddBlockToInput(Addition):
         """Inserts and returns the given block."""
         parent = root.find(self.input_id)
         assert isinstance(parent, Input)
-        block = Block(
-            id_=self.block_id,
+        block = Block.create(
             opcode=self.opcode,
             is_shadow=self.is_shadow,
         )
@@ -210,7 +208,6 @@ class AddBlockToInput(Addition):
         return {
             "type": "AddBlockToInput",
             "input-id": self.input_id,
-            "block-id": self.block_id,
             "opcode": self.opcode,
             "is-shadow": self.is_shadow,
         }
@@ -220,12 +217,10 @@ class AddBlockToInput(Addition):
     def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
         assert dict_["type"] == "AddBlockToInput"
         input_id = dict_["input-id"]
-        block_id = dict_["block-id"]
         opcode = dict_["opcode"]
         is_shadow = dict_["is-shadow"]
         return AddBlockToInput(
             input_id=input_id,
-            block_id=block_id,
             opcode=opcode,
             is_shadow=is_shadow,
         )
