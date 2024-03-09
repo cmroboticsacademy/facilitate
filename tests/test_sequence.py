@@ -1,5 +1,6 @@
 import functools
 from pathlib import Path
+from pprint import pprint
 
 import pytest
 
@@ -11,17 +12,18 @@ _PATH_TESTS = Path(__file__).parent
 _PATH_PROGRAMS = _PATH_TESTS / "resources" / "programs"
 
 
-@pytest.mark.xfail()
 def test_position_of_block() -> None:
     filename = _PATH_PROGRAMS / "spike_curric_vacuum_mini_challenge"  / "2515268" / "36.json"
     tree = load_from_file(filename)
     sequence = tree.find("io9Jcf3?[Z3`[$L)5Zbd").parent
+    pprint(sequence)
     assert isinstance(sequence, Sequence)
+    assert len(sequence.blocks) == 9
 
     block = tree.find("j]U#7^CHJOqlaahe)(2n")
     assert block is not None
 
-    expected = 5
+    expected = 8
     actual = sequence.position_of_block(block)
     assert actual == expected
 
