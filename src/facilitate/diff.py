@@ -17,8 +17,8 @@ from facilitate.edit import (
     Delete,
     Edit,
     EditScript,
-    MoveBlockFromSequenceToSequence,
     MoveBlockInSequence,
+    MoveBlockToSequence,
     MoveFieldToBlock,
     MoveInputToBlock,
     MoveNodeToInput,
@@ -160,7 +160,6 @@ def _move_block(
             move_to_parent=move_to_parent,
         )
 
-    # move Block to Sequence
     if isinstance(move_to_parent, Sequence):
         assert isinstance(move_from_parent, Sequence)
         assert isinstance(move_to_parent, Sequence)
@@ -178,10 +177,9 @@ def _move_block(
                 position = move_to_parent.position_of_block(insert_after_node) + 1
                 break
 
-        return MoveBlockFromSequenceToSequence(
-            move_from_sequence_id=move_from_parent.id_,
-            move_to_sequence_id=move_to_parent.id_,
+        return MoveBlockToSequence(
             block_id=move_block.id_,
+            sequence_id=move_to_parent.id_,
             position=position,
         )
 
