@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from overrides import overrides
 
 from facilitate.model.node import Node, TerminalNode
-from facilitate.util import quote
+from facilitate.util import generate_id, quote
 
 if t.TYPE_CHECKING:
     import networkx as nx
@@ -27,7 +27,7 @@ class Field(TerminalNode):
         id_: str | None = None,
     ) -> Field:
         if not id_:
-            id_ = f"field:{name}"
+            id_ = generate_id(f"field:{name}")
         return cls(id_=id_, name=name, value=value)
 
     def __hash__(self) -> int:
