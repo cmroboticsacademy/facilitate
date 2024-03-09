@@ -1,5 +1,5 @@
 install:
-	poetry install
+	poetry install --with dev
 
 lint:
 	poetry run ruff src
