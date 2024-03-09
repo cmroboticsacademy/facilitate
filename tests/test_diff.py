@@ -44,6 +44,24 @@ def test_diff_merge_top_level_sequences() -> None:
     )
 
 
+def test_diff_with_insert_sequence_into_input() -> None:
+    diff_student_program_versions(
+        "spike_curric_search_for_ice_part_3_mini_challenge",
+        "2952421",
+        89,
+        145
+    )
+
+
+def test_diff_with_sequence_move() -> None:
+    diff_student_program_versions(
+        "spike_curric_getting_started_curriculum",
+        "4847838",
+        420,
+        436
+    )
+
+
 def test_diff_programs_with_field_value_change() -> None:
     level_dir = _PATH_PROGRAMS / "spike_curric_turning_in_place_left_turn_try_it"
     student_dir = level_dir / "4847845"

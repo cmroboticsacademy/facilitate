@@ -1,0 +1,81 @@
+{
+  "9QjVuYDhN]nxRQi1KR9+": {
+    "opcode": "event_whenprogramstarts",
+    "next": "[6wFY-fCA_n@C2OAr~9C",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "G5HVDOhT^*{J(YCI{R0Q": {
+    "opcode": "spike_movement_setMovementSpeed",
+    "next": null,
+    "parent": "[6wFY-fCA_n@C2OAr~9C",
+    "inputs": {
+      "SPEED": [
+        1,
+        "fo=x#3ew=]-o*aySwdK]"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "fo=x#3ew=]-o*aySwdK]": {
+    "opcode": "math_power_clamp",
+    "next": null,
+    "parent": "G5HVDOhT^*{J(YCI{R0Q",
+    "inputs": {},
+    "fields": {
+      "NUM": [
+        "100",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "[6wFY-fCA_n@C2OAr~9C": {
+    "opcode": "control_forever",
+    "next": null,
+    "parent": "9QjVuYDhN]nxRQi1KR9+",
+    "inputs": {
+      "SUBSTACK": [
+        2,
+        "G5HVDOhT^*{J(YCI{R0Q"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "jQ}4GU7CB[5m{t6|KJz4": {
+    "opcode": "spike_movemenet_direction",
+    "next": null,
+    "parent": null,
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "`dy}Ij9%f!iGGQh(pZKp"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "`dy}Ij9%f!iGGQh(pZKp": {
+    "opcode": "spike_movement_direction_picker_3",
+    "next": null,
+    "parent": "jQ}4GU7CB[5m{t6|KJz4",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}

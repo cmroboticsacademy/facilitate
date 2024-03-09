@@ -1,0 +1,127 @@
+{
+  "io9Jcf3?[Z3`[$L)5Zbd": {
+    "opcode": "event_whenprogramstarts",
+    "next": "#%g0-y%0U(~tNb%CY/~F",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "*6)p_=J2rrah,lQ0UDDN": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": null,
+    "parent": "#%g0-y%0U(~tNb%CY/~F",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "u)Croa4!(J]x2jF%cjNo"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          ""
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "u)Croa4!(J]x2jF%cjNo": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "*6)p_=J2rrah,lQ0UDDN",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "~6gfd)D+~_?~^2F7aF;W": {
+    "opcode": "control_wait_until",
+    "next": null,
+    "parent": null,
+    "inputs": {
+      "CONDITION": [
+        1,
+        null
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "N}DWB*:h74YQ/A;Ey{n{": {
+    "opcode": "spike_sensor_is_distance",
+    "next": null,
+    "parent": "#%g0-y%0U(~tNb%CY/~F",
+    "inputs": {
+      "PORT": [
+        1,
+        "O@we%*a9$/^|X-pku4h="
+      ],
+      "DISTANCE": [
+        1,
+        [
+          4,
+          "0"
+        ]
+      ]
+    },
+    "fields": {
+      "COMPARATOR": [
+        "exactly (=)",
+        null
+      ],
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "O@we%*a9$/^|X-pku4h=": {
+    "opcode": "spike_sensor_port_menu",
+    "next": null,
+    "parent": "N}DWB*:h74YQ/A;Ey{n{",
+    "inputs": {},
+    "fields": {
+      "PORT": [
+        "B",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "#%g0-y%0U(~tNb%CY/~F": {
+    "opcode": "control_repeat_until",
+    "next": null,
+    "parent": "io9Jcf3?[Z3`[$L)5Zbd",
+    "inputs": {
+      "CONDITION": [
+        2,
+        "N}DWB*:h74YQ/A;Ey{n{"
+      ],
+      "SUBSTACK": [
+        2,
+        "*6)p_=J2rrah,lQ0UDDN"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  }
+}
