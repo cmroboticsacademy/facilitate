@@ -20,7 +20,7 @@ def test_diff_literal_already_has_expression() -> None:
     script = compute_edit_script(tree_from, tree_to)
 
 
-@pytest.mark.xfail()
+# @pytest.mark.xfail()
 def test_diff_update_is_not_none() -> None:
     level_dir = _PATH_PROGRAMS / "spike_curric_sequential_movements_mini_challenge_curriculum"
     student_dir = level_dir / "2952515"

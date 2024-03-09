@@ -454,6 +454,9 @@ class Update(Edit):
                 return None
             value_from = node_from.value
             value_to = node_to.value
+        elif isinstance(node_from, Input) and isinstance(node_to, Input):
+            value_from = node_from.name
+            value_to = node_to.name
         else:
             return None
 
@@ -473,6 +476,8 @@ class Update(Edit):
             node.opcode = self.value
         elif isinstance(node, Field | Literal):
             node.value = self.value
+        elif isinstance(node, Input):
+            node.name = self.value
         else:
             error = f"cannot update node of type {type(node)}"
             raise TypeError(error)
