@@ -226,7 +226,8 @@ def compute_bottom_up_mappings(
         )
         top_candidate = candidates[0]
 
-        if dice(node, top_candidate, mappings) > min_dice:
+        score = dice(node, top_candidate, mappings)
+        if score >= min_dice:
             mappings.add(node, top_candidate)
 
     for node in root_x.postorder():
