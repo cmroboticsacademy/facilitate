@@ -9,7 +9,7 @@ T = t.TypeVar("T")
 
 
 def generate_id(prefix: str | None = None) -> str:
-    id_ = f"{str(uuid.uuid4())}"
+    id_ = f"{uuid.uuid4()!s}"
     if prefix is not None:
         id_ = f"{prefix}:{id_}"
     return f"_G:{id_}"

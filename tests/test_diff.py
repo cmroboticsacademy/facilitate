@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import pytest
-
 from facilitate.diff import compute_edit_script
 from facilitate.loader import load_from_file
 from facilitate.model.node import Node

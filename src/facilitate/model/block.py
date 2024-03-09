@@ -127,13 +127,15 @@ class Block(Node):
     def find_input(self, name: str) -> Input | None:
         """Attempts to find an input to this block by its name.
 
-        Returns None if no input with the given name is found."""
+        Returns None if no input with the given name is found.
+        """
         return next((input_ for input_ in self.inputs if input_.name == name), None)
 
     def find_field(self, name: str) -> Field | None:
         """Attempts to find a field of this block by its name.
 
-        Returns None if no field with the given name is found."""
+        Returns None if no field with the given name is found.
+        """
         return next((field for field in self.fields if field.name == name), None)
 
     def add_input(self, name: str) -> Input:

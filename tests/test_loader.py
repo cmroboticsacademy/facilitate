@@ -1,11 +1,11 @@
 
 from pathlib import Path
 
-from facilitate.model.block import Block
 from facilitate.loader import (
     _join_sequences,
     load_from_file,
 )
+from facilitate.model.block import Block
 
 _PATH_TESTS = Path(__file__).parent
 _PATH_PROGRAMS = _PATH_TESTS / "resources" / "programs"

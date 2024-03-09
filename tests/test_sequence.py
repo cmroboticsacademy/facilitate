@@ -2,11 +2,9 @@ import functools
 from pathlib import Path
 from pprint import pprint
 
-import pytest
-
+from facilitate.loader import load_from_file
 from facilitate.model.block import Block
 from facilitate.model.sequence import Sequence
-from facilitate.loader import load_from_file
 
 _PATH_TESTS = Path(__file__).parent
 _PATH_PROGRAMS = _PATH_TESTS / "resources" / "programs"

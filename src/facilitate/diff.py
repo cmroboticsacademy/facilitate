@@ -38,21 +38,16 @@ if t.TYPE_CHECKING:
 def _find_insertion_position(
     missing_block: Block,
     mappings: NodeMappings,
-    *,
-    parent_from: Sequence | None = None,
-    parent_to: Sequence | None = None,
 ) -> int:
     logger.debug("finding insertion position for {}", missing_block.id_)
 
-    if parent_to is None:
-        parent_to = missing_block.parent
-        assert parent_to is not None
-        assert isinstance(parent_to, Sequence)
+    parent_to = missing_block.parent
+    assert parent_to is not None
+    assert isinstance(parent_to, Sequence)
 
-    if parent_from is None:
-        parent_from = mappings.destination_is_mapped_to(parent_to)
-        assert parent_from is not None
-        assert isinstance(parent_from, Sequence)
+    parent_from = mappings.destination_is_mapped_to(parent_to)
+    assert parent_from is not None
+    assert isinstance(parent_from, Sequence)
 
     missing_block_position = parent_to.position_of_block(missing_block)
 
@@ -172,6 +167,8 @@ def _move_node(
     if isinstance(move_node, Block):
         assert isinstance(move_from_parent, Sequence)
         assert isinstance(move_to_parent, Sequence)
+        assert isinstance(move_node_partner, Block)
+        assert isinstance(move_node_partner_parent, Sequence)
 
         position = 0
         partner_position = move_node_partner_parent.position_of_block(move_node_partner)

@@ -189,7 +189,7 @@ def _build_input(
         literal_value = value_array[1][1]
         expression = Literal.create(literal_value)
     elif value_array[1] is None:
-        logger.trace("input {} has no expression", id_)
+        logger.trace(f"input {name} has no expression")
         return None
     else:
         error = f"invalid input value: {value_array[1]}"
