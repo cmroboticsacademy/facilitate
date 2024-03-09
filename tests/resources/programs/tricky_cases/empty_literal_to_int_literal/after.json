@@ -1,0 +1,19 @@
+{
+  "GG_XfSoX8K:4xfsYv)[l": {
+    "opcode": "spike_sensor_is_distance",
+    "next": null,
+    "parent": null,
+    "inputs": {
+      "DISTANCE": [
+        1,
+        [
+          4,
+          "1"
+        ]
+      ]
+    },
+    "fields": {},
+    "shadow": false
+  }
+}
+
