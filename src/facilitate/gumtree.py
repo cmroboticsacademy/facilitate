@@ -15,7 +15,6 @@ from facilitate.model.input import Input
 from facilitate.model.program import Program
 from facilitate.model.sequence import Sequence
 
-
 if t.TYPE_CHECKING:
     from facilitate.model.node import Node
 
@@ -94,7 +93,7 @@ def dice(
     if isinstance(root_x, Block) and isinstance(root_y, Block):
         if root_x.id_ == root_y.id_:
             score *= 2
-    elif isinstance(root_x, Field | Input) and isinstance(root_y, Field | Input):
+    elif isinstance(root_x, Field | Input) and isinstance(root_y, Field | Input):  # noqa: SIM102
         if root_x.name == root_y.name:
             score *= 2
 
