@@ -45,7 +45,8 @@ def cli(verbose: bool) -> None:
 
 @cli.group()
 def fuzz() -> None:
-    pass
+    # disable logging during fuzzing
+    logger.remove()
 
 
 @fuzz.command("parse")
