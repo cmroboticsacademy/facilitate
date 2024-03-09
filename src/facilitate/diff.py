@@ -188,9 +188,7 @@ def _move_block(
         )
 
     if isinstance(move_to_parent, Sequence):
-        assert isinstance(move_from_parent, Sequence)
         assert isinstance(move_to_parent, Sequence)
-        assert isinstance(move_block_partner, Block)
         assert isinstance(move_block_partner_parent, Sequence)
 
         position = 0
@@ -210,7 +208,8 @@ def _move_block(
             position=position,
         )
 
-    raise NotImplementedError
+    error = f"unexpected move of Block to parent: {move_to_parent.__class__.__name__}"
+    raise ValueError(error)
 
 
 def _move_input(
