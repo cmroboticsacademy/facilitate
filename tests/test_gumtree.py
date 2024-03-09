@@ -15,7 +15,24 @@ _PATH_TESTS = Path(__file__).parent
 _PATH_PROGRAMS = _PATH_TESTS / "resources" / "programs"
 
 
-def test_diff_programs_with_field_value_change() -> None:
+def _load(filename: str) -> Node:
+    return load_from_file(_PATH_PROGRAMS / filename)
+
+
+def test_gumtree_with_two_top_level_sequences() -> None:
+    tree_from = _load("tricky_cases/merge_two_top_level_sequences/before.json")
+    tree_to = _load("tricky_cases/merge_two_top_level_sequences/after.json")
+    x = tree_from.find
+    y = tree_to.find
+
+    mappings = compute_gumtree_mappings(
+        tree_from,
+        tree_to,
+    )
+    mappings.check()
+
+
+def test_gumtree_with_field_value_change() -> None:
     level_dir = _PATH_PROGRAMS / "spike_curric_turning_in_place_left_turn_try_it"
     student_dir = level_dir / "4847845"
     before_file = student_dir / "4.json"

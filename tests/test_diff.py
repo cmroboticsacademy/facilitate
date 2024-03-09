@@ -1,21 +1,47 @@
+import typing as t
 from pathlib import Path
 
 from facilitate.diff import compute_edit_script
+from facilitate.edit import EditScript
 from facilitate.loader import load_from_file
 from facilitate.model.node import Node
+
 
 _PATH_TESTS = Path(__file__).parent
 _PATH_PROGRAMS = _PATH_TESTS / "resources" / "programs"
 
 
-def test_diff_literal_already_has_expression() -> None:
-    level_dir = _PATH_PROGRAMS / "spike_curric_moving_forward_50cm_try_it"
-    student_dir = level_dir / "2762924"
-    before_file = student_dir / "11.json"
-    after_file = student_dir / "12.json"
+def diff_student_program_versions(
+    level_name: str,
+    student_id: str,
+    before_version: int,
+    after_version: int,
+) -> EditScript:
+    level_dir = _PATH_PROGRAMS / level_name
+    student_dir = level_dir / student_id
+    before_file = student_dir / f"{before_version}.json"
+    after_file = student_dir / f"{after_version}.json"
     tree_from = load_from_file(before_file)
     tree_to = load_from_file(after_file)
-    compute_edit_script(tree_from, tree_to)
+    return compute_edit_script(tree_from, tree_to)
+
+
+def test_diff_literal_already_has_expression() -> None:
+    diff_student_program_versions(
+        "spike_curric_moving_forward_50cm_try_it",
+        "2762924",
+        11,
+        12,
+    )
+
+
+def test_diff_merge_top_level_sequences() -> None:
+    diff_student_program_versions(
+        "spike_curric_arm_movement_getting_stuck_try_it",
+        "2605221",
+        3,
+        8
+    )
 
 
 def test_diff_programs_with_field_value_change() -> None:

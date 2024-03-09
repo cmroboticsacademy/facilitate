@@ -1,0 +1,20 @@
+{
+  "io9Jcf3?[Z3`[$L)5Zbd": {
+    "opcode": "event_whenprogramstarts",
+    "next": "P|AeRtr5^wBA}@w!(*+b",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "P|AeRtr5^wBA}@w!(*+b": {
+    "opcode": "spike_motor_runForDirectionTimes",
+    "next": null,
+    "parent": "io9Jcf3?[Z3`[$L)5Zbd",
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  }
+}

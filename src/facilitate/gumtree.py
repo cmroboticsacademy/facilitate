@@ -276,13 +276,21 @@ def compute_gumtree_mappings(
     mappings.add(root_x, root_y)
 
     # try to map top-level sequences
-    # - if two top-level sequences share the same ID, they are mapped
+    # - if two top-level sequences share the same ID, they are mapped (if not already mapped)
     if isinstance(root_x, Program) and isinstance(root_y, Program):
         for top_level_x in root_x.top_level_nodes:
             assert isinstance(top_level_x, Sequence)
+            if mappings.source_is_mapped(top_level_x):
+                    continue
+
             for top_level_y in root_y.top_level_nodes:
                 assert isinstance(top_level_y, Sequence)
+                if mappings.destination_is_mapped(top_level_y):
+                    continue
+
                 if top_level_x.id_ == top_level_y.id_:
                     mappings.add(top_level_x, top_level_y)
+
+    mappings.check()
 
     return mappings

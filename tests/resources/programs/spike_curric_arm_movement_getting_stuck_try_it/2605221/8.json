@@ -1,0 +1,69 @@
+{
+  "io9Jcf3?[Z3`[$L)5Zbd": {
+    "opcode": "event_whenprogramstarts",
+    "next": "P|AeRtr5^wBA}@w!(*+b",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "P|AeRtr5^wBA}@w!(*+b": {
+    "opcode": "spike_motor_runForDirectionTimes",
+    "next": null,
+    "parent": "io9Jcf3?[Z3`[$L)5Zbd",
+    "inputs": {
+      "MOTOR": [
+        1,
+        "bBEr.__}~3G17Y}{FonO"
+      ],
+      "SPIN_DIRECTIONS": [
+        1,
+        "mfl|fE]_4lC*b[}GtJ51"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "1"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "rotations",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "bBEr.__}~3G17Y}{FonO": {
+    "opcode": "spike_sensor_motor_menu",
+    "next": null,
+    "parent": "P|AeRtr5^wBA}@w!(*+b",
+    "inputs": {},
+    "fields": {
+      "MOTOR": [
+        "A",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "mfl|fE]_4lC*b[}GtJ51": {
+    "opcode": "spike_direction_picker",
+    "next": null,
+    "parent": "P|AeRtr5^wBA}@w!(*+b",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "counterclockwise",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}
