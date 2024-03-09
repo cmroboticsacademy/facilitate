@@ -481,6 +481,54 @@ class MoveBlockFromSequenceToSequence(Move):
 
 
 @dataclass(frozen=True, kw_only=True)
+class MoveNodeToInput(Move):
+    node_id: str
+    parent_block_id: str
+    input_name: str
+
+    @overrides
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
+        node_to_move = root.find(self.node_id)
+        assert node_to_move is not None
+
+        move_to_block = root.find(self.parent_block_id)
+        assert isinstance(move_to_block, Block)
+
+        node_to_move_parent = node_to_move.parent
+        assert node_to_move_parent is not None
+        node_to_move_parent.remove_child(node_to_move)
+        input_ = move_to_block.find_input(self.input_name)
+        assert input_ is not None
+
+        node_to_move.parent = input_
+        input_.expression = node_to_move
+
+        return node_to_move
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "MoveNodeToInput",
+            "node-id": self.node_id,
+            "move-to-block-id": self.parent_block_id,
+            "input-name": self.input_name,
+        }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "MoveNodeToInput"
+        node_id = dict_["node-id"]
+        move_to_block_id = dict_["move-to-block-id"]
+        input_name = dict_["input-name"]
+        return MoveNodeToInput(
+            node_id=node_id,
+            parent_block_id=move_to_block_id,
+            input_name=input_name,
+        )
+
+
+@dataclass(frozen=True, kw_only=True)
 class MoveBlockToInput(Move):
     block_id: str
     parent_block_id: str
@@ -495,7 +543,9 @@ class MoveBlockToInput(Move):
         assert isinstance(move_to_block, Block)
 
         # detach from current parent
-        block_to_move.parent.remove_child(block_to_move)
+        block_to_move_parent = block_to_move.parent
+        assert block_to_move_parent is not None
+        block_to_move_parent.remove_child(block_to_move)
 
         input_ = move_to_block.find_input(self.input_name)
         assert input_ is not None

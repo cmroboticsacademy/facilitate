@@ -21,7 +21,7 @@ from facilitate.edit import (
     MoveBlockInSequence,
     MoveFieldToBlock,
     MoveInputToBlock,
-    MoveBlockToInput,
+    MoveNodeToInput,
     Update,
 )
 from facilitate.gumtree import compute_gumtree_mappings
@@ -135,12 +135,12 @@ def _move_block_to_input(
     *,
     move_block: Block,
     move_to_parent: Input,
-) -> MoveBlockToInput:
-    move_to_block = move_to_parent.parent
-    assert isinstance(move_to_block, Block)
-    return MoveBlockToInput(
-        block_id=move_block.id_,
-        parent_block_id=move_to_parent.parent.id_,
+) -> MoveNodeToInput:
+    parent_block = move_to_parent.parent
+    assert isinstance(parent_block, Block)
+    return MoveNodeToInput(
+        node_id=move_block.id_,
+        parent_block_id=parent_block.id_,
         input_name=move_to_parent.name,
     )
 
