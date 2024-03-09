@@ -15,6 +15,7 @@ from facilitate.edit import (
     Delete,
     Edit,
     EditScript,
+    MoveBlockFromSequenceToSequence,
     MoveBlockInSequence,
     MoveFieldToBlock,
     MoveInputToBlock,
@@ -35,18 +36,23 @@ if t.TYPE_CHECKING:
 
 
 def _find_insertion_position(
-    tree_from: Node,
-    tree_to: Node,
     missing_block: Block,
     mappings: NodeMappings,
+    *,
+    parent_from: Sequence | None = None,
+    parent_to: Sequence | None = None,
 ) -> int:
     logger.debug("finding insertion position for {}", missing_block.id_)
-    parent_to = missing_block.parent
-    assert parent_to is not None
-    parent_from = mappings.destination_is_mapped_to(parent_to)
-    assert parent_from is not None
-    assert isinstance(parent_from, Sequence)
-    assert isinstance(parent_to, Sequence)
+
+    if parent_to is None:
+        parent_to = missing_block.parent
+        assert parent_to is not None
+        assert isinstance(parent_to, Sequence)
+
+    if parent_from is None:
+        parent_from = mappings.destination_is_mapped_to(parent_to)
+        assert parent_from is not None
+        assert isinstance(parent_from, Sequence)
 
     missing_block_position = parent_to.position_of_block(missing_block)
 
@@ -66,10 +72,6 @@ def _find_insertion_position(
             return parent_from.position_of_block(insert_after_node) + 1
 
     return 0
-
-    assert insert_after_node is not None
-    assert isinstance(insert_after_node, Block)
-    return parent_from.position_of_block(insert_after_node) + 1
 
 
 def _align_children(
@@ -119,8 +121,6 @@ def _align_children(
             continue
 
         position = _find_insertion_position(
-            tree_from=sequence_from,
-            tree_to=sequence_to,
             missing_block=b,
             mappings=mappings,
         )
@@ -169,6 +169,27 @@ def _move_node(
             # NOTE is this dangerous?
             field_id=move_node.id_,
         )
+    if isinstance(move_node, Block):
+        assert isinstance(move_from_parent, Sequence)
+        assert isinstance(move_to_parent, Sequence)
+
+        position = 0
+        partner_position = move_node_partner_parent.position_of_block(move_node_partner)
+
+        for partner_insert_at_position in range(partner_position - 1, -1, -1):
+            partner_insert_after_node = move_node_partner_parent.blocks[partner_insert_at_position]
+            insert_after_node = mappings.destination_is_mapped_to(partner_insert_after_node)
+            if insert_after_node is not None:
+                assert isinstance(insert_after_node, Block)
+                position = move_to_parent.position_of_block(insert_after_node) + 1
+                break
+
+        return MoveBlockFromSequenceToSequence(
+            move_from_sequence_id=move_from_parent.id_,
+            move_to_sequence_id=move_to_parent.id_,
+            block_id=move_node.id_,
+            position=position,
+        )
 
     raise NotImplementedError
 
@@ -211,8 +232,6 @@ def _insert_missing_node(
 
     if isinstance(missing_node, Block) and isinstance(parent, Sequence):
         position = _find_insertion_position(
-            tree_from=tree_from,
-            tree_to=tree_to,
             missing_block=missing_node,
             mappings=mappings,
         )

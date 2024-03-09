@@ -367,6 +367,58 @@ class MoveInputToBlock(Move):
 
 
 @dataclass(frozen=True, kw_only=True)
+class MoveBlockFromSequenceToSequence(Move):
+    move_from_sequence_id: str
+    move_to_sequence_id: str
+    block_id: str
+    position: int
+
+    @overrides
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
+        from_sequence = root.find(self.move_from_sequence_id)
+        assert isinstance(from_sequence, Sequence)
+        to_sequence = root.find(self.move_to_sequence_id)
+        assert isinstance(to_sequence, Sequence)
+        assert from_sequence != to_sequence
+
+        block = from_sequence.find(self.block_id)
+        assert isinstance(block, Block)
+        assert block.parent == from_sequence
+
+        from_sequence.blocks.remove(block)
+
+        new_position = self.position
+        to_sequence.blocks.insert(new_position, block)
+        block.parent = to_sequence
+        return block
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "MoveBlockFromSequenceToSequence",
+            "move-from-sequence-id": self.move_from_sequence_id,
+            "move-to-sequence-id": self.move_to_sequence_id,
+            "block-id": self.block_id,
+            "position": self.position,
+        }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "MoveBlockFromSequenceToSequence"
+        move_from_sequence_id = dict_["move-from-sequence-id"]
+        move_to_sequence_id = dict_["move-to-sequence-id"]
+        block_id = dict_["block-id"]
+        position = dict_["position"]
+        return MoveBlockFromSequenceToSequence(
+            move_from_sequence_id=move_from_sequence_id,
+            move_to_sequence_id=move_to_sequence_id,
+            block_id=block_id,
+            position=position,
+        )
+
+
+@dataclass(frozen=True, kw_only=True)
 class MoveBlockInSequence(Move):
     sequence_id: str
     block_id: str
