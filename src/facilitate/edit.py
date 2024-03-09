@@ -14,6 +14,7 @@ from facilitate.model.block import Block
 from facilitate.model.field import Field
 from facilitate.model.input import Input
 from facilitate.model.literal import Literal
+from facilitate.model.program import Program
 from facilitate.model.sequence import Sequence
 
 if t.TYPE_CHECKING:
@@ -59,6 +60,34 @@ class Addition(Edit):
 
 class Move(Edit):
     """Represents a move edit."""
+
+
+@dataclass(frozen=True, kw_only=True)
+class AddSequenceToProgram(Addition):
+    position: int
+
+    @overrides
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
+        """Inserts and returns the given input."""
+        assert isinstance(root, Program)
+        added = Sequence.create()
+        added.tags.append("ADDED")
+        root.top_level_nodes.insert(self.position, added)
+        return added
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "AddSequenceToProgram",
+            "position": self.position,
+        }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "AddSequenceToProgram"
+        position = dict_["position"]
+        return AddSequenceToProgram(position=position)
 
 
 @dataclass(frozen=True, kw_only=True)
