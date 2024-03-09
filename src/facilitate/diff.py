@@ -22,6 +22,7 @@ from facilitate.edit import (
     MoveFieldToBlock,
     MoveInputToBlock,
     MoveNodeToInput,
+    MoveSequenceToProgram,
     Update,
 )
 from facilitate.gumtree import compute_gumtree_mappings
@@ -129,6 +130,32 @@ def _align_children(
         )
         script.append(move)
         move.apply(sequence_from)
+
+
+def _compute_move_position(
+    move_node: Node,
+    move_to_parent: Program | Sequence,
+    mappings: NodeMappings,
+) -> int:
+    position = 0
+    partner = mappings.source_is_mapped_to(move_node)
+    assert partner is not None
+    partner_parent = partner.parent
+    assert isinstance(partner_parent, Program | Sequence)
+
+    move_to_parent_children = list(move_to_parent.children())
+
+    partner_position = partner_parent.position_of_child(partner)
+    partner_children = list(partner_parent.children())
+
+    for partner_insert_at_position in range(partner_position - 1, -1, -1):
+        partner_insert_after_node = partner_children[partner_insert_at_position]
+        insert_after_node = mappings.destination_is_mapped_to(partner_insert_after_node)
+        if insert_after_node is not None:
+            position = move_to_parent_children.index(insert_after_node) + 1
+            break
+
+    return position
 
 
 def _move_block_to_input(
@@ -240,6 +267,7 @@ def _move_sequence(
     *,
     move_sequence: Sequence,
     move_to_parent: Node,
+    mappings: NodeMappings,
 ) -> Edit:
     if isinstance(move_to_parent, Input):
         parent_block = move_to_parent.parent
@@ -251,12 +279,23 @@ def _move_sequence(
         )
 
     if isinstance(move_to_parent, Program):
-        raise NotImplementedError
+        if move_sequence.parent == move_to_parent:
+            error = "sequence is already a child of the program"
+            raise ValueError(error)
 
-    if isinstance(move_to_parent, Sequence):
-        raise NotImplementedError
+        position = _compute_move_position(
+            move_node=move_sequence,
+            move_to_parent=move_to_parent,
+            mappings=mappings,
+        )
 
-    raise NotImplementedError
+        return MoveSequenceToProgram(
+            sequence_id=move_sequence.id_,
+            position=position,
+        )
+
+    error = f"unexpected move of Sequence to parent: {move_to_parent.__class__.__name__}"
+    raise TypeError(error)
 
 
 def _move_node(
@@ -306,6 +345,7 @@ def _move_node(
         return _move_sequence(
             move_sequence=move_node,
             move_to_parent=move_to_parent,
+            mappings=mappings,
         )
 
     if isinstance(move_node, Literal):
