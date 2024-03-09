@@ -333,6 +333,63 @@ class AddFieldToBlock(Addition):
 
 
 @dataclass(frozen=True, kw_only=True)
+class MoveSequenceToProgram(Move):
+    sequence_id: str
+    position: int
+
+    @overrides
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
+        assert isinstance(root, Program)
+        sequence = root.find(self.sequence_id)
+        assert isinstance(sequence, Sequence)
+        assert sequence.parent is not None
+
+        position = self.position
+
+        # are we switching position of a top-level sequence?
+        if sequence.parent == root:
+            current_position = root.top_level_nodes.index(sequence)
+
+            # if the sequence is already in the correct position, do nothing
+            if position == current_position:
+                logger.warning("sequence {} already in position {}", sequence.id_, position)
+                return sequence
+
+            # if we want to move sequence to a later position, we need to decrement its position
+            # to account for the temporary removal of the sequence from the list
+            if position > current_position:
+                position -= 1
+
+            root.top_level_nodes.remove(sequence)
+
+        # or are we moving a sequence from elsewhere in the program?
+        else:
+            sequence.parent.remove_child(sequence)
+
+        root.top_level_nodes.insert(position, sequence)
+        return sequence
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "MoveSequenceToProgram",
+            "sequence-id": self.sequence_id,
+            "position": self.position,
+        }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "MoveSequenceToProgram"
+        sequence_id = dict_["sequence-id"]
+        position = dict_["position"]
+        return MoveSequenceToProgram(
+            sequence_id=sequence_id,
+            position=position,
+        )
+
+
+@dataclass(frozen=True, kw_only=True)
 class MoveFieldToBlock(Move):
     move_from_block_id: str
     move_to_block_id: str
