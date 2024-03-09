@@ -212,6 +212,44 @@ class AddBlockToSequence(Addition):
 
 
 @dataclass(frozen=True, kw_only=True)
+class AddSequenceToInput(Addition):
+    """Inserts an empty sequence into an input as an expression."""
+    block_id: str
+    input_name: str
+
+    @overrides
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
+        """Inserts and returns the given sequence."""
+        block = root.find(self.block_id)
+        assert isinstance(block, Block)
+        input_ = block.find_input(self.input_name)
+        assert input_ is not None
+        sequence = Sequence.create()
+        sequence.parent = input_
+        input_.expression = sequence
+        return sequence
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "AddSequenceToInput",
+            "block-id": self.block_id,
+            "input-name": self.input_name,
+        }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "AddSequenceToInput"
+        block_id = dict_["block-id"]
+        input_name = dict_["input-name"]
+        return AddSequenceToInput(
+            block_id=block_id,
+            input_name=input_name,
+        )
+
+
+@dataclass(frozen=True, kw_only=True)
 class AddBlockToInput(Addition):
     """Inserts a block into an input as an expression."""
     input_id: str

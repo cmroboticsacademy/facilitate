@@ -12,6 +12,7 @@ from facilitate.edit import (
     AddInputToBlock,
     Addition,
     AddLiteralToInput,
+    AddSequenceToInput,
     AddSequenceToProgram,
     Delete,
     Edit,
@@ -253,6 +254,14 @@ def _insert_missing_node(
             input_id=parent.id_,
             opcode=missing_node.opcode,
             is_shadow=missing_node.is_shadow,
+        )
+
+    if isinstance(missing_node, Sequence) and isinstance(parent, Input):
+        block = parent.parent
+        assert isinstance(block, Block)
+        return AddSequenceToInput(
+            block_id=block.id_,
+            input_name=parent.name,
         )
 
     if isinstance(missing_node, Sequence) and isinstance(parent, Program):
