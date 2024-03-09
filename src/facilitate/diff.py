@@ -223,18 +223,41 @@ def _move_field(
 def _move_literal(
     *,
     move_literal: Literal,
-    move_from_parent: Node,
     move_to_parent: Node,
 ) -> Edit:
-    raise NotImplementedError
+    if isinstance(move_to_parent, Input):
+        parent_block = move_to_parent.parent
+        assert isinstance(parent_block, Block)
+        return MoveNodeToInput(
+            node_id=move_literal.id_,
+            parent_block_id=parent_block.id_,
+            input_name=move_to_parent.name,
+        )
+
+    error = f"unexpected move of Literal to parent: {move_to_parent.__class__.__name__}"
+    raise ValueError(error)
 
 
 def _move_sequence(
     *,
     move_sequence: Sequence,
-    move_from_parent: Node,
     move_to_parent: Node,
 ) -> Edit:
+    if isinstance(move_to_parent, Input):
+        parent_block = move_to_parent.parent
+        assert isinstance(parent_block, Block)
+        return MoveNodeToInput(
+            node_id=move_sequence.id_,
+            parent_block_id=parent_block.id_,
+            input_name=move_to_parent.name,
+        )
+
+    if isinstance(move_to_parent, Program):
+        raise NotImplementedError
+
+    if isinstance(move_to_parent, Sequence):
+        raise NotImplementedError
+
     raise NotImplementedError
 
 
@@ -284,7 +307,6 @@ def _move_node(
         assert isinstance(move_node_partner, Sequence)
         return _move_sequence(
             move_sequence=move_node,
-            move_from_parent=move_from_parent,
             move_to_parent=move_to_parent,
         )
 
@@ -292,7 +314,6 @@ def _move_node(
         assert isinstance(move_node_partner, Literal)
         return _move_literal(
             move_literal=move_node,
-            move_from_parent=move_from_parent,
             move_to_parent=move_to_parent,
         )
 
