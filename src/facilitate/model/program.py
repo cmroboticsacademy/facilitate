@@ -66,6 +66,13 @@ class Program(Node):
                 return False
         return True
 
+    def position_of_child(self, child: Node) -> int:
+        assert isinstance(child, Sequence)
+        return self.top_level_nodes.index(child)
+
+    def child(self, index: int) -> Node:
+        return self.top_level_nodes[index]
+
     @overrides
     def children(self) -> t.Iterator[Node]:
         yield from self.top_level_nodes

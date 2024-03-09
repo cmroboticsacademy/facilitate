@@ -12,6 +12,7 @@ from facilitate.edit import (
     AddInputToBlock,
     Addition,
     AddLiteralToInput,
+    AddSequenceToProgram,
     Delete,
     Edit,
     EditScript,
@@ -36,35 +37,34 @@ if t.TYPE_CHECKING:
 
 
 def _find_insertion_position(
-    missing_block: Block,
+    missing_node: Node,
     mappings: NodeMappings,
 ) -> int:
-    logger.debug("finding insertion position for {}", missing_block.id_)
+    logger.debug("finding insertion position for {}", missing_node.id_)
 
-    parent_to = missing_block.parent
+    parent_to = missing_node.parent
     assert parent_to is not None
-    assert isinstance(parent_to, Sequence)
+    assert isinstance(parent_to, Program | Sequence)
 
     parent_from = mappings.destination_is_mapped_to(parent_to)
     assert parent_from is not None
-    assert isinstance(parent_from, Sequence)
+    assert isinstance(parent_from, Program | Sequence)
 
-    missing_block_position = parent_to.position_of_block(missing_block)
+    missing_node_position = parent_to.position_of_child(missing_node)
 
-    if missing_block_position == 0:
+    if missing_node_position == 0:
         return 0
 
-    logger.debug("missing block position: {}", missing_block_position)
+    logger.debug("missing node position: {}", missing_node_position)
 
-    # it's possible that the node before the missing block hasn't been mapped,
+    # it's possible that the node before the missing node hasn't been mapped,
     # so we need to work leftwards until we find a mapped node
     # if we fail to find a mapped node, we return zero as the index
-    for node_before_position in range(missing_block_position - 1, -1, -1):
-        node_before_missing_block = parent_to.blocks[node_before_position]
-        insert_after_node = mappings.destination_is_mapped_to(node_before_missing_block)
+    for node_before_position in range(missing_node_position - 1, -1, -1):
+        node_before_missing = parent_to.child(node_before_position)
+        insert_after_node = mappings.destination_is_mapped_to(node_before_missing)
         if insert_after_node is not None:
-            assert isinstance(insert_after_node, Block)
-            return parent_from.position_of_block(insert_after_node) + 1
+            return parent_from.position_of_child(insert_after_node) + 1
 
     return 0
 
@@ -116,7 +116,7 @@ def _align_children(
             continue
 
         position = _find_insertion_position(
-            missing_block=b,
+            missing_node=b,
             mappings=mappings,
         )
 
@@ -237,7 +237,7 @@ def _insert_missing_node(
 
     if isinstance(missing_node, Block) and isinstance(parent, Sequence):
         position = _find_insertion_position(
-            missing_block=missing_node,
+            missing_node=missing_node,
             mappings=mappings,
         )
         return AddBlockToSequence(
@@ -256,7 +256,13 @@ def _insert_missing_node(
         )
 
     if isinstance(missing_node, Sequence) and isinstance(parent, Program):
-        raise NotImplementedError
+        position = _find_insertion_position(
+            missing_node=missing_node,
+            mappings=mappings,
+        )
+        return AddSequenceToProgram(
+            position=position,
+        )
 
     logger.error(
         "missing node: {}<{}>; parent: {}<{}>",

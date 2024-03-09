@@ -70,6 +70,10 @@ class Sequence(Node):
     def position_of_block(self, block: Block) -> int:
         return self.blocks.index(block)
 
+    def position_of_child(self, child: Node) -> int:
+        assert isinstance(child, Block)
+        return self.position_of_block(child)
+
     def insert_block(
         self,
         opcode: str,
@@ -94,6 +98,9 @@ class Sequence(Node):
             raise TypeError(error)
         self.blocks.remove(child)
         child.parent = None
+
+    def child(self, index: int) -> Node:
+        return self.blocks[index]
 
     @overrides
     def children(self) -> t.Iterator[Node]:
