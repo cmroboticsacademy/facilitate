@@ -7,7 +7,7 @@ from overrides import overrides
 
 from facilitate.model.block import Block
 from facilitate.model.node import Node
-from facilitate.util import quote
+from facilitate.util import generate_id, quote
 
 if t.TYPE_CHECKING:
     import networkx as nx
@@ -17,6 +17,15 @@ if t.TYPE_CHECKING:
 class Sequence(Node):
     """Represents a sequence of blocks."""
     blocks: list[Block] = field(default_factory=list)
+
+    @classmethod
+    def create(cls) -> Sequence:
+        """Creates a new empty sequence."""
+        id_ = generate_id("seq")
+        return cls(
+            id_=id_,
+            blocks=[],
+        )
 
     @classmethod
     def build(cls, blocks: list[Block]) -> Sequence:
