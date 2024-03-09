@@ -130,6 +130,104 @@ def _align_children(
         move.apply(sequence_from)
 
 
+def _move_block(
+    *,
+    move_block: Block,
+    move_block_partner: Block,
+    move_block_partner_parent: Node,
+    move_from_parent: Node,
+    move_to_parent: Node,
+    mappings: NodeMappings,
+) -> Edit:
+    # move Block to Input
+    if isinstance(move_block, Block) and isinstance(move_to_parent, Input):
+        # Input -> Input
+        if isinstance(move_from_parent, Input):
+            raise NotImplementedError
+
+        # Sequence -> Input
+        if isinstance(move_from_parent, Sequence):
+            assert isinstance(move_block_partner_parent, Sequence)
+            raise NotImplementedError
+
+    # move Block to Sequence
+    if isinstance(move_block, Block) and isinstance(move_to_parent, Sequence):
+        assert isinstance(move_from_parent, Sequence)
+        assert isinstance(move_to_parent, Sequence)
+        assert isinstance(move_block_partner, Block)
+        assert isinstance(move_block_partner_parent, Sequence)
+
+        position = 0
+        partner_position = move_block_partner_parent.position_of_block(move_block_partner)
+
+        for partner_insert_at_position in range(partner_position - 1, -1, -1):
+            partner_insert_after_node = move_block_partner_parent.blocks[partner_insert_at_position]
+            insert_after_node = mappings.destination_is_mapped_to(partner_insert_after_node)
+            if insert_after_node is not None:
+                assert isinstance(insert_after_node, Block)
+                position = move_to_parent.position_of_block(insert_after_node) + 1
+                break
+
+        return MoveBlockFromSequenceToSequence(
+            move_from_sequence_id=move_from_parent.id_,
+            move_to_sequence_id=move_to_parent.id_,
+            block_id=move_block.id_,
+            position=position,
+        )
+
+    raise NotImplementedError
+
+
+def _move_input(
+    *,
+    move_input: Input,
+    move_from_parent: Node,
+    move_to_parent: Node,
+) -> Edit:
+    assert isinstance(move_from_parent, Block)
+    assert isinstance(move_to_parent, Block)
+    return MoveInputToBlock(
+        move_from_block_id=move_from_parent.id_,
+        move_to_block_id=move_to_parent.id_,
+        # NOTE is this dangerous?
+        input_id=move_input.id_,
+    )
+
+
+def _move_field(
+    *,
+    move_field: Field,
+    move_from_parent: Node,
+    move_to_parent: Node,
+) -> Edit:
+    assert isinstance(move_from_parent, Block)
+    assert isinstance(move_to_parent, Block)
+    return MoveFieldToBlock(
+        move_from_block_id=move_from_parent.id_,
+        move_to_block_id=move_to_parent.id_,
+        # NOTE is this dangerous?
+        field_id=move_field.id_,
+    )
+
+
+def _move_literal(
+    *,
+    move_literal: Literal,
+    move_from_parent: Node,
+    move_to_parent: Node,
+) -> Edit:
+    raise NotImplementedError
+
+
+def _move_sequence(
+    *,
+    move_sequence: Sequence,
+    move_from_parent: Node,
+    move_to_parent: Node,
+) -> Edit:
+    raise NotImplementedError
+
+
 def _move_node(
     move_node: Node,
     move_node_partner: Node,
@@ -148,56 +246,48 @@ def _move_node(
     logger.debug(f"moving to parent: {move_to_parent.id_} {move_to_parent.__class__.__name__}")
 
     if isinstance(move_node, Input):
-        assert isinstance(move_from_parent, Block)
-        assert isinstance(move_to_parent, Block)
-        return MoveInputToBlock(
-            move_from_block_id=move_from_parent.id_,
-            move_to_block_id=move_to_parent.id_,
-            # NOTE is this dangerous?
-            input_id=move_node.id_,
+        return _move_input(
+            move_input=move_node,
+            move_from_parent=move_from_parent,
+            move_to_parent=move_to_parent,
         )
 
     if isinstance(move_node, Field):
-        assert isinstance(move_from_parent, Block)
-        assert isinstance(move_to_parent, Block)
-        return MoveFieldToBlock(
-            move_from_block_id=move_from_parent.id_,
-            move_to_block_id=move_to_parent.id_,
-            # NOTE is this dangerous?
-            field_id=move_node.id_,
+        return _move_field(
+            move_field=move_node,
+            move_from_parent=move_from_parent,
+            move_to_parent=move_to_parent,
         )
 
     if isinstance(move_node, Block):
-        assert isinstance(move_from_parent, Sequence)
-        assert isinstance(move_to_parent, Sequence)
         assert isinstance(move_node_partner, Block)
-        assert isinstance(move_node_partner_parent, Sequence)
-
-        position = 0
-        partner_position = move_node_partner_parent.position_of_block(move_node_partner)
-
-        for partner_insert_at_position in range(partner_position - 1, -1, -1):
-            partner_insert_after_node = move_node_partner_parent.blocks[partner_insert_at_position]
-            insert_after_node = mappings.destination_is_mapped_to(partner_insert_after_node)
-            if insert_after_node is not None:
-                assert isinstance(insert_after_node, Block)
-                position = move_to_parent.position_of_block(insert_after_node) + 1
-                break
-
-        return MoveBlockFromSequenceToSequence(
-            move_from_sequence_id=move_from_parent.id_,
-            move_to_sequence_id=move_to_parent.id_,
-            block_id=move_node.id_,
-            position=position,
+        return _move_block(
+            move_block=move_node,
+            move_block_partner=move_node_partner,
+            move_block_partner_parent=move_node_partner_parent,
+            move_from_parent=move_from_parent,
+            move_to_parent=move_to_parent,
+            mappings=mappings,
         )
 
     if isinstance(move_node, Sequence):
-        raise NotImplementedError
+        assert isinstance(move_node_partner, Sequence)
+        return _move_sequence(
+            move_sequence=move_node,
+            move_from_parent=move_from_parent,
+            move_to_parent=move_to_parent,
+        )
 
     if isinstance(move_node, Literal):
-        raise NotImplementedError
+        assert isinstance(move_node_partner, Literal)
+        return _move_literal(
+            move_literal=move_node,
+            move_from_parent=move_from_parent,
+            move_to_parent=move_to_parent,
+        )
 
-    raise NotImplementedError
+    error = f"unexpected node type: {move_node.__class__.__name__}"
+    raise ValueError(error)
 
 
 def _insert_missing_node(
