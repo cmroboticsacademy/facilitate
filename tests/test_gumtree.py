@@ -1,12 +1,50 @@
-
 import pytest
 
+from pathlib import Path
+
 from facilitate.gumtree import (
+    compute_gumtree_mappings,
     compute_topdown_mappings,
     dice,
 )
+from facilitate.loader import load_from_file
 from facilitate.mappings import NodeMappings
 from facilitate.model.node import Node
+
+_PATH_TESTS = Path(__file__).parent
+_PATH_PROGRAMS = _PATH_TESTS / "resources" / "programs"
+
+
+def test_diff_programs_with_field_value_change() -> None:
+    level_dir = _PATH_PROGRAMS / "spike_curric_turning_in_place_left_turn_try_it"
+    student_dir = level_dir / "4847845"
+    before_file = student_dir / "4.json"
+    after_file = student_dir / "5.json"
+    tree_from = load_from_file(before_file)
+    tree_to = load_from_file(after_file)
+    mappings = compute_gumtree_mappings(
+        tree_from,
+        tree_to,
+    )
+
+    x = tree_from.find
+    y = tree_to.find
+
+    assert (x("PROGRAM"), y("PROGRAM")) in mappings
+    assert (x("9QjVuYDhN]nxRQi1KR9+"), y("9QjVuYDhN]nxRQi1KR9+")) in mappings
+    assert (x("#FZ(.H$KR:RYV8|n1ZwG"), y("#FZ(.H$KR:RYV8|n1ZwG")) in mappings
+    assert (
+        x("#FZ(.H$KR:RYV8|n1ZwG").find_field("UNITS"),
+        y("#FZ(.H$KR:RYV8|n1ZwG").find_field("UNITS"),
+    ) in mappings
+    assert (
+        x("#FZ(.H$KR:RYV8|n1ZwG").find_input("RATE"),
+        y("#FZ(.H$KR:RYV8|n1ZwG").find_input("RATE"),
+    ) in mappings
+    assert (
+        x("#FZ(.H$KR:RYV8|n1ZwG").find_input("RATE").expression,
+        y("#FZ(.H$KR:RYV8|n1ZwG").find_input("RATE").expression,
+    ) in mappings
 
 
 def test_dice(good_tree: Node, bad_tree: Node) -> None:

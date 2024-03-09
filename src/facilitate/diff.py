@@ -155,6 +155,7 @@ def _move_node(
             # NOTE is this dangerous?
             input_id=move_node.id_,
         )
+
     if isinstance(move_node, Field):
         assert isinstance(move_from_parent, Block)
         assert isinstance(move_to_parent, Block)
@@ -164,6 +165,7 @@ def _move_node(
             # NOTE is this dangerous?
             field_id=move_node.id_,
         )
+
     if isinstance(move_node, Block):
         assert isinstance(move_from_parent, Sequence)
         assert isinstance(move_to_parent, Sequence)
@@ -187,6 +189,12 @@ def _move_node(
             block_id=move_node.id_,
             position=position,
         )
+
+    if isinstance(move_node, Sequence):
+        raise NotImplementedError
+
+    if isinstance(move_node, Literal):
+        raise NotImplementedError
 
     raise NotImplementedError
 

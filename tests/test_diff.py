@@ -18,6 +18,16 @@ def test_diff_literal_already_has_expression() -> None:
     compute_edit_script(tree_from, tree_to)
 
 
+def test_diff_programs_with_field_value_change() -> None:
+    level_dir = _PATH_PROGRAMS / "spike_curric_turning_in_place_left_turn_try_it"
+    student_dir = level_dir / "4847845"
+    before_file = student_dir / "4.json"
+    after_file = student_dir / "5.json"
+    tree_from = load_from_file(before_file)
+    tree_to = load_from_file(after_file)
+    compute_edit_script(tree_from, tree_to)
+
+
 def test_diff_update_is_not_none() -> None:
     level_dir = _PATH_PROGRAMS / "spike_curric_sequential_movements_mini_challenge_curriculum"
     student_dir = level_dir / "2952515"

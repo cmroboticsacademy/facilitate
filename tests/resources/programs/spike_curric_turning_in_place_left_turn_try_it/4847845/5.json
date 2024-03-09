@@ -1,0 +1,51 @@
+{
+  "9QjVuYDhN]nxRQi1KR9+": {
+    "opcode": "event_whenprogramstarts",
+    "next": "#FZ(.H$KR:RYV8|n1ZwG",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "#FZ(.H$KR:RYV8|n1ZwG": {
+    "opcode": "spike_movement_heading_for_duration_3",
+    "next": null,
+    "parent": "9QjVuYDhN]nxRQi1KR9+",
+    "inputs": {
+      "HEADING": [
+        1,
+        "W5LTd40k@Tgl4%OC*FhN"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "10"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "rotations",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "W5LTd40k@Tgl4%OC*FhN": {
+    "opcode": "spike_heading_input",
+    "next": null,
+    "parent": "#FZ(.H$KR:RYV8|n1ZwG",
+    "inputs": {},
+    "fields": {
+      "NUM": [
+        "left: -5",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}

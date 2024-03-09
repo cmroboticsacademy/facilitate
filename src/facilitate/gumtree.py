@@ -9,8 +9,12 @@ from itertools import product
 from loguru import logger
 
 from facilitate.mappings import NodeMappings
+from facilitate.model.block import Block
+from facilitate.model.field import Field
+from facilitate.model.input import Input
 from facilitate.model.program import Program
 from facilitate.model.sequence import Sequence
+
 
 if t.TYPE_CHECKING:
     from facilitate.model.node import Node
@@ -87,8 +91,14 @@ def dice(
     )
 
     # prefer nodes with the same ID
-    if root_x.id_ == root_y.id_:
-        score *= 2
+    if isinstance(root_x, Block) and isinstance(root_y, Block):
+        if root_x.id_ == root_y.id_:
+            score *= 2
+    elif isinstance(root_x, Field | Input) and isinstance(root_y, Field | Input):
+        if root_x.name == root_y.name:
+            score *= 2
+
+    score = min(score, 1.0)
 
     logger.trace(
         f"dice(common={mapped_descendants}, x={num_descendants_x}, y={num_descendants_y})"
@@ -155,7 +165,7 @@ def compute_topdown_mappings(
                         candidates.append((node_x, node_y))
                     else:
                         logger.debug(f"isolated match: {node_x.id_} vs. {node_y.id_}")
-                        mappings.add(node_x, node_y)
+                        mappings.add_with_descendants(node_x, node_y)
 
                     added_trees_x.append(node_x)
                     added_trees_y.append(node_y)
