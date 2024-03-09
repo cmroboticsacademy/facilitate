@@ -1,8 +1,29 @@
-
 import functools
+from pathlib import Path
+
+import pytest
 
 from facilitate.model.block import Block
 from facilitate.model.sequence import Sequence
+from facilitate.loader import load_from_file
+
+_PATH_TESTS = Path(__file__).parent
+_PATH_PROGRAMS = _PATH_TESTS / "resources" / "programs"
+
+
+@pytest.mark.xfail()
+def test_position_of_block() -> None:
+    filename = _PATH_PROGRAMS / "spike_curric_vacuum_mini_challenge"  / "2515268" / "36.json"
+    tree = load_from_file(filename)
+    sequence = tree.find("io9Jcf3?[Z3`[$L)5Zbd").parent
+    assert isinstance(sequence, Sequence)
+
+    block = tree.find("j]U#7^CHJOqlaahe)(2n")
+    assert block is not None
+
+    expected = 5
+    actual = sequence.position_of_block(block)
+    assert actual == expected
 
 
 def test_insert_block() -> None:
