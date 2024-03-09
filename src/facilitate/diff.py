@@ -55,8 +55,18 @@ def _find_insertion_position(
 
     logger.debug("missing block position: {}", missing_block_position)
 
-    node_before_missing_block = parent_to.blocks[missing_block_position - 1]
-    insert_after_node = mappings.destination_is_mapped_to(node_before_missing_block)
+    # it's possible that the node before the missing block hasn't been mapped,
+    # so we need to work leftwards until we find a mapped node
+    # if we fail to find a mapped node, we return zero as the index
+    for node_before_position in range(missing_block_position - 1, -1, -1):
+        node_before_missing_block = parent_to.blocks[node_before_position]
+        insert_after_node = mappings.destination_is_mapped_to(node_before_missing_block)
+        if insert_after_node is not None:
+            assert isinstance(insert_after_node, Block)
+            return parent_from.position_of_block(insert_after_node) + 1
+
+    return 0
+
     assert insert_after_node is not None
     assert isinstance(insert_after_node, Block)
     return parent_from.position_of_block(insert_after_node) + 1
@@ -104,6 +114,9 @@ def _align_children(
 
         a = mappings.destination_is_mapped_to(b)
         assert a is not None
+
+        if a not in mapped_node_from_children:
+            continue
 
         position = _find_insertion_position(
             tree_from=sequence_from,
