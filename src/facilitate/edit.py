@@ -481,6 +481,54 @@ class MoveBlockFromSequenceToSequence(Move):
 
 
 @dataclass(frozen=True, kw_only=True)
+class MoveBlockToInput(Move):
+    block_id: str
+    parent_block_id: str
+    input_name: str
+
+    @overrides
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
+        block_to_move = root.find(self.block_id)
+        assert isinstance(block_to_move, Block)
+
+        move_to_block = root.find(self.parent_block_id)
+        assert isinstance(move_to_block, Block)
+
+        # detach from current parent
+        block_to_move.parent.remove_child(block_to_move)
+
+        input_ = move_to_block.find_input(self.input_name)
+        assert input_ is not None
+
+        block_to_move.parent = input_
+        input_.expression = block_to_move
+
+        return block_to_move
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "MoveBlockToInput",
+            "block-id": self.block_id,
+            "move-to-block-id": self.parent_block_id,
+            "input-name": self.input_name,
+        }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "MoveBlockToInput"
+        block_id = dict_["block-id"]
+        move_to_block_id = dict_["move-to-block-id"]
+        input_name = dict_["input-name"]
+        return MoveBlockToInput(
+            block_id=block_id,
+            parent_block_id=move_to_block_id,
+            input_name=input_name,
+        )
+
+
+@dataclass(frozen=True, kw_only=True)
 class MoveBlockInSequence(Move):
     sequence_id: str
     block_id: str

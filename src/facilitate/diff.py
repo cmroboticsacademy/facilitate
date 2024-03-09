@@ -21,6 +21,7 @@ from facilitate.edit import (
     MoveBlockInSequence,
     MoveFieldToBlock,
     MoveInputToBlock,
+    MoveBlockToInput,
     Update,
 )
 from facilitate.gumtree import compute_gumtree_mappings
@@ -130,6 +131,20 @@ def _align_children(
         move.apply(sequence_from)
 
 
+def _move_block_to_input(
+    *,
+    move_block: Block,
+    move_to_parent: Input,
+) -> MoveBlockToInput:
+    move_to_block = move_to_parent.parent
+    assert isinstance(move_to_block, Block)
+    return MoveBlockToInput(
+        block_id=move_block.id_,
+        parent_block_id=move_to_parent.parent.id_,
+        input_name=move_to_parent.name,
+    )
+
+
 def _move_block(
     *,
     move_block: Block,
@@ -139,19 +154,14 @@ def _move_block(
     move_to_parent: Node,
     mappings: NodeMappings,
 ) -> Edit:
-    # move Block to Input
-    if isinstance(move_block, Block) and isinstance(move_to_parent, Input):
-        # Input -> Input
-        if isinstance(move_from_parent, Input):
-            raise NotImplementedError
-
-        # Sequence -> Input
-        if isinstance(move_from_parent, Sequence):
-            assert isinstance(move_block_partner_parent, Sequence)
-            raise NotImplementedError
+    if isinstance(move_to_parent, Input):
+        return _move_block_to_input(
+            move_block=move_block,
+            move_to_parent=move_to_parent,
+        )
 
     # move Block to Sequence
-    if isinstance(move_block, Block) and isinstance(move_to_parent, Sequence):
+    if isinstance(move_to_parent, Sequence):
         assert isinstance(move_from_parent, Sequence)
         assert isinstance(move_to_parent, Sequence)
         assert isinstance(move_block_partner, Block)
