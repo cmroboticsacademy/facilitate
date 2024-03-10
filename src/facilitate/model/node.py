@@ -74,6 +74,11 @@ class Node(abc.ABC):
             yield child
             yield from child.descendants()
 
+    @final
+    def contains(self, node: Node) -> bool:
+        """Determines whether the given node is a descendant of this node."""
+        return node in self.descendants()
+
     def find(self, id_: str) -> Node | None:
         """Finds the node with the given ID within the subtree rooted at this node.
 
