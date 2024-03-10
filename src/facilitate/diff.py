@@ -298,11 +298,16 @@ def _move_sequence(
 
 
 def _move_node(
+    tree_from: Node,
+    tree_to: Node,
     move_node: Node,
     move_node_partner: Node,
     mappings: NodeMappings,
 ) -> Edit:
     logger.debug("moving node: {} {}", move_node.id_, move_node.__class__.__name__)
+
+    assert tree_from.contains(move_node)
+    assert tree_to.contains(move_node_partner)
 
     move_from_parent = move_node.parent
     assert move_from_parent is not None
@@ -492,6 +497,8 @@ def update_insert_align_move_phase(
             # - if the parents of the node and its partner are not mapped, move the node
             if (parent_from, parent_to) not in mappings:
                 edit = _move_node(
+                    tree_from=tree_from,
+                    tree_to=tree_to,
                     move_node=_maybe_node_from,
                     move_node_partner=node_to,
                     mappings=mappings,
@@ -510,7 +517,6 @@ def update_insert_align_move_phase(
                 )
 
     return script
-
 
 
 def compute_edit_script(
