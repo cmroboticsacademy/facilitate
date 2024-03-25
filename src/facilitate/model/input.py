@@ -82,9 +82,6 @@ class Input(Node):
 
     @overrides
     def remove_child(self, child: Node) -> None:
-        if self.expression is None:
-            error = f"cannot remove child {child.id_}: no expression of {self.id_}."
-            raise ValueError(error)
         if self.expression is not child:
             error = f"cannot remove child {child.id_}: not expression of {self.id_}."
             raise ValueError(error)
