@@ -1,0 +1,52 @@
+{
+  "1uI%.l#`C?UW:g_3Q?3x": {
+    "opcode": "spike_movement_heading_for_duration_3",
+    "next": "F^pIAaRhG5f2Q$+5uLdW",
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "y}r3)-q!tJp$9Nr3B1R;": {
+    "opcode": "control_forever",
+    "next": null,
+    "inputs": {
+      "SUBSTACK": [
+        2,
+        "k^[MaI}j=9JbqIa[H.T/"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "k^[MaI}j=9JbqIa[H.T/": {
+    "opcode": "spike_movemenet_direction_for_duration_3",
+    "next": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "F^pIAaRhG5f2Q$+5uLdW": {
+    "opcode": "spike_movemenet_direction_for_duration_3",
+    "next": "y}r3)-q!tJp$9Nr3B1R;",
+    "inputs": {
+      "RATE": [
+        1,
+        [
+          4,
+          "5"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  }
+}

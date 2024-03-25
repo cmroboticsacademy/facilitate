@@ -1,0 +1,145 @@
+{
+  "1uI%.l#`C?UW:g_3Q?3x": {
+    "opcode": "spike_movement_heading_for_duration_3",
+    "next": "k^[MaI}j=9JbqIa[H.T/",
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "y}r3)-q!tJp$9Nr3B1R;": {
+    "opcode": "control_forever",
+    "next": null,
+    "inputs": {
+      "SUBSTACK": [
+        2,
+        "1uI%.l#`C?UW:g_3Q?3x"
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  ",u^fVhWBB}9Da.IqM5V4": {
+    "opcode": "spike_movemenet_direction_for_duration_3",
+    "next": null,
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "MfW?*cikI|$j_xpoeZb-"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "100"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "MfW?*cikI|$j_xpoeZb-": {
+    "opcode": "spike_movement_direction_picker_3",
+    "next": null,
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "k^[MaI}j=9JbqIa[H.T/": {
+    "opcode": "spike_movemenet_direction_for_duration_3",
+    "next": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "a[h1|tQuEo$NJ}Ck:kfP": {
+    "opcode": "spike_movement_heading_for_duration_3",
+    "next": "kn2|nC.8Xayw|x#57M7?",
+    "inputs": {
+      "HEADING": [
+        1,
+        "LaO+j}lCK9!Q|BG;^WDR"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "180"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "degrees",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "LaO+j}lCK9!Q|BG;^WDR": {
+    "opcode": "spike_heading_input",
+    "next": null,
+    "inputs": {},
+    "fields": {
+      "NUM": [
+        "right: 90",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "kn2|nC.8Xayw|x#57M7?": {
+    "opcode": "spike_movemenet_direction_for_duration_3",
+    "next": null,
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "galHgNOWpV^41^[[$ucx"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "100"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "galHgNOWpV^41^[[$ucx": {
+    "opcode": "spike_movement_direction_picker_3",
+    "next": null,
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}
