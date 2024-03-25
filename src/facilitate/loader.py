@@ -50,8 +50,7 @@ def _inject_parent_into_block_descriptions(
     for id_, description in id_to_node_description.items():
         # remove ambiguous "parent" field:
         # can mean immediate parent or predecessor (i.e., previous block in sequence)
-        if "parent" in description:
-            description["parent"] = None
+        description["parent"] = None
 
         # identify parenthood via "inputs" field
         for input_values in description["inputs"].values():
