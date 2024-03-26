@@ -1,7 +1,7 @@
 {
   "1uI%.l#`C?UW:g_3Q?3x": {
     "opcode": "spike_movement_heading_for_duration_3",
-    "next": "F^pIAaRhG5f2Q$+5uLdW",
+    "next": null,
     "inputs": {},
     "fields": {},
     "shadow": false,
@@ -25,27 +25,6 @@
     "next": null,
     "inputs": {},
     "fields": {},
-    "shadow": false,
-    "topLevel": false
-  },
-  "F^pIAaRhG5f2Q$+5uLdW": {
-    "opcode": "spike_movemenet_direction_for_duration_3",
-    "next": "y}r3)-q!tJp$9Nr3B1R;",
-    "inputs": {
-      "RATE": [
-        1,
-        [
-          4,
-          "5"
-        ]
-      ]
-    },
-    "fields": {
-      "UNITS": [
-        "cm",
-        null
-      ]
-    },
     "shadow": false,
     "topLevel": false
   }
