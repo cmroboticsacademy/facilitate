@@ -136,7 +136,8 @@ class AddLiteralToInput(Addition):
         """Inserts and returns the given literal."""
         parent = root.find(self.input_id)
         assert isinstance(parent, Input)
-        added = parent.add_literal(self.value)
+        added = Literal.create(value=self.value)
+        parent.add_child(added)
         added.tags.append("ADDED")
         return added
 
@@ -225,8 +226,7 @@ class AddSequenceToInput(Addition):
         input_ = block.find_input(self.input_name)
         assert input_ is not None
         sequence = Sequence.create()
-        sequence.parent = input_
-        input_.expression = sequence
+        input_.add_child(sequence)
         return sequence
 
     @overrides
@@ -265,8 +265,7 @@ class AddBlockToInput(Addition):
             opcode=self.opcode,
             is_shadow=self.is_shadow,
         )
-        block.parent = parent
-        parent.expression = block
+        parent.add_child(block)
         block.tags.append("ADDED")
         return block
 
@@ -554,9 +553,7 @@ class MoveNodeToInput(Move):
         input_ = move_to_block.find_input(self.input_name)
         assert input_ is not None
 
-        node_to_move.parent = input_
-        input_.expression = node_to_move
-
+        input_.add_child(node_to_move)
         return node_to_move
 
     @overrides

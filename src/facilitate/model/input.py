@@ -3,11 +3,10 @@ from __future__ import annotations
 __all__ = ("Input",)
 
 import typing as t
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from overrides import overrides
 
-from facilitate.model.literal import Literal
 from facilitate.model.node import Node
 from facilitate.util import generate_id, quote
 
@@ -18,7 +17,7 @@ if t.TYPE_CHECKING:
 @dataclass(kw_only=True, eq=False)
 class Input(Node):
     name: str
-    expression: Node | None
+    _children: list[Node] = field(default_factory=list)
 
     @classmethod
     def create(
@@ -30,25 +29,28 @@ class Input(Node):
     ) -> Input:
         if not id_:
             id_ = generate_id(f"input:{name}")
-        return cls(id_=id_, name=name, expression=expression)
+        children = [expression] if expression is not None else []
+        return cls(id_=id_, name=name, _children=children)
 
     def __hash__(self) -> int:
         return hash(self.id_)
 
+    @property
+    def expression(self) -> Node | None:
+        if self._children:
+            return self._children[0]
+        return None
+
     @overrides
     def is_valid(self) -> bool:
-        if self.expression is not None:
-            return self.expression.is_valid()
-        return True
+        if len(self._children) > 1:
+            return False
+        return all(child.is_valid() for child in self.children())
 
-    def add_literal(self, value: str) -> Literal:
-        if self.expression is not None:
-            error = f"cannot add literal to {self.id_}: already has expression."
-            raise ValueError(error)
-        literal = Literal.create(value)
-        literal.parent = self
-        self.expression = literal
-        return literal
+    def add_child(self, child: Node) -> None:
+        assert child not in self._children
+        child.parent = self
+        self._children.append(child)
 
     @classmethod
     def determine_id(cls, block_id: str, input_name: str) -> str:
@@ -56,12 +58,11 @@ class Input(Node):
 
     @overrides
     def copy(self: t.Self) -> t.Self:
-        expression = None if self.expression is None else self.expression.copy()
         return self.__class__(
             id_=self.id_,
             tags=self.tags.copy(),
             name=self.name,
-            expression=expression,
+            _children=self._children.copy(),
         )
 
     @overrides
@@ -74,25 +75,26 @@ class Input(Node):
             return False
         assert isinstance(other, Input)
 
-        if self.expression is None:
-            return other.expression is None
-        assert other.expression is not None
-        return self.expression.equivalent_to(other.expression)
+        if len(self._children) != len(other._children):
+            return False
+
+        return all(
+            child.equivalent_to(other_child)
+            for child, other_child
+            in zip(self._children, other._children, strict=True)
+        )
 
     @overrides
     def children(self) -> t.Iterator[Node]:
-        if self.expression is not None:
-            yield self.expression
-        else:
-            yield from ()
+        yield from self._children
 
     @overrides
     def remove_child(self, child: Node) -> None:
-        if self.expression is not child:
-            error = f"cannot remove child {child.id_}: not expression of {self.id_}."
+        if child not in self._children:
+            error = f"cannot remove child {child.id_}: does not belong to parent {self.id_}"
             raise ValueError(error)
         child.parent = None
-        self.expression = None
+        self._children.remove(child)
 
     @overrides
     def _add_to_nx_digraph(self, graph: nx.DiGraph) -> None:
@@ -104,8 +106,8 @@ class Input(Node):
             **attributes,
         )
 
-        if self.expression is not None:
-            self.expression._add_to_nx_digraph(graph)
-            graph.add_edge(quote(self.id_), quote(self.expression.id_))
+        for expression in self.children():
+            expression._add_to_nx_digraph(graph)
+            graph.add_edge(quote(self.id_), quote(expression.id_))
 
 

@@ -145,12 +145,7 @@ class Block(Node):
         return next((field for field in self.fields if field.name == name), None)
 
     def add_input(self, name: str) -> Input:
-        id_ = Input.determine_id(self.id_, name)
-        input_ = Input(
-            id_=id_,
-            name=name,
-            expression=None,
-        )
+        input_ = Input.create(name=name, expression=None)
         input_.parent = self
 
         # insert input in alphabetical order
