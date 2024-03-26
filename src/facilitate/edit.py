@@ -738,7 +738,6 @@ class Delete(Edit):
 
         if not no_delete and node.has_children():
             error = f"cannot delete node {self.node_id}: has children."
-            print(f"kids: {[c.id_ for c in node.children()]}")
             raise ValueError(error)
 
         parent = node.parent
