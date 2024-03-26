@@ -44,6 +44,12 @@ class Block(Node):
         return hash(self.id_)
 
     @overrides
+    def is_valid(self) -> bool:
+        fields_are_valid = all(field.is_valid() for field in self.fields)
+        inputs_are_valid = all(input_.is_valid() for input_ in self.inputs)
+        return fields_are_valid and inputs_are_valid
+
+    @overrides
     def copy(self: t.Self) -> t.Self:
         return self.__class__(
             id_=self.id_,

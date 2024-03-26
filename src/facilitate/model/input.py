@@ -35,6 +35,12 @@ class Input(Node):
     def __hash__(self) -> int:
         return hash(self.id_)
 
+    @overrides
+    def is_valid(self) -> bool:
+        if self.expression is not None:
+            return self.expression.is_valid()
+        return True
+
     def add_literal(self, value: str) -> Literal:
         if self.expression is not None:
             error = f"cannot add literal to {self.id_}: already has expression."

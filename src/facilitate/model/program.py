@@ -22,6 +22,12 @@ class Program(Node):
         return hash(self.id_)
 
     @overrides
+    def is_valid(self) -> bool:
+        if not all(isinstance(node, Sequence) for node in self.top_level_nodes):
+            return False
+        return all(node.is_valid() for node in self.top_level_nodes)
+
+    @overrides
     def copy(self: t.Self) -> t.Self:
         return self.__class__(
             id_=self.id_,

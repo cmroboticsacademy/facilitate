@@ -26,6 +26,11 @@ class Node(abc.ABC):
             child.parent = self
 
     @abc.abstractmethod
+    def is_valid(self) -> bool:
+        """Determines whether this node is valid."""
+        ...
+
+    @abc.abstractmethod
     def copy(self: t.Self) -> t.Self:
         """Creates a deep copy of this node."""
         raise NotImplementedError

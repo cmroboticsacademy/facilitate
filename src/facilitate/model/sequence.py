@@ -42,6 +42,13 @@ class Sequence(Node):
         return hash(self.id_)
 
     @overrides
+    def is_valid(self) -> bool:
+        return all(
+            isinstance(block, Block) and block.is_valid()
+            for block in self.blocks
+        )
+
+    @overrides
     def copy(self: t.Self) -> t.Self:
         return self.__class__(
             id_=self.id_,

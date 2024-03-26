@@ -34,6 +34,10 @@ class Field(TerminalNode):
         return hash(self.id_)
 
     @overrides
+    def is_valid(self) -> bool:
+        return True
+
+    @overrides
     def copy(self: t.Self) -> t.Self:
         return self.__class__(
             id_=self.id_,
