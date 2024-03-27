@@ -1,0 +1,295 @@
+{
+  "io9Jcf3?[Z3`[$L)5Zbd": {
+    "opcode": "event_whenprogramstarts",
+    "next": ":3b-sB9jq=1b|MRbBArU",
+    "parent": null,
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  ":3b-sB9jq=1b|MRbBArU": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": ";o5e$M.-w*21+.i7Fg_}",
+    "parent": "io9Jcf3?[Z3`[$L)5Zbd",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "**F0=M^h.7#Cq!*wAdFQ"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "70"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "**F0=M^h.7#Cq!*wAdFQ": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": ":3b-sB9jq=1b|MRbBArU",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "0DODkq1aVZ0g-tA1%Zce": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "%Y7-]YYZ~r1XY.[39yr?",
+    "parent": "/rql2BYKpKFcV)-Uh6wk",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "*D1i.=#Um.Vxi`Alc6%2"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "8"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "*D1i.=#Um.Vxi`Alc6%2": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "0DODkq1aVZ0g-tA1%Zce",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "%Y7-]YYZ~r1XY.[39yr?": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "NqpKE5xfSW3Uk~/W`dpY",
+    "parent": "0DODkq1aVZ0g-tA1%Zce",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        ";qcN;Ez^g$o;6m#AX3wH"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "70"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  ";qcN;Ez^g$o;6m#AX3wH": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "%Y7-]YYZ~r1XY.[39yr?",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "NqpKE5xfSW3Uk~/W`dpY": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "`{^Es8]Z(#%}u#[.xFZt",
+    "parent": "%Y7-]YYZ~r1XY.[39yr?",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "#g`*XJlrN,9FOxC8tk-C"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "8"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "#g`*XJlrN,9FOxC8tk-C": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "NqpKE5xfSW3Uk~/W`dpY",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "`{^Es8]Z(#%}u#[.xFZt": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": "$?TvMTh36vd_LujyRA(w",
+    "parent": "NqpKE5xfSW3Uk~/W`dpY",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "=lRjLxQSz2E|^{]Oj1w9"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "70"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "=lRjLxQSz2E|^{]Oj1w9": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "`{^Es8]Z(#%}u#[.xFZt",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "forward",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  "$?TvMTh36vd_LujyRA(w": {
+    "opcode": "spike_movemenet_direction_for_duration",
+    "next": null,
+    "parent": "`{^Es8]Z(#%}u#[.xFZt",
+    "inputs": {
+      "DIRECTION": [
+        1,
+        "IRMIcwIKbR[IlkY5Jk!H"
+      ],
+      "RATE": [
+        1,
+        [
+          4,
+          "8"
+        ]
+      ]
+    },
+    "fields": {
+      "UNITS": [
+        "cm",
+        null
+      ]
+    },
+    "shadow": false,
+    "topLevel": false
+  },
+  "IRMIcwIKbR[IlkY5Jk!H": {
+    "opcode": "spike_movement_direction_picker",
+    "next": null,
+    "parent": "$?TvMTh36vd_LujyRA(w",
+    "inputs": {},
+    "fields": {
+      "SPIN_DIRECTIONS": [
+        "right",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  },
+  ";o5e$M.-w*21+.i7Fg_}": {
+    "opcode": "spike_movement_stopMoving",
+    "next": null,
+    "parent": ":3b-sB9jq=1b|MRbBArU",
+    "inputs": {},
+    "fields": {},
+    "shadow": false,
+    "topLevel": false
+  },
+  "/rql2BYKpKFcV)-Uh6wk": {
+    "opcode": "spike_play_beep",
+    "next": "0DODkq1aVZ0g-tA1%Zce",
+    "parent": null,
+    "inputs": {
+      "NOTE": [
+        1,
+        "]XUQ;)0l).sOk2R:oTki"
+      ],
+      "BEATS": [
+        1,
+        [
+          4,
+          "0.2"
+        ]
+      ]
+    },
+    "fields": {},
+    "shadow": false,
+    "topLevel": true
+  },
+  "]XUQ;)0l).sOk2R:oTki": {
+    "opcode": "note",
+    "next": null,
+    "parent": "/rql2BYKpKFcV)-Uh6wk",
+    "inputs": {},
+    "fields": {
+      "NOTE": [
+        "60",
+        null
+      ]
+    },
+    "shadow": true,
+    "topLevel": false
+  }
+}
