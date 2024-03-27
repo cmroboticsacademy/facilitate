@@ -25,6 +25,11 @@ class Node(abc.ABC):
         for child in self.children():
             child.parent = self
 
+    def add_tag_to_subtree(self, tag: str) -> None:
+        """Adds a tag to all of the nodes in the subtree rooted at this node."""
+        for node in self.nodes():
+            node.tags.append(tag)
+
     @abc.abstractmethod
     def is_valid(self) -> bool:
         """Determines whether this node is valid."""
