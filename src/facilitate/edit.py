@@ -508,6 +508,7 @@ class MoveBlockToSequence(Move):
         move_from_parent.remove_child(move_block)
         move_to_sequence.blocks.insert(self.position, move_block)
         move_block.parent = move_to_sequence
+        move_block.tags.append("MOVED")
         return move_block
 
     @overrides
