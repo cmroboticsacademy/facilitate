@@ -57,6 +57,7 @@ class BaseDiffFuzzer(abc.ABC):
         pairs: list[tuple[Path, Path]] = list(self.generate_pairs())
         if self.number:
             pairs = pairs[:self.number]
+        print(f"testing {len(pairs)} pairs")
         for from_program_file, to_program_file in pairs:
             if crash := self._run_one(from_program_file, to_program_file):
                 yield crash
