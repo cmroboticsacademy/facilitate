@@ -67,7 +67,7 @@ def _find_insertion_position(
     for node_before_position in range(missing_node_position - 1, -1, -1):
         node_before_missing = parent_to.child(node_before_position)
         insert_after_node = mappings.destination_is_mapped_to(node_before_missing)
-        if insert_after_node is not None:
+        if insert_after_node is not None and insert_after_node.parent == parent_from:
             return parent_from.position_of_child(insert_after_node) + 1
 
     return 0
