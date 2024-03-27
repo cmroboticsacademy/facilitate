@@ -406,7 +406,7 @@ class MoveFieldToBlock(Move):
         assert field is not None
         assert isinstance(field, Field)
 
-        field.tags.append("MOVED")
+        field.add_tag_to_subtree("MOVED")
 
         move_from_block.remove_child(field)
         return move_to_block.add_child(field)
@@ -451,7 +451,7 @@ class MoveInputToBlock(Move):
         assert input_ is not None
         assert isinstance(input_, Input)
 
-        input_.tags.append("MOVED")
+        input_.add_tag_to_subtree("MOVED")
 
         logger.debug(
             "moving input {} from {} to {}",
@@ -509,7 +509,7 @@ class MoveBlockToSequence(Move):
         move_from_parent.remove_child(move_block)
         move_to_sequence.blocks.insert(self.position, move_block)
         move_block.parent = move_to_sequence
-        move_block.tags.append("MOVED")
+        move_block.add_tag_to_subtree("MOVED")
         return move_block
 
     @overrides
@@ -647,6 +647,7 @@ class MoveBlockInSequence(Move):
             new_position -= 1
 
         sequence.blocks.insert(new_position, block)
+        block.add_tag_to_subtree("MOVED")
         return block
 
     @overrides
