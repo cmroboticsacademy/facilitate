@@ -22,6 +22,7 @@ from facilitate.edit import (
     MoveFieldToBlock,
     MoveInputToBlock,
     MoveNodeToInput,
+    MoveSequenceInProgram,
     MoveSequenceToProgram,
     Update,
 )
@@ -123,14 +124,24 @@ def _align_children(
             mappings=mappings,
         )
 
-        # FIXME update to work with Program
-        assert isinstance(parent_from, Sequence)
-        assert isinstance(a, Block)
-        move = MoveBlockInSequence(
-            sequence_id=parent_to.id_,
-            block_id=a.id_,
-            position=position,
-        )
+        move: Edit
+        if isinstance(parent_to, Sequence):
+            assert isinstance(a, Block)
+            move = MoveBlockInSequence(
+                sequence_id=parent_to.id_,
+                block_id=a.id_,
+                position=position,
+            )
+        elif isinstance(parent_to, Program):
+            assert isinstance(a, Sequence)
+            move = MoveSequenceInProgram(
+                sequence_id=a.id_,
+                position=position,
+            )
+        else:
+            error = f"unexpected parent type: {parent_to.__class__.__name__}"
+            raise TypeError(error)
+
         script.append(move)
         move.apply(parent_from)
 
@@ -511,7 +522,6 @@ def update_insert_align_move_phase(
                     script.append(edit)
 
             # align stage
-            # FIXME should apply to Program today
             if isinstance(_maybe_node_from, Sequence | Program):
                 assert isinstance(node_to, Sequence | Program)
                 _align_children(

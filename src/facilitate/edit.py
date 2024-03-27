@@ -580,6 +580,49 @@ class MoveNodeToInput(Move):
 
 
 @dataclass(frozen=True, kw_only=True)
+class MoveSequenceInProgram(Move):
+    sequence_id: str
+    position: int
+
+    @overrides
+    def apply(self, root: Node, *, no_delete: bool = False) -> Node | None:  # noqa: ARG002
+        """Moves the sequence to the given position in the program."""
+        assert isinstance(root, Program)
+        sequence = root.find(self.sequence_id)
+        assert isinstance(sequence, Sequence)
+        assert sequence.parent == root
+
+        current_position = root.position_of_child(sequence)
+        root.top_level_nodes.remove(sequence)
+
+        new_position = self.position
+        if new_position > current_position:
+            new_position -= 1
+
+        root.top_level_nodes.insert(new_position, sequence)
+        return sequence
+
+    @overrides
+    def to_dict(self) -> dict[str, t.Any]:
+        return {
+            "type": "MoveSequenceInProgram",
+            "sequence-id": self.sequence_id,
+            "position": self.position,
+        }
+
+    @classmethod
+    @overrides
+    def _from_dict(cls, dict_: dict[str, t.Any]) -> Edit:
+        assert dict_["type"] == "MoveSequenceInProgram"
+        sequence_id = dict_["sequence-id"]
+        position = dict_["position"]
+        return MoveSequenceInProgram(
+            sequence_id=sequence_id,
+            position=position,
+        )
+
+
+@dataclass(frozen=True, kw_only=True)
 class MoveBlockInSequence(Move):
     sequence_id: str
     block_id: str
