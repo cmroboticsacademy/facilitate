@@ -72,6 +72,7 @@ class AddSequenceToProgram(Addition):
         assert isinstance(root, Program)
         added = Sequence.create()
         added.tags.append("ADDED")
+        added.parent = root
         root.top_level_nodes.insert(self.position, added)
         return added
 
