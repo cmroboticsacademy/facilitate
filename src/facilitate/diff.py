@@ -74,21 +74,21 @@ def _find_insertion_position(
 
 def _align_children(
     script: EditScript,
-    sequence_from: Sequence,
-    sequence_to: Sequence,
+    parent_from: Sequence | Program,
+    parent_to: Sequence | Program,
     mappings: NodeMappings,
 ) -> None:
     """Aligns the children of two nodes."""
-    logger.debug("aligning children of {} and {}", sequence_from.id_, sequence_to.id_)
+    logger.debug("aligning children of {} and {}", parent_from.id_, parent_to.id_)
 
     def equals(x: Node, y: Node) -> bool:
         return (x, y) in mappings
 
     mapped_node_from_children = [
-        block for block in sequence_from.blocks if mappings.source_is_mapped(block)
+        child for child in parent_from.children() if mappings.source_is_mapped(child)
     ]
     mapped_node_to_children = [
-        block for block in sequence_to.blocks if mappings.destination_is_mapped(block)
+        child for child in parent_to.children() if mappings.destination_is_mapped(child)
     ]
 
     logger.debug(
@@ -100,13 +100,13 @@ def _align_children(
         f"{', '.join(block.id_ for block in mapped_node_to_children)}",
     )
 
-    lcs: list[tuple[Block, Block]] = longest_common_subsequence(
+    lcs: list[tuple[Node, Node]] = longest_common_subsequence(
         mapped_node_from_children,
         mapped_node_to_children,
         equals,
     )
-    lcs_node_to: list[Block] = [y for (_, y) in lcs]
-    logger.debug(f"lcs (node to) [{len(lcs_node_to)}]: {', '.join(block.id_ for block in lcs_node_to)}")
+    lcs_node_to: list[Node] = [y for (_, y) in lcs]
+    logger.debug(f"lcs (node to) [{len(lcs_node_to)}]: {', '.join(child.id_ for child in lcs_node_to)}")
 
     for b in mapped_node_to_children:
         if b in lcs_node_to:
@@ -123,13 +123,16 @@ def _align_children(
             mappings=mappings,
         )
 
+        # FIXME update to work with Program
+        assert isinstance(parent_from, Sequence)
+        assert isinstance(a, Block)
         move = MoveBlockInSequence(
-            sequence_id=sequence_from.id_,
+            sequence_id=parent_to.id_,
             block_id=a.id_,
             position=position,
         )
         script.append(move)
-        move.apply(sequence_from)
+        move.apply(parent_from)
 
 
 def _compute_move_position(
@@ -467,6 +470,8 @@ def update_insert_align_move_phase(
     script = EditScript()
 
     for node_to in breadth_first_search(tree_to):
+        logger.debug(f"processing node: {node_to.id_} {node_to.__class__.__name__}")
+
         _maybe_node_from = mappings.destination_is_mapped_to(node_to)
 
         if not _maybe_node_from:
@@ -490,29 +495,29 @@ def update_insert_align_move_phase(
 
             parent_from = _maybe_node_from.parent
             parent_to = node_to.parent
-            if parent_from is None or parent_to is None:
-                continue
 
             # move stage
             # - if the parents of the node and its partner are not mapped, move the node
-            if (parent_from, parent_to) not in mappings:
-                edit = _move_node(
-                    tree_from=tree_from,
-                    tree_to=tree_to,
-                    move_node=_maybe_node_from,
-                    move_node_partner=node_to,
-                    mappings=mappings,
-                )
-                edit.apply(tree_from)
-                script.append(edit)
+            if parent_from is not None and parent_to is not None:  # noqa: SIM102
+                if (parent_from, parent_to) not in mappings:
+                    edit = _move_node(
+                        tree_from=tree_from,
+                        tree_to=tree_to,
+                        move_node=_maybe_node_from,
+                        move_node_partner=node_to,
+                        mappings=mappings,
+                    )
+                    edit.apply(tree_from)
+                    script.append(edit)
 
             # align stage
-            if isinstance(_maybe_node_from, Sequence):
-                assert isinstance(node_to, Sequence)
+            # FIXME should apply to Program today
+            if isinstance(_maybe_node_from, Sequence | Program):
+                assert isinstance(node_to, Sequence | Program)
                 _align_children(
                     script=script,
-                    sequence_from=_maybe_node_from,
-                    sequence_to=node_to,
+                    parent_from=_maybe_node_from,
+                    parent_to=node_to,
                     mappings=mappings,
                 )
 
