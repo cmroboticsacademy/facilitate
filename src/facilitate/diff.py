@@ -75,6 +75,7 @@ def _find_insertion_position(
 
 def _align_children(
     script: EditScript,
+    tree_from: Node,
     parent_from: Sequence | Program,
     parent_to: Sequence | Program,
     mappings: NodeMappings,
@@ -85,11 +86,20 @@ def _align_children(
     def equals(x: Node, y: Node) -> bool:
         return (x, y) in mappings
 
+    # sequence of children of (parent_from) whose partners are children of (parent_to)
     mapped_node_from_children = [
         child for child in parent_from.children() if mappings.source_is_mapped(child)
     ]
+    mapped_node_from_children = [
+        child for child in mapped_node_from_children if mappings.source_is_mapped_to(child).parent == parent_to
+    ]
+
+    # sequence of children of (parent_to) whose partners are children of (parent_from)
     mapped_node_to_children = [
         child for child in parent_to.children() if mappings.destination_is_mapped(child)
+    ]
+    mapped_node_to_children = [
+        child for child in mapped_node_to_children if mappings.destination_is_mapped_to(child).parent == parent_from
     ]
 
     logger.debug(
@@ -128,7 +138,7 @@ def _align_children(
         if isinstance(parent_to, Sequence):
             assert isinstance(a, Block)
             move = MoveBlockInSequence(
-                sequence_id=parent_to.id_,
+                sequence_id=parent_from.id_,
                 block_id=a.id_,
                 position=position,
             )
@@ -143,7 +153,7 @@ def _align_children(
             raise TypeError(error)
 
         script.append(move)
-        move.apply(parent_from)
+        move.apply(tree_from)
 
 
 def _compute_move_position(
@@ -526,6 +536,7 @@ def update_insert_align_move_phase(
                 assert isinstance(node_to, Sequence | Program)
                 _align_children(
                     script=script,
+                    tree_from=tree_from,
                     parent_from=_maybe_node_from,
                     parent_to=node_to,
                     mappings=mappings,
