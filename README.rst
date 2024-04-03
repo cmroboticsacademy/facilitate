@@ -88,5 +88,17 @@ To only run the linter and type checker, run the following command:
 
     make lint
 
-Additionally, the :code:`facilitate` command-line interface provides a fuzzer, described in the Command-Line Interface section.
+Additionally, the :code:`facilitate` command-line interface provides a fuzzer.
+To use the fuzzer to attempt to parse all programs within a given directory:
 
+.. code:: shell
+
+    poetry run facilitate fuzz parse -i programs -o crashes.csv
+
+The above command will find all the `.json` program files within the specified directory, attempt to parse them, and log any programs that cause the parser to crash to the specified output CSV file.
+
+To use the fuzzer to attempt to diff all successive pairs of student programs within a given directory:
+
+.. code:: shell
+
+    poetry run facilitate fuzz diff -i programs -o crashes.csv
