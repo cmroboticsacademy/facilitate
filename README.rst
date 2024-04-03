@@ -4,7 +4,7 @@ Facilitate
 Installation
 ------------
 
-Before beginning, you will need to install Python 3.11 and [Poetry](https://python-poetry.org).
+Before beginning, you will need to install Python 3.11 and `Poetry <https://python-poetry.org>`_.
 Once you have the necessary prerequisites, you can install the project by running the following command:
 
 .. code:: shell
