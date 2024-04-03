@@ -11,8 +11,8 @@ Once you have the necessary prerequisites, you can install the project by runnin
 
     poetry install
 
-Usage: Command-Line Interface
------------------------------
+Command-Line Interface
+----------------------
 
 Facilitate provides a command-line interface that is mostly intended for debugging and development purposes.
 To obtain a list of commands exposed by the CLI, run the following command:
@@ -31,14 +31,25 @@ It takes the path to a JSON-formatted Scratch program as input and outputs eithe
 
     poetry run facilitate draw examples/bad.json -f pdf -o ast.bad.pdf
 
-Usage: Server
--------------
+HTTP API
+--------
 
-Facilitate provides a simple web server that is used to compute edit scripts between Scratch programs.
-The server exposes a single endpoint, GET /diff, that accepts two Scratch programs within a JSON payload and returns the edit script between the two programs.
+Facilitate provides a simple HTTP API.
+That API is served by a Flask server that can either be deployed locally or to AWS Lambda via Zappa (i.e., serverless).
 
-Deployment: Local via Flask
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:code:`PUT /diff`
+~~~~~~~~~~~~~~~~~
+
+Accepts two Scratch programs within a JSON payload and returns an edit script between those programs.
+
+:code:`PUT /progress`
+~~~~~~~~~~~~~~~~~~~~~
+
+Deployment
+----------
+
+Local Deployment via Flask
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To deploy the server locally via Flask, run the following command:
 
@@ -52,8 +63,8 @@ While the server is running, you can use the example script to simulate a call t
 
     poetry run scripts/invoke-diff.py
 
-Deployment: Production via AWS Lambda and Zappa
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Production Deployment via AWS Lambda and Zappa
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To deploy the server to production (AWS Lambda) via Zappa, run the following command:
 
