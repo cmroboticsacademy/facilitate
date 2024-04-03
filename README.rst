@@ -129,6 +129,16 @@ It takes the path to two JSON-formatted Scratch program as input (:code:`before`
 
     poetry run facilitate diff examples/bad.json examples/good.json -o diff.json
 
+:code:`animate`
+~~~~~~~~~~~~~~~
+
+The :code:`animate` command is used to visualize the edit script that transforms one Scratch program into another.
+It takes the path to an edit script and the path to the original Scratch program as input and outputs a GIF to the specified output path (:code:`-o` / :code:`--output`).
+
+.. code:: shell
+
+    poetry run facilitate animate diff.json examples/bad.json -o animation.gif
+
 Testing
 -------
 
