@@ -40,10 +40,51 @@ That API is served by a Flask server that can either be deployed locally or to A
 :code:`PUT /diff`
 ~~~~~~~~~~~~~~~~~
 
-Accepts two Scratch programs within a JSON payload and returns an edit script between those programs.
+Computes an edit script that transforms one Scratch program into another program.
+
+**Payload:**
+
+.. code:: json
+
+    {
+        "from_program": ...,
+        "to_program": ...
+    }
+
+:code:`PUT /distance`
+~~~~~~~~~~~~~~~~~~~~~
+
+Computes a weighted edit distance from one Scratch program to another program.
+
+**Payload:**
+
+.. code:: json
+
+    {
+        "from_program": ...,
+        "to_program": ...
+    }
 
 :code:`PUT /progress`
 ~~~~~~~~~~~~~~~~~~~~~
+
+Computes the progress of a student program towards a set of acceptable reference solutions.
+Progress is represented as the weighted edit distance from the student program to each reference solution.
+
+**Payload:**
+
+.. code:: json
+
+    {
+        "program": ...,
+        "solutions": [
+            {
+
+            },
+            ...
+        ]
+    }
+
 
 Deployment
 ----------
