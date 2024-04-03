@@ -119,6 +119,16 @@ It takes the path to a JSON-formatted Scratch program as input and outputs eithe
 
     poetry run facilitate draw examples/bad.json -f pdf -o ast.bad.pdf
 
+:code:`diff`
+~~~~~~~~~~~~
+
+The :code:`diff` command is used to compute an edit script that transforms one Scratch program into another.
+It takes the path to two JSON-formatted Scratch program as input (:code:`before` and :code:`after`, respectively) and outputs the edit script to the specified output path (:code:`-o` / :code:`--output`).
+
+.. code:: shell
+
+    poetry run facilitate diff examples/bad.json examples/good.json -o diff.json
+
 Testing
 -------
 
