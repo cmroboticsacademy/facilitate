@@ -62,7 +62,7 @@ class Input(Node):
             id_=self.id_,
             tags=self.tags.copy(),
             name=self.name,
-            _children=self._children.copy(),
+            _children=[child.copy() for child in self._children],
         )
 
     @overrides

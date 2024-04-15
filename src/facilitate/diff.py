@@ -91,7 +91,7 @@ def _align_children(
         child for child in parent_from.children() if mappings.source_is_mapped(child)
     ]
     mapped_node_from_children = [
-        child for child in mapped_node_from_children if mappings.source_is_mapped_to(child).parent == parent_to
+        child for child in mapped_node_from_children if mappings.source_is_mapped_to(child).parent == parent_to  # type: ignore
     ]
 
     # sequence of children of (parent_to) whose partners are children of (parent_from)
@@ -99,7 +99,7 @@ def _align_children(
         child for child in parent_to.children() if mappings.destination_is_mapped(child)
     ]
     mapped_node_to_children = [
-        child for child in mapped_node_to_children if mappings.destination_is_mapped_to(child).parent == parent_from
+        child for child in mapped_node_to_children if mappings.destination_is_mapped_to(child).parent == parent_from  # type: ignore
     ]
 
     logger.debug(
@@ -550,6 +550,9 @@ def compute_edit_script(
     tree_to: Node,
 ) -> EditScript:
     """Computes an edit script to transform one tree into another."""
+    tree_from = tree_from.copy()
+    tree_to = tree_to.copy()
+
     mappings = compute_gumtree_mappings(tree_from, tree_to)
     logger.debug("mappings: {}", mappings)
 

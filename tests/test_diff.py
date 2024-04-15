@@ -1,11 +1,12 @@
-import typing as t
 from pathlib import Path
 
 from facilitate.diff import compute_edit_script
-from facilitate.edit import EditScript
+from facilitate.edit import (
+    Delete,
+    EditScript,
+)
 from facilitate.loader import load_from_file
 from facilitate.model.node import Node
-
 
 _PATH_TESTS = Path(__file__).parent
 _PATH_PROGRAMS = _PATH_TESTS / "resources" / "programs"
@@ -26,6 +27,22 @@ def diff_student_program_versions(
     return compute_edit_script(tree_from, tree_to)
 
 
+def test_deleted_nodes_appear_in_before_program() -> None:
+    student_dir = _PATH_PROGRAMS / "spike_curric_turning_in_place_left_turn_try_it" / "4847845"
+    tree_from = load_from_file(student_dir / "4.json")
+    tree_from_size = tree_from.size()
+    tree_to = load_from_file(student_dir / "5.json")
+    edit_script = compute_edit_script(tree_from, tree_to)
+
+    # computing edits should have no side effects
+    assert tree_from_size == tree_from.size()
+
+    for edit in edit_script:
+        if isinstance(edit, Delete):
+            print(edit.node_id)
+            assert tree_from.find(edit.node_id) is not None
+
+
 def test_diff_literal_already_has_expression() -> None:
     diff_student_program_versions(
         "spike_curric_moving_forward_50cm_try_it",
@@ -40,7 +57,7 @@ def test_diff_merge_top_level_sequences() -> None:
         "spike_curric_arm_movement_getting_stuck_try_it",
         "2605221",
         3,
-        8
+        8,
     )
 
 
@@ -49,7 +66,7 @@ def test_diff_with_insert_sequence_into_input() -> None:
         "spike_curric_search_for_ice_part_3_mini_challenge",
         "2952421",
         89,
-        145
+        145,
     )
 
 
@@ -58,7 +75,7 @@ def test_diff_with_sequence_move() -> None:
         "spike_curric_getting_started_curriculum",
         "4847838",
         420,
-        436
+        436,
     )
 
 
