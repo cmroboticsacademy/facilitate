@@ -9,6 +9,7 @@ import click
 from loguru import logger
 
 from facilitate.diff import compute_edit_script
+from facilitate.distance import compute_distance
 from facilitate.edit import EditScript
 from facilitate.fuzzer.diff import (
     BaseDiffFuzzer,
@@ -200,6 +201,22 @@ def diff(before: str, after: str, output: str) -> None:
 
     edits = compute_edit_script(ast_before, ast_after)
     edits.save_to_json(output)
+
+
+@cli.command()
+@click.argument("before", type=click.Path(exists=True))
+@click.argument("after", type=click.Path(exists=True))
+def distance(before: str, after: str) -> None:
+    """Computes a weighted edit distance between two versions of a Scratch program."""
+    ast_before = load_from_file(before)
+    ast_after = load_from_file(after)
+    edits = compute_edit_script(ast_before, ast_after)
+    distance = compute_distance(
+        tree_from=ast_before,
+        tree_after=ast_after,
+        edit_script=edits,
+    )
+    print(distance)
 
 
 @cli.command()

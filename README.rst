@@ -129,6 +129,16 @@ It takes the path to two JSON-formatted Scratch program as input (:code:`before`
 
     poetry run facilitate diff examples/bad.json examples/good.json -o diff.json
 
+:code:`distance`
+~~~~~~~~~~~~~~~~
+
+The :code:`distance` command is used to compute a weighted edit distance from one Scratch program to another program.
+It takes the path to two JSON-formatted Scratch program as input (:code:`before` and :code:`after`, respectively) and outputs the weighted edit distance to the standard output.
+
+.. code:: shell
+
+    poetry run facilitate distance examples/bad.json examples/good.json
+
 :code:`animate`
 ~~~~~~~~~~~~~~~
 
