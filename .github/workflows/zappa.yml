@@ -6,7 +6,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: ./.github/workflows/poetry.yml
+    - uses: .github/workflows/poetry.yml
 
     - name: Configure AWS profile
       run: |
