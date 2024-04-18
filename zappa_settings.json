@@ -9,14 +9,17 @@
         "slim_handler": false,
         "keep_warm": false,
         "exclude": [
+            ".git",
             ".github",
             ".mypy_cache",
             ".pytest_cache",
             ".ruff_cache",
             "data",
+            "examples",
+            "programs",
             "visualizations",
             "Makefile"
         ],
-        "exclude_glob": ["*.zip", "*.tar.gz", "*.json", "*.png"]
+        "exclude_glob": ["*.zip", "*.tar.gz", "*.json", "*.png", "*.gif"]
     }
 }
