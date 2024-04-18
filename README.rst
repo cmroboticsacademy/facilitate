@@ -93,6 +93,12 @@ To deploy the server to production (AWS Lambda) via Zappa, run the following com
 
     poetry run zappa deploy
 
+Once the server has been deployed, you can update the version of the application via the following command:
+
+.. code:: shell
+
+    poetry run zappa update
+
 To undeploy the server from production, run the following command:
 
 .. code:: shell
