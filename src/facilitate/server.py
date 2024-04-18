@@ -7,8 +7,11 @@ import flask_cors
 from apiflask import APIFlask, Schema
 from apiflask.fields import (
     Boolean,
+    DateTime,
     Dict,
+    Float,
     Integer,
+    List,
     Nested,
     String,
 )
@@ -44,6 +47,24 @@ class Block(Schema):
     y = Integer(required=False)
 
 
+class Solution(Schema):
+    id_ = Integer(
+        attribute="id",
+        data_key="id",
+        required=True,
+        strict=True,
+    )
+    cmra_blocks_element_id = Integer(
+        required=True,
+        strict=True,
+    )
+    weight = Float(strict=True)
+    program = String(required=True)
+    created_at = DateTime(required=False)
+    updated_at = DateTime(required=False)
+
+
+
 class DiffRequest(Schema):
     from_program = Dict(
         keys=String(),
@@ -56,6 +77,14 @@ class DiffRequest(Schema):
         values=Nested(Block()),
         required=True,
         data_key="to",
+    )
+
+
+class ProgressRequest(Schema):
+    program = String()
+    solutions = List(
+        Nested(Solution()),
+        required=True,
     )
 
 
@@ -90,3 +119,9 @@ def distance(json_data: dict[str, t.Any]) -> flask.Response:
     })
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
+
+
+@app.put("/progress")  # type: ignore
+@app.input(ProgressRequest, location="json")
+def progress(json_data: dict[str, t.Any]) -> flask.Response:
+    raise NotImplementedError
