@@ -2,12 +2,8 @@ name: Zappa
 on: [workflow_dispatch]
 jobs:
   deploy:
-    runs-on: ubuntu-20.04
+    uses: ./.github/workflows/poetry.yml
     steps:
-    - uses: actions/checkout@v4
-
-    - uses: .github/workflows/poetry.yml
-
     - name: Configure AWS profile
       run: |
         poetry run aws configure set region us-east-2 --profile default
