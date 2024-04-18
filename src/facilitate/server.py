@@ -14,6 +14,7 @@ from apiflask.fields import (
 )
 
 from facilitate.diff import compute_edit_script
+from facilitate.distance import compute_edit_script_and_distance
 from facilitate.loader import load_program_from_block_descriptions
 
 app = APIFlask(__name__)
@@ -69,5 +70,23 @@ def diff(json_data: dict[str, t.Any]) -> flask.Response:
 
     edit_script = compute_edit_script(from_program, to_program)
     response = flask.jsonify(edit_script.to_dict())
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+
+@app.put("/distance")  # type: ignore
+@app.input(DiffRequest, location="json")
+def distance(json_data: dict[str, t.Any]) -> flask.Response:
+    jsn_from_program = json_data["from_program"]
+    jsn_to_program = json_data["to_program"]
+
+    from_program = load_program_from_block_descriptions(jsn_from_program)
+    to_program = load_program_from_block_descriptions(jsn_to_program)
+
+    edit_script, distance = compute_edit_script_and_distance(from_program, to_program)
+    response = flask.jsonify({
+        "edits": edit_script.to_dict(),
+        "distance": distance,
+    })
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response

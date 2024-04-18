@@ -1,6 +1,7 @@
 """Computes weighted distances from edit scripts."""
 from __future__ import annotations
 
+from facilitate.diff import compute_edit_script
 from facilitate.edit import (
     AddBlockToInput,
     AddBlockToSequence,
@@ -150,14 +151,14 @@ def compute_distance(
     *,
     tree_from: Program,
     edit_script: EditScript,
-    tree_after: Program | None = None,
+    tree_to: Program | None = None,
 ) -> float:
     """Computes the weighted distance of an edit script."""
-    if tree_after is None:
+    if tree_to is None:
         edited_tree = edit_script.apply(tree_from)
         assert isinstance(edited_tree, Program)
-        tree_after = edited_tree
-    assert tree_after is not None
+        tree_to = edited_tree
+    assert tree_to is not None
 
     deletion_costs = _compute_deletion_costs(
         tree_from,
@@ -171,3 +172,17 @@ def compute_distance(
     )
 
     return deletion_costs + insertion_costs + update_costs + move_costs
+
+
+def compute_edit_script_and_distance(
+    tree_from: Program,
+    tree_to: Program,
+) -> tuple[EditScript, float]:
+    """Computes the edit script and weighted distance between two trees."""
+    edit_script = compute_edit_script(tree_from, tree_to)
+    distance = compute_distance(
+        tree_from=tree_from,
+        tree_to=tree_to,
+        edit_script=edit_script,
+    )
+    return edit_script, distance

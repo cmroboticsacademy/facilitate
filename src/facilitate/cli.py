@@ -213,7 +213,7 @@ def distance(before: str, after: str) -> None:
     edits = compute_edit_script(ast_before, ast_after)
     distance = compute_distance(
         tree_from=ast_before,
-        tree_after=ast_after,
+        tree_to=ast_after,
         edit_script=edits,
     )
     print(distance)
