@@ -125,7 +125,8 @@ def distance(json_data: dict[str, t.Any]) -> flask.Response:
 @app.input(ProgressRequest, location="json")
 def progress(json_data: dict[str, t.Any]) -> flask.Response:
     jsn_user_program = json.loads(json_data["user_program"])
-    user_program = load_program_from_block_descriptions(jsn_user_program)
+    jsn_user_blocks = jsn_user_program["targets"][0]["blocks"]
+    user_program = load_program_from_block_descriptions(jsn_user_blocks)
 
     solution_distances: list[dict[str, t.Any]] = []
 
