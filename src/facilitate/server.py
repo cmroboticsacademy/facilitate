@@ -132,7 +132,8 @@ def progress(json_data: dict[str, t.Any]) -> flask.Response:
     solutions = json_data["solutions"]
     for solution in solutions:
         jsn_solution_program = json.loads(solution["program"])
-        solution_program = load_program_from_block_descriptions(jsn_solution_program)
+        jsn_solution_blocks = jsn_solution_program["targets"][0]["blocks"]
+        solution_program = load_program_from_block_descriptions(jsn_solution_blocks)
         edit_script, distance = compute_edit_script_and_distance(
             tree_from=user_program,
             tree_to=solution_program,
