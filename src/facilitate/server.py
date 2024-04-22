@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import typing as t
 
 import flask
@@ -64,7 +65,6 @@ class Solution(Schema):
     updated_at = DateTime(required=False)
 
 
-
 class DiffRequest(Schema):
     from_program = Dict(
         keys=String(),
@@ -81,7 +81,7 @@ class DiffRequest(Schema):
 
 
 class ProgressRequest(Schema):
-    program = String()
+    user_program = String()
     solutions = List(
         Nested(Solution()),
         required=True,
@@ -124,4 +124,25 @@ def distance(json_data: dict[str, t.Any]) -> flask.Response:
 @app.put("/progress")  # type: ignore
 @app.input(ProgressRequest, location="json")
 def progress(json_data: dict[str, t.Any]) -> flask.Response:
-    raise NotImplementedError
+    jsn_user_program = json.loads(json_data["user_program"])
+    user_program = load_program_from_block_descriptions(jsn_user_program)
+
+    solution_distances: list[dict[str, t.Any]] = []
+
+    solutions = json_data["solutions"]
+    for solution in solutions:
+        jsn_solution_program = json.loads(solution["program"])
+        solution_program = load_program_from_block_descriptions(jsn_solution_program)
+        edit_script, distance = compute_edit_script_and_distance(
+            tree_from=user_program,
+            tree_to=solution_program,
+        )
+        solution_distances.append({
+            "id": solution["id"],
+            "distance": distance,
+            "edits": edit_script.to_dict(),
+        })
+
+    response = flask.jsonify(solution_distances)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
