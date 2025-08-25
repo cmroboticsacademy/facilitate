@@ -1,0 +1,25 @@
+{
+  "dev": {
+    "app_function": "facilitate.server.app", // Update if your app entry point is different
+    "project_name": "facilitate", // Name for your Lambda project
+    "runtime": "python3.11", // Python runtime version on AWS Lambda
+    "s3_bucket": "your-zappa-deployment-bucket", // Replace with your own S3 bucket name
+    "slim_handler": false, // Full package upload (true = use handler stub)
+    "keep_warm": false, // Disable keep-warm pings to reduce cost
+
+    "exclude": [
+      ".git",
+      ".github",
+      ".mypy_cache",
+      ".pytest_cache",
+      ".ruff_cache",
+      "data",
+      "examples",
+      "programs",
+      "visualizations",
+      "Makefile"
+    ],
+
+    "exclude_glob": ["*.zip", "*.tar.gz", "*.json", "*.png", "*.gif"]
+  }
+}

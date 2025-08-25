@@ -8,3 +8,4 @@ data
 **.pyc
 **/.ipynb_checkpoints/**
 **/__pycache__/**
+zappa_settings.json
